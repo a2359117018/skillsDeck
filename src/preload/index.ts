@@ -3,34 +3,34 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
   skills: {
-    search: (keyword: string) => ipcRenderer.invoke('skills:search', keyword),
-    list: (opts?: { global?: boolean; agent?: string }) =>
+    search: (keyword: string): Promise<string> => ipcRenderer.invoke('skills:search', keyword),
+    list: (opts?: { global?: boolean; agent?: string }): Promise<unknown[]> =>
       ipcRenderer.invoke('skills:list', opts),
-    install: (opts: { packageRef: string; agents: string[]; global?: boolean }) =>
+    install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:install', opts),
-    update: (opts: { packageRef: string; global?: boolean }) =>
+    update: (opts: { packageRef: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:update', opts),
-    updateAll: (opts?: { global?: boolean }) =>
+    updateAll: (opts?: { global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:update-all', opts),
-    remove: (opts: { packageRef: string; agent?: string; global?: boolean }) =>
+    remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:remove', opts)
   },
   env: {
-    check: () => ipcRenderer.invoke('env:check'),
-    installNode: () => ipcRenderer.invoke('env:install-node'),
+    check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),
+    installNode: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('env:install-node'),
     onDownloadProgress: (callback: (percent: number) => void): (() => void) => {
-      const listener = (_event: Electron.IpcRendererEvent, percent: number) => callback(percent)
+      const listener = (_event: Electron.IpcRendererEvent, percent: number): void => callback(percent)
       ipcRenderer.on('env:download-progress', listener)
       return () => ipcRenderer.removeListener('env:download-progress', listener)
     }
   },
   store: {
-    getSettings: () => ipcRenderer.invoke('store:get-settings'),
-    setSettings: (partial: Record<string, unknown>) =>
+    getSettings: (): Promise<unknown> => ipcRenderer.invoke('store:get-settings'),
+    setSettings: (partial: Record<string, unknown>): Promise<void> =>
       ipcRenderer.invoke('store:set-settings', partial)
   },
   window: {
-    openSettings: () => ipcRenderer.invoke('window:open-settings')
+    openSettings: (): Promise<void> => ipcRenderer.invoke('window:open-settings')
   }
 }
 

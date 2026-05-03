@@ -39,7 +39,7 @@ const allFilteredSelected = computed(() =>
   allAgents.value.length > 0 && allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
 
-function toggleSelectCommon() {
+function toggleSelectCommon(): void {
   const flags = commonAgents.map((a) => a.agentFlag)
   if (allCommonSelected.value) {
     selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
@@ -48,7 +48,7 @@ function toggleSelectCommon() {
   }
 }
 
-function toggleSelectAll() {
+function toggleSelectAll(): void {
   const flags = allAgents.value.map((a) => a.agentFlag)
   if (allFilteredSelected.value) {
     selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
@@ -57,12 +57,12 @@ function toggleSelectAll() {
   }
 }
 
-function toggleGlobal(val: boolean) {
+function toggleGlobal(val: boolean): void {
   isGlobal.value = val
   if (val) selectedAgents.value = []
 }
 
-async function handleInstall() {
+async function handleInstall(): Promise<void> {
   if (!isGlobal.value && selectedAgents.value.length === 0) {
     message.warning('请选择至少一个安装目标')
     return
@@ -79,16 +79,17 @@ async function handleInstall() {
     } else {
       message.error('安装失败')
     }
-  } catch (error: any) {
-    commandOutput.value = error.message
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    commandOutput.value = errMsg
     commandDone.value = true
-    message.error('安装失败: ' + error.message)
+    message.error('安装失败: ' + errMsg)
   } finally {
     installing.value = false
   }
 }
 
-function handleClose() {
+function handleClose(): void {
   if (!installing.value) {
     emit('update:show', false)
     if (commandDone.value) emit('complete')

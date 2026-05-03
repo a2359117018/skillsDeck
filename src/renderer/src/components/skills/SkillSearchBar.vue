@@ -10,7 +10,7 @@ const debouncedSearch = useDebounceFn(() => {
   if (keyword.value.trim()) emit('search', keyword.value.trim())
 }, 300)
 
-function onInput(value: string) {
+function onInput(value: string): void {
   keyword.value = value
   debouncedSearch()
 }

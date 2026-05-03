@@ -3,18 +3,19 @@ import { onMounted, ref, h } from 'vue'
 import { NDataTable, NButton, NSpace, NTabPane, NTabs, NEmpty, NSpin, useMessage } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
+import type { Skill } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const message = useMessage()
 const currentTab = ref('project')
 
-async function loadSkills() {
+async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled(currentTab.value === 'global')
 }
 
 onMounted(() => loadSkills())
 
-async function handleUpdateAll() {
+async function handleUpdateAll(): Promise<void> {
   const result = await skillsStore.updateAll(currentTab.value === 'global')
   if (result.success) {
     message.success('更新成功')
@@ -24,7 +25,7 @@ async function handleUpdateAll() {
   }
 }
 
-async function handleUpdate(name: string) {
+async function handleUpdate(name: string): Promise<void> {
   const result = await skillsStore.update(name, currentTab.value === 'global')
   if (result.success) {
     message.success(`${name} 更新成功`)
@@ -34,7 +35,7 @@ async function handleUpdate(name: string) {
   }
 }
 
-async function handleRemove(name: string) {
+async function handleRemove(name: string): Promise<void> {
   if (!window.confirm(`确定删除 ${name}? 此操作不可撤销`)) return
   const result = await skillsStore.remove(name)
   if (result.success) {
@@ -45,7 +46,7 @@ async function handleRemove(name: string) {
   }
 }
 
-const columns: DataTableColumns = [
+const columns: DataTableColumns<Skill> = [
   { title: '名称', key: 'name' },
   { title: '版本', key: 'version', width: 100 },
   { title: '来源', key: 'source', ellipsis: { tooltip: true } },
@@ -53,7 +54,7 @@ const columns: DataTableColumns = [
     title: '操作',
     key: 'actions',
     width: 180,
-    render(row: any) {
+    render(row: Skill) {
       return h(NSpace, { size: 'small' }, () => [
         h(NButton, { size: 'small', onClick: () => handleUpdate(row.name) }, () => '更新'),
         h(NButton, { size: 'small', type: 'error', onClick: () => handleRemove(row.name) }, () => '删除')

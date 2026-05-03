@@ -16,7 +16,7 @@ const showInstallDialog = ref(false)
 const operationOutput = ref('')
 const operationLoading = ref(false)
 
-async function handleUpdate() {
+async function handleUpdate(): Promise<void> {
   operationLoading.value = true
   operationOutput.value = ''
   try {
@@ -29,7 +29,7 @@ async function handleUpdate() {
   }
 }
 
-async function handleRemove() {
+async function handleRemove(): Promise<void> {
   if (!window.confirm(`确定删除 ${packageRef}? 此操作不可撤销`)) return
   operationLoading.value = true
   operationOutput.value = ''

@@ -10,16 +10,16 @@ const skillsStore = useSkillsStore()
 const showInstallDialog = ref(false)
 const selectedPackage = ref('')
 
-function handleSearch(keyword: string) {
+function handleSearch(keyword: string): void {
   skillsStore.search(keyword)
 }
 
-function handleNavigate(packageRef: string) {
+function handleNavigate(packageRef: string): void {
   selectedPackage.value = packageRef
   showInstallDialog.value = true
 }
 
-function handleInstallComplete() {
+function handleInstallComplete(): void {
   showInstallDialog.value = false
   selectedPackage.value = ''
 }
