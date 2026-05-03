@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { NLayout, NLayoutSider, NMenu } from 'naive-ui'
+import { NLayout, NLayoutSider, NMenu, NButton } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
 
@@ -14,7 +14,7 @@ const menuOptions: MenuOption[] = [
   { label: '搜索', key: 'search' }
 ]
 
-function handleMenuUpdate(key: string) {
+function handleMenuUpdate(key: string): void {
   router.push({ name: key })
 }
 
@@ -29,6 +29,9 @@ const activeKey = computed(() => route.name as string)
           NPX Skills
         </div>
         <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
+        <div style="padding: 16px; margin-top: auto">
+          <NButton @click="window.api.window.openSettings()">设置</NButton>
+        </div>
       </NLayoutSider>
       <NLayout>
         <div style="padding: 24px; overflow-y: auto; height: 100vh">

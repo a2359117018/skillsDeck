@@ -18,8 +18,8 @@ const api = {
   env: {
     check: () => ipcRenderer.invoke('env:check'),
     installNode: () => ipcRenderer.invoke('env:install-node'),
-    onDownloadProgress: (callback: (percent: number) => void) => {
-      const listener = (_: any, percent: number) => callback(percent)
+    onDownloadProgress: (callback: (percent: number) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, percent: number) => callback(percent)
       ipcRenderer.on('env:download-progress', listener)
       return () => ipcRenderer.removeListener('env:download-progress', listener)
     }

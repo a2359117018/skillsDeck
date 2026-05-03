@@ -118,6 +118,19 @@ export async function downloadNode(
 }
 
 /**
+ * Register the extracted Node.js bin directory in PATH
+ * @param nodeDir - Path to the extracted Node.js directory
+ */
+export function registerNodeInPath(nodeDir: string): void {
+  const binDir = join(nodeDir, 'bin')
+  if (process.platform === 'win32') {
+    process.env.PATH = `${binDir};${process.env.PATH}`
+  } else {
+    process.env.PATH = `${binDir}:${process.env.PATH}`
+  }
+}
+
+/**
  * Extract the downloaded Node.js archive and return the extracted directory path
  * @param archivePath - Path to the downloaded Node.js archive
  * @returns Path to the extracted Node.js directory
@@ -130,5 +143,7 @@ export async function extractAndRegisterNode(archivePath: string): Promise<strin
     (d) => d.startsWith('node-v') && !d.endsWith('.zip') && !d.endsWith('.tar.gz') && !d.endsWith('.tar.xz')
   )
   if (!extractedDirName) throw new Error('Extraction failed: no node directory found')
-  return join(installDir, extractedDirName)
+  const nodeDir = join(installDir, extractedDirName)
+  registerNodeInPath(nodeDir)
+  return nodeDir
 }

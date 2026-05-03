@@ -8,7 +8,9 @@ const routes = [
     name: 'skill-detail',
     component: () => import('../views/SkillDetail.vue'),
     props: true
-  }
+  },
+  { path: '/env', name: 'env', component: () => import('../views/EnvDetection.vue') },
+  { path: '/settings', name: 'settings', component: () => import('../views/SettingsView.vue') }
 ]
 
 export const router = createRouter({
