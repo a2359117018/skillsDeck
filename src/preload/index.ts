@@ -1,12 +1,39 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
-// Custom APIs for renderer
-const api = {}
+const api = {
+  skills: {
+    search: (keyword: string): Promise<string> => ipcRenderer.invoke('skills:search', keyword),
+    list: (opts?: { global?: boolean; agent?: string }): Promise<unknown[]> =>
+      ipcRenderer.invoke('skills:list', opts),
+    install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
+      ipcRenderer.invoke('skills:install', opts),
+    update: (opts: { packageRef: string; global?: boolean }): Promise<unknown> =>
+      ipcRenderer.invoke('skills:update', opts),
+    updateAll: (opts?: { global?: boolean }): Promise<unknown> =>
+      ipcRenderer.invoke('skills:update-all', opts),
+    remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
+      ipcRenderer.invoke('skills:remove', opts)
+  },
+  env: {
+    check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),
+    installNode: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('env:install-node'),
+    onDownloadProgress: (callback: (percent: number) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, percent: number): void => callback(percent)
+      ipcRenderer.on('env:download-progress', listener)
+      return () => ipcRenderer.removeListener('env:download-progress', listener)
+    }
+  },
+  store: {
+    getSettings: (): Promise<unknown> => ipcRenderer.invoke('store:get-settings'),
+    setSettings: (partial: Record<string, unknown>): Promise<void> =>
+      ipcRenderer.invoke('store:set-settings', partial)
+  },
+  window: {
+    openSettings: (): Promise<void> => ipcRenderer.invoke('window:open-settings')
+  }
+}
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)

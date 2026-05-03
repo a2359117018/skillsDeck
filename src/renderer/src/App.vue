@@ -1,26 +1,58 @@
 <script setup lang="ts">
-import Versions from './components/Versions.vue'
+import { computed } from 'vue'
+import { NLayout, NLayoutSider, NMenu, NButton } from 'naive-ui'
+import { useRouter, useRoute } from 'vue-router'
+import type { MenuOption } from 'naive-ui'
 
-const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+const router = useRouter()
+const route = useRoute()
+
+const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
+
+const menuOptions: MenuOption[] = [
+  { label: '已安装', key: 'installed' },
+  { label: '搜索', key: 'search' }
+]
+
+function handleMenuUpdate(key: string): void {
+  router.push({ name: key })
+}
+
+const activeKey = computed(() => route.name as string)
+
+function openSettings(): void {
+  window.api.window.openSettings()
+}
 </script>
 
 <template>
-  <img alt="logo" class="logo" src="./assets/electron.svg" />
-  <div class="creator">Powered by electron-vite</div>
-  <div class="text">
-    Build an Electron app with
-    <span class="vue">Vue</span>
-    and
-    <span class="ts">TypeScript</span>
+  <div v-if="windowType === 'main'" class="app-shell">
+    <NLayout has-sider>
+      <NLayoutSider bordered :width="180" :collapsed-width="0" collapse-mode="width">
+        <div class="sidebar-header" style="padding: 16px; font-weight: 600; font-size: 14px">
+          NPX Skills
+        </div>
+        <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
+        <div style="padding: 16px; margin-top: auto">
+          <NButton @click="openSettings">设置</NButton>
+        </div>
+      </NLayoutSider>
+      <NLayout>
+        <div style="padding: 24px; overflow-y: auto; height: 100vh">
+          <router-view />
+        </div>
+      </NLayout>
+    </NLayout>
   </div>
-  <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-  <div class="actions">
-    <div class="action">
-      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-    </div>
-    <div class="action">
-      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>
-    </div>
+  <div v-else-if="windowType === 'env'">
+    <router-view />
   </div>
-  <Versions />
+  <div v-else-if="windowType === 'settings'">
+    <router-view />
+  </div>
 </template>
+
+<style scoped>
+.app-shell { height: 100vh; }
+.sidebar-header { border-bottom: 1px solid var(--n-border-color); }
+</style>

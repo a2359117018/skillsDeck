@@ -1,0 +1,48 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import type { EnvStatus } from '../../../shared/types'
+
+export const useEnvStore = defineStore('env', () => {
+  const status = ref<EnvStatus | null>(null)
+  const checking = ref(false)
+  const downloading = ref(false)
+  const downloadProgress = ref(0)
+  const error = ref<string | null>(null)
+
+  async function check(): Promise<void> {
+    checking.value = true
+    error.value = null
+    try {
+      status.value = await window.api.env.check()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Environment check failed'
+    } finally {
+      checking.value = false
+    }
+  }
+
+  async function installNode(): Promise<void> {
+    downloading.value = true
+    downloadProgress.value = 0
+    error.value = null
+    try {
+      const result = await window.api.env.installNode()
+      if (!result.success) throw new Error(result.error)
+      await check()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Node.js install failed'
+    } finally {
+      downloading.value = false
+    }
+  }
+
+  return {
+    status,
+    checking,
+    downloading,
+    downloadProgress,
+    error,
+    check,
+    installNode
+  }
+})
