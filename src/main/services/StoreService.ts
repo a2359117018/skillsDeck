@@ -6,36 +6,83 @@ interface StoreSchema {
   envStatus: EnvStatus | null
 }
 
-let store: Store<StoreSchema> | null = null
+const DEFAULT_SETTINGS: AppSettings = {
+  defaultAgent: 'claude-code',
+  autoCheckEnv: true
+}
 
+let store: Store<StoreSchema> | null = null
+const inMemoryFallback: StoreSchema = {
+  settings: { ...DEFAULT_SETTINGS },
+  envStatus: null
+}
+
+/**
+ * Initialize and return the electron-store instance
+ * Falls back to in-memory storage if initialization fails
+ * @returns Store instance or in-memory fallback
+ */
 function getStore(): Store<StoreSchema> {
   if (!store) {
-    store = new Store<StoreSchema>({
-      defaults: {
-        settings: {
-          defaultAgent: 'claude-code',
-          autoCheckEnv: true
-        },
-        envStatus: null
-      }
-    })
+    try {
+      store = new Store<StoreSchema>({
+        defaults: {
+          settings: { ...DEFAULT_SETTINGS },
+          envStatus: null
+        }
+      })
+    } catch (error) {
+      console.error('Failed to initialize electron-store, using in-memory fallback:', error)
+    }
   }
-  return store
+  return store as Store<StoreSchema>
 }
 
+/**
+ * Get current application settings
+ * @returns Current application settings
+ */
 export function getSettings(): AppSettings {
-  return getStore().get('settings')
+  try {
+    return getStore().get('settings')
+  } catch {
+    return inMemoryFallback.settings
+  }
 }
 
+/**
+ * Update application settings with partial object
+ * @param partial - Partial settings object to merge
+ */
 export function setSettings(partial: Partial<AppSettings>): void {
-  const current = getStore().get('settings')
-  getStore().set('settings', { ...current, ...partial })
+  try {
+    const current = getStore().get('settings')
+    getStore().set('settings', { ...current, ...partial })
+  } catch {
+    inMemoryFallback.settings = { ...inMemoryFallback.settings, ...partial }
+  }
 }
 
+/**
+ * Get cached environment status
+ * @returns Environment status or null if not checked
+ */
 export function getEnvStatus(): EnvStatus | null {
-  return getStore().get('envStatus')
+  try {
+    return getStore().get('envStatus')
+  } catch {
+    return inMemoryFallback.envStatus
+  }
 }
 
+/**
+ * Save environment status to store
+ * @param status - Environment status to save
+ */
 export function setEnvStatus(status: EnvStatus): void {
-  getStore().set('envStatus', status)
+  try {
+    getStore().set('envStatus', status)
+  } catch {
+    inMemoryFallback.envStatus = status
+  }
 }
