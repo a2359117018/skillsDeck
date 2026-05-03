@@ -9,11 +9,11 @@ const downloadProgress = ref(0)
 
 onMounted(() => envStore.check())
 
-function closeWindow() {
+function closeWindow(): void {
   window.close()
 }
 
-async function handleInstallNode() {
+async function handleInstallNode(): Promise<void> {
   downloading.value = true
   const cleanup = window.api.env.onDownloadProgress((percent) => {
     downloadProgress.value = percent
