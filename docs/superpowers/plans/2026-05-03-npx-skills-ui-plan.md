@@ -1054,6 +1054,350 @@ In `tsconfig.web.json`, add `"src/shared/**/*"` to the `include` array.
 
 Run: `npm run typecheck`
 
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/preload/ src/shared/ tsconfig.node.json tsconfig.web.json
+git commit -m "feat: add preload API bridge with shared types"
+```
+
+---
+
+### 4.1 Vue Router + Pinia Setup
+
+**Priority:** P3 | **Depends on:** 3.2
+
+**Files:**
+- Modify: `src/renderer/src/main.ts`
+- Create: `src/renderer/src/router/index.ts`
+- Create: `src/renderer/src/stores/skills.ts`
+- Create: `src/renderer/src/stores/env.ts`
+
+Router with 4 routes: `/` (installed list), `/search` (search), `/skill/:packageRef` (detail), plus env/settings window routes. Pinia stores for skills and env state.
+
+- [ ] **Step 1: Create `src/renderer/src/router/index.ts`**
+
+```ts
+import { createRouter, createWebHashHistory } from 'vue-router'
+
+const routes = [
+  { path: '/', name: 'installed', component: () => import('../views/InstalledList.vue') },
+  { path: '/search', name: 'search', component: () => import('../views/SkillsSearch.vue') },
+  { path: '/skill/:packageRef', name: 'skill-detail', component: () => import('../views/SkillDetail.vue'), props: true }
+]
+
+export const router = createRouter({
+  history: createWebHashHistory(),
+  routes
+})
+```
+
+- [ ] **Step 2: Create `src/renderer/src/stores/skills.ts`**
+
+```ts
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+
+export const useSkillsStore = defineStore('skills', () => {
+  const searchOutput = ref('')
+  const installedSkills = ref<any[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  function clearError() { error.value = null }
+
+  async function search(keyword: string) {
+    loading.value = true
+    error.value = null
+    try {
+      searchOutput.value = await window.api.skills.search(keyword)
+    } catch (e: any) {
+      error.value = e.message || 'Search failed'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchInstalled(global?: boolean) {
+    loading.value = true
+    error.value = null
+    try {
+      installedSkills.value = await window.api.skills.list({ global })
+    } catch (e: any) {
+      error.value = e.message || 'Failed to load skills'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function install(packageRef: string, agents: string[], isGlobal: boolean) {
+    loading.value = true
+    error.value = null
+    try {
+      return await window.api.skills.install({ packageRef, agents, global: isGlobal })
+    } catch (e: any) {
+      error.value = e.message || 'Install failed'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function update(packageRef: string) {
+    loading.value = true
+    error.value = null
+    try {
+      return await window.api.skills.update({ packageRef })
+    } catch (e: any) {
+      error.value = e.message || 'Update failed'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function remove(packageRef: string) {
+    loading.value = true
+    error.value = null
+    try {
+      return await window.api.skills.remove({ packageRef })
+    } catch (e: any) {
+      error.value = e.message || 'Remove failed'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { searchOutput, installedSkills, loading, error, clearError, search, fetchInstalled, install, update, remove }
+})
+```
+
+- [ ] **Step 3: Create `src/renderer/src/stores/env.ts`**
+
+```ts
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+
+export const useEnvStore = defineStore('env', () => {
+  const status = ref<any>(null)
+  const checking = ref(false)
+  const downloading = ref(false)
+  const downloadProgress = ref(0)
+  const error = ref<string | null>(null)
+
+  async function check() {
+    checking.value = true
+    error.value = null
+    try {
+      status.value = await window.api.env.check()
+    } catch (e: any) {
+      error.value = e.message || 'Environment check failed'
+    } finally {
+      checking.value = false
+    }
+  }
+
+  async function installNode() {
+    downloading.value = true
+    downloadProgress.value = 0
+    error.value = null
+    try {
+      const result = await window.api.env.installNode()
+      if (!result.success) throw new Error(result.error)
+      await check()
+    } catch (e: any) {
+      error.value = e.message || 'Node.js install failed'
+    } finally {
+      downloading.value = false
+    }
+  }
+
+  return { status, checking, downloading, downloadProgress, error, check, installNode }
+})
+```
+
+- [ ] **Step 4: Rewrite `src/renderer/src/main.ts`**
+
+```ts
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import { router } from './router'
+
+const app = createApp(App)
+app.use(createPinia())
+app.use(router)
+app.mount('#app')
+```
+
+- [ ] **Step 5: Verify typecheck**
+
+Run: `npm run typecheck`
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/renderer/src/main.ts src/renderer/src/router/ src/renderer/src/stores/
+git commit -m "feat: add Vue Router, Pinia stores for skills and env"
+```
+
+---
+
+### 4.2 App Layout Shell
+
+**Priority:** P3 | **Depends on:** 4.1
+
+**Files:**
+- Modify: `src/renderer/src/App.vue`
+
+Layout shell with left sidebar navigation. Sidebar shows: installed list, search, settings. The content area renders `<router-view />`. Window-type detection: env/settings windows render their own views, main window renders this shell.
+
+- [ ] **Step 1: Rewrite `src/renderer/src/App.vue`**
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue'
+import { NLayout, NLayoutSider, NMenu, NIcon } from 'naive-ui'
+import { useRouter, useRoute } from 'vue-router'
+import type { MenuOption } from 'naive-ui'
+import { h } from 'vue'
+
+const router = useRouter()
+const route = useRoute()
+
+const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
+
+const menuOptions: MenuOption[] = [
+  { label: '已安装', key: 'installed' },
+  { label: '搜索', key: 'search' }
+]
+
+function handleMenuUpdate(key: string) {
+  router.push({ name: key })
+}
+
+const activeKey = computed(() => route.name as string)
+</script>
+
+<template>
+  <div v-if="windowType === 'main'" class="app-shell">
+    <NLayout has-sider>
+      <NLayoutSider bordered :width="180" :collapsed-width="0" collapse-mode="width">
+        <div class="sidebar-header" style="padding: 16px; font-weight: 600; font-size: 14px">
+          NPX Skills
+        </div>
+        <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
+      </NLayoutSider>
+      <NLayout>
+        <div style="padding: 24px; overflow-y: auto; height: 100vh">
+          <router-view />
+        </div>
+      </NLayout>
+    </NLayout>
+  </div>
+  <div v-else-if="windowType === 'env'">
+    <router-view />
+  </div>
+  <div v-else-if="windowType === 'settings'">
+    <router-view />
+  </div>
+</template>
+
+<style scoped>
+.app-shell { height: 100vh; }
+.sidebar-header { border-bottom: 1px solid var(--n-border-color); }
+</style>
+```
+
+- [ ] **Step 2: Verify typecheck**
+
+Run: `npm run typecheck`
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/renderer/src/App.vue
+git commit -m "feat: add app layout shell with sidebar navigation"
+```
+
+---
+
+### 5.1 CommandOutput Component
+
+**Priority:** P4 | **Depends on:** 4.2
+
+**Files:**
+- Create: `src/renderer/src/components/common/CommandOutput.vue`
+
+Terminal-style output display. Parses skill refs (`owner/repo@skill-name`) into clickable spans that emit navigate events.
+
+- [ ] **Step 1: Create `src/renderer/src/components/common/CommandOutput.vue`**
+
+```vue
+<script setup lang="ts">
+import { computed, h } from 'vue'
+
+const props = defineProps<{ content: string }>()
+const emit = defineEmits<{ (e: 'navigate', packageRef: string): void }>()
+
+const SKILL_REF_RE = /([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+)/g
+
+const segments = computed(() => {
+  const parts: { type: 'text' | 'ref'; value: string }[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  const re = new RegExp(SKILL_REF_RE.source, 'g')
+  while ((match = re.exec(props.content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', value: props.content.slice(lastIndex, match.index) })
+    }
+    parts.push({ type: 'ref', value: match[1] })
+    lastIndex = re.lastIndex
+  }
+  if (lastIndex < props.content.length) {
+    parts.push({ type: 'text', value: props.content.slice(lastIndex) })
+  }
+  return parts
+})
+</script>
+
+<template>
+  <div class="terminal-output">
+    <template v-for="(seg, i) in segments" :key="i">
+      <span v-if="seg.type === 'text'" class="text">{{ seg.value }}</span>
+      <a v-else class="skill-ref" @click.prevent="emit('navigate', seg.value)">{{ seg.value }}</a>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+.terminal-output {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.skill-ref {
+  color: #4fc3f7;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.skill-ref:hover { color: #81d4fa; }
+</style>
+```
+
+- [ ] **Step 2: Verify typecheck**
+
+Run: `npm run typecheck`
+
 - [ ] **Step 3: Commit**
 
 ```bash
@@ -1065,13 +1409,15 @@ git commit -m "feat: add CommandOutput component with clickable skill refs"
 
 ### 5.2 Search Page
 
-**Priority:** P4 | **Depends on:** 5.1, 2.1
+**Priority:** P4 | **Depends on:** 5.1, 5.4
 
 **Files:**
 - Create: `src/renderer/src/components/skills/SkillSearchBar.vue`
 - Create: `src/renderer/src/views/SkillsSearch.vue`
 
 Search bar with 300ms debounce. Results displayed in CommandOutput terminal panel. Clicking a skill ref opens install dialog.
+
+> **Design note:** `npx skills find` does NOT support `--json` output. The terminal-style display with clickable skill refs is the intended UX given this CLI limitation. This is documented and accepted.
 
 - [ ] **Step 1: Create `src/renderer/src/components/skills/SkillSearchBar.vue`**
 
@@ -1342,6 +1688,31 @@ const allAgents = computed(() => {
   )
 })
 
+const allCommonSelected = computed(() =>
+  commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
+)
+const allFilteredSelected = computed(() =>
+  allAgents.value.length > 0 && allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
+)
+
+function toggleSelectCommon() {
+  const flags = commonAgents.map((a) => a.agentFlag)
+  if (allCommonSelected.value) {
+    selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
+  } else {
+    selectedAgents.value = [...new Set([...selectedAgents.value, ...flags])]
+  }
+}
+
+function toggleSelectAll() {
+  const flags = allAgents.value.map((a) => a.agentFlag)
+  if (allFilteredSelected.value) {
+    selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
+  } else {
+    selectedAgents.value = [...new Set([...selectedAgents.value, ...flags])]
+  }
+}
+
 function toggleGlobal(val: boolean) {
   isGlobal.value = val
   if (val) selectedAgents.value = []
@@ -1403,11 +1774,27 @@ function handleClose() {
         <NCheckboxGroup v-model:value="selectedAgents">
           <NCollapse :default-expanded-names="['common', 'all']">
             <NCollapseItem title="常用" name="common">
+              <NCheckbox
+                :checked="allCommonSelected"
+                :indeterminate="selectedAgents.some(s => commonAgents.some(a => a.agentFlag === s)) && !allCommonSelected"
+                @update:checked="toggleSelectCommon"
+                style="margin-bottom: 8px"
+              >
+                全选常用
+              </NCheckbox>
               <NSpace vertical>
                 <NCheckbox v-for="agent in commonAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
               </NSpace>
             </NCollapseItem>
             <NCollapseItem title="全部" name="all">
+              <NCheckbox
+                :checked="allFilteredSelected"
+                :indeterminate="selectedAgents.some(s => allAgents.some(a => a.agentFlag === s)) && !allFilteredSelected"
+                @update:checked="toggleSelectAll"
+                style="margin-bottom: 8px"
+              >
+                全选当前筛选
+              </NCheckbox>
               <NSpace vertical style="max-height: 200px; overflow-y: auto">
                 <NCheckbox v-for="agent in allAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
               </NSpace>
@@ -1468,7 +1855,7 @@ git commit -m "feat: add install dialog with multi-agent picker and search filte
 **Files:**
 - Create: `src/renderer/src/views/SkillDetail.vue`
 
-Detail page reached by clicking a skill ref. Shows install/update/delete actions with inline command output.
+Detail page for managing a specific skill. Shows install/update/delete actions with inline command output. Reached from search results (clicking a skill ref navigates here) or from installed list.
 
 - [ ] **Step 1: Create `src/renderer/src/views/SkillDetail.vue`**
 
@@ -1476,7 +1863,7 @@ Detail page reached by clicking a skill ref. Shows install/update/delete actions
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NPageHeader, NButton, NSpace, useMessage } from 'naive-ui'
+import { NPageHeader, NButton, NSpace, NDescriptions, NDescriptionsItem, NText, useMessage } from 'naive-ui'
 import { useSkillsStore } from '../../stores/skills'
 import SkillInstallDialog from '../../components/skills/SkillInstallDialog.vue'
 import CommandOutput from '../../components/common/CommandOutput.vue'
@@ -1486,7 +1873,7 @@ const router = useRouter()
 const skillsStore = useSkillsStore()
 const message = useMessage()
 
-const packageRef = route.params.packageRef as string
+const packageRef = decodeURIComponent(route.params.packageRef as string)
 const showInstallDialog = ref(false)
 const operationOutput = ref('')
 const operationLoading = ref(false)
@@ -1505,13 +1892,18 @@ async function handleUpdate() {
 }
 
 async function handleRemove() {
+  if (!window.confirm(`确定删除 ${packageRef}? 此操作不可撤销`)) return
   operationLoading.value = true
   operationOutput.value = ''
   try {
     const result = await skillsStore.remove(packageRef)
     operationOutput.value = result.stdout || result.stderr || ''
-    if (result.success) message.success('删除成功')
-    else message.error('删除失败')
+    if (result.success) {
+      message.success('删除成功')
+      setTimeout(() => router.back(), 500)
+    } else {
+      message.error('删除失败')
+    }
   } finally {
     operationLoading.value = false
   }
@@ -1520,7 +1912,12 @@ async function handleRemove() {
 
 <template>
   <div class="detail-page">
-    <NPageHeader @back="router.back()" :title="packageRef" subtitle="技能详情" />
+    <NPageHeader @back="router.back()" :title="packageRef" subtitle="技能管理" />
+    <NDescriptions bordered :column="1" label-placement="left" style="margin-top: 16px">
+      <NDescriptionsItem label="包名">
+        <NText code>{{ packageRef }}</NText>
+      </NDescriptionsItem>
+    </NDescriptions>
     <NSpace style="margin-top: 16px">
       <NButton type="primary" @click="showInstallDialog = true">安装到...</NButton>
       <NButton :loading="operationLoading" @click="handleUpdate">更新</NButton>
@@ -1620,6 +2017,7 @@ async function handleInstallNode() {
       </div>
 
       <NSpace justify="end" style="margin-top: 16px">
+        <NButton @click="window.close()">跳过</NButton>
         <NButton :loading="envStore.checking" @click="envStore.check()">重新检测</NButton>
       </NSpace>
     </NCard>
