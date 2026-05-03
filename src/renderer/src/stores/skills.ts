@@ -48,13 +48,26 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function update(packageRef: string) {
+  async function update(packageRef: string, global?: boolean) {
     loading.value = true
     error.value = null
     try {
-      return await window.api.skills.update({ packageRef })
+      return await window.api.skills.update({ packageRef, global })
     } catch (e: any) {
       error.value = e.message || 'Update failed'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updateAll(global?: boolean) {
+    loading.value = true
+    error.value = null
+    try {
+      return await window.api.skills.updateAll({ global })
+    } catch (e: any) {
+      error.value = e.message || 'Update all failed'
       throw e
     } finally {
       loading.value = false
@@ -84,6 +97,7 @@ export const useSkillsStore = defineStore('skills', () => {
     fetchInstalled,
     install,
     update,
+    updateAll,
     remove
   }
 })
