@@ -220,12 +220,15 @@ src/
 
 **`list --json`**: Direct `JSON.parse(stdout)` — returns structured array.
 
-**`find`**: Text parsing required. Pattern:
+**`find`**: No full parsing. Raw output is displayed in a terminal-style panel. Only `owner/repo@skill-name` patterns are matched and rendered as clickable links:
+
 ```
-owner/repo@skill-name  38.1K installs
-└ https://skills.sh/owner/repo/skill-name
+匹配正则: /[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+/
 ```
-Regex extraction: `/^(.+)@(.+)\s+([\d.]+K?)\s+installs$/m`
+
+- Clicked skill-ref → opens install dialog with package pre-filled
+- ANSI color codes stripped via `strip-ansi` before rendering
+- Graceful degradation: if pattern fails to match, plain text is displayed; user can manually copy package name
 
 ### Execution Strategy
 
