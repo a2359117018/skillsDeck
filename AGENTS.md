@@ -14,6 +14,7 @@ Three-process Electron app:
 - **Shared** (`src/shared/`): TypeScript interfaces shared across main/preload/renderer.
 
 Entry points:
+
 - Main: `src/main/index.ts`
 - Renderer: `src/renderer/src/main.ts`
 - Preload: `src/preload/index.ts`
@@ -55,6 +56,7 @@ npm run format       # Prettier write
 ## Multi-Window Behavior
 
 The app creates three window types controlled by the `window` query parameter:
+
 - `main` (default): Primary app shell with sidebar.
 - `env`: Modal dialog for environment detection (Node.js installation).
 - `settings`: Modal dialog for app settings.
@@ -71,6 +73,7 @@ Router handles all views; `App.vue` switches layout based on `windowType`.
 ## Skills CLI Integration
 
 `SkillsService` shells out to `npx skills` via `execa`:
+
 - Commands: `find`, `list --json`, `add`, `update`, `remove`.
 - **Windows**: `shell: true` is required for `execa` to resolve `npx`.
 - **Timeout**: 60 seconds (`COMMAND_TIMEOUT`).

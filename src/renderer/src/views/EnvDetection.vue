@@ -34,7 +34,8 @@ async function handleInstallNode(): Promise<void> {
       <NSpin :show="envStore.checking">
         <NSpace vertical size="large">
           <NText :type="envStore.status?.nodeInstalled ? 'success' : 'error'">
-            {{ envStore.status?.nodeInstalled ? '✓' : '✗' }} Node.js {{ envStore.status?.nodeVersion || '' }}
+            {{ envStore.status?.nodeInstalled ? '✓' : '✗' }} Node.js
+            {{ envStore.status?.nodeVersion || '' }}
           </NText>
           <NText :type="envStore.status?.npxInstalled ? 'success' : 'error'">
             {{ envStore.status?.npxInstalled ? '✓' : '✗' }} npx

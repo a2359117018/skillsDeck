@@ -50,6 +50,7 @@ P6 — Polish & Integration (depends on P5)
 ```
 
 **Parallelizable groups:**
+
 - P1: 2.1, 2.2, 2.3, 2.4 can run in parallel
 - P4: 5.1, 5.3, 5.4 can run in parallel; 5.2 needs 5.1 + 5.4; 5.5 needs 5.4
 - P5: 6.1 and 6.2 can run in parallel
@@ -88,6 +89,7 @@ Confirm that `find` does NOT support `--json`. Document the raw text format for 
 **Priority:** P0 (blocking) | **Depends on:** nothing
 
 **Files:**
+
 - Modify: `package.json`
 
 - [ ] **Step 1: Install runtime dependencies**
@@ -121,6 +123,7 @@ git commit -m "chore: install project dependencies"
 **Priority:** P0 (blocking) | **Depends on:** 1.1
 
 **Files:**
+
 - Create: `src/main/services/` directory
 - Create: `src/main/ipc/` directory
 - Create: `src/renderer/src/router/` directory
@@ -155,6 +158,7 @@ git commit -m "chore: scaffold directory structure"
 **Priority:** P0 (blocking) | **Depends on:** 1.2
 
 **Files:**
+
 - Create: `src/shared/types.ts` (new shared location accessible to both tsconfig.node.json and tsconfig.web.json)
 - Modify: `tsconfig.node.json` (add `src/shared/**/*` to include)
 - Modify: `tsconfig.web.json` (add `src/shared/**/*` to include)
@@ -215,6 +219,7 @@ git commit -m "feat: add shared type definitions for IPC contracts"
 **Priority:** P1 | **Depends on:** 1.3
 
 **Files:**
+
 - Create: `src/renderer/src/constants/agents.ts`
 
 Agent list from `SupportedAgents.md`, hardcoded as a TypeScript constant array. This file lives in renderer because it's only used by UI components (install dialog, list page).
@@ -234,59 +239,294 @@ export interface Agent {
 export const COMMON_AGENT_FLAGS = ['claude-code', 'cursor', 'github-copilot', 'gemini-cli']
 
 export const AGENTS: Agent[] = [
-  { name: 'AiderDesk', agentFlag: 'aider-desk', projectPath: '.aider-desk/skills/', globalPath: '~/.aider-desk/skills/' },
-  { name: 'Amp', agentFlag: 'amp', projectPath: '.agents/skills/', globalPath: '~/.config/agents/skills/' },
-  { name: 'Kimi Code CLI', agentFlag: 'kimi-cli', projectPath: '.agents/skills/', globalPath: '~/.config/agents/skills/' },
-  { name: 'Replit', agentFlag: 'replit', projectPath: '.agents/skills/', globalPath: '~/.config/agents/skills/' },
-  { name: 'Universal', agentFlag: 'universal', projectPath: '.agents/skills/', globalPath: '~/.config/agents/skills/' },
-  { name: 'Antigravity', agentFlag: 'antigravity', projectPath: '.agents/skills/', globalPath: '~/.gemini/antigravity/skills/' },
-  { name: 'Augment', agentFlag: 'augment', projectPath: '.augment/skills/', globalPath: '~/.augment/skills/' },
+  {
+    name: 'AiderDesk',
+    agentFlag: 'aider-desk',
+    projectPath: '.aider-desk/skills/',
+    globalPath: '~/.aider-desk/skills/'
+  },
+  {
+    name: 'Amp',
+    agentFlag: 'amp',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.config/agents/skills/'
+  },
+  {
+    name: 'Kimi Code CLI',
+    agentFlag: 'kimi-cli',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.config/agents/skills/'
+  },
+  {
+    name: 'Replit',
+    agentFlag: 'replit',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.config/agents/skills/'
+  },
+  {
+    name: 'Universal',
+    agentFlag: 'universal',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.config/agents/skills/'
+  },
+  {
+    name: 'Antigravity',
+    agentFlag: 'antigravity',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.gemini/antigravity/skills/'
+  },
+  {
+    name: 'Augment',
+    agentFlag: 'augment',
+    projectPath: '.augment/skills/',
+    globalPath: '~/.augment/skills/'
+  },
   { name: 'IBM Bob', agentFlag: 'bob', projectPath: '.bob/skills/', globalPath: '~/.bob/skills/' },
-  { name: 'Claude Code', agentFlag: 'claude-code', projectPath: '.claude/skills/', globalPath: '~/.claude/skills/' },
-  { name: 'OpenClaw', agentFlag: 'openclaw', projectPath: 'skills/', globalPath: '~/.openclaw/skills/' },
-  { name: 'Cline', agentFlag: 'cline', projectPath: '.agents/skills/', globalPath: '~/.agents/skills/' },
-  { name: 'Dexto', agentFlag: 'dexto', projectPath: '.agents/skills/', globalPath: '~/.agents/skills/' },
-  { name: 'Warp', agentFlag: 'warp', projectPath: '.agents/skills/', globalPath: '~/.agents/skills/' },
-  { name: 'CodeArts Agent', agentFlag: 'codearts-agent', projectPath: '.codeartsdoer/skills/', globalPath: '~/.codeartsdoer/skills/' },
-  { name: 'CodeBuddy', agentFlag: 'codebuddy', projectPath: '.codebuddy/skills/', globalPath: '~/.codebuddy/skills/' },
-  { name: 'Codemaker', agentFlag: 'codemaker', projectPath: '.codemaker/skills/', globalPath: '~/.codemaker/skills/' },
-  { name: 'Code Studio', agentFlag: 'codestudio', projectPath: '.codestudio/skills/', globalPath: '~/.codestudio/skills/' },
-  { name: 'Codex', agentFlag: 'codex', projectPath: '.agents/skills/', globalPath: '~/.codex/skills/' },
-  { name: 'Command Code', agentFlag: 'command-code', projectPath: '.commandcode/skills/', globalPath: '~/.commandcode/skills/' },
-  { name: 'Continue', agentFlag: 'continue', projectPath: '.continue/skills/', globalPath: '~/.continue/skills/' },
-  { name: 'Cortex Code', agentFlag: 'cortex', projectPath: '.cortex/skills/', globalPath: '~/.snowflake/cortex/skills/' },
-  { name: 'Crush', agentFlag: 'crush', projectPath: '.crush/skills/', globalPath: '~/.config/crush/skills/' },
-  { name: 'Cursor', agentFlag: 'cursor', projectPath: '.agents/skills/', globalPath: '~/.cursor/skills/' },
-  { name: 'Deep Agents', agentFlag: 'deepagents', projectPath: '.agents/skills/', globalPath: '~/.deepagents/agent/skills/' },
-  { name: 'Devin for Terminal', agentFlag: 'devin', projectPath: '.devin/skills/', globalPath: '~/.config/devin/skills/' },
-  { name: 'Droid', agentFlag: 'droid', projectPath: '.factory/skills/', globalPath: '~/.factory/skills/' },
-  { name: 'Firebender', agentFlag: 'firebender', projectPath: '.agents/skills/', globalPath: '~/.firebender/skills/' },
-  { name: 'ForgeCode', agentFlag: 'forgecode', projectPath: '.forge/skills/', globalPath: '~/.forge/skills/' },
-  { name: 'Gemini CLI', agentFlag: 'gemini-cli', projectPath: '.agents/skills/', globalPath: '~/.gemini/skills/' },
-  { name: 'GitHub Copilot', agentFlag: 'github-copilot', projectPath: '.agents/skills/', globalPath: '~/.copilot/skills/' },
-  { name: 'Goose', agentFlag: 'goose', projectPath: '.goose/skills/', globalPath: '~/.config/goose/skills/' },
-  { name: 'Junie', agentFlag: 'junie', projectPath: '.junie/skills/', globalPath: '~/.junie/skills/' },
-  { name: 'iFlow CLI', agentFlag: 'iflow-cli', projectPath: '.iflow/skills/', globalPath: '~/.iflow/skills/' },
-  { name: 'Kilo Code', agentFlag: 'kilo', projectPath: '.kilocode/skills/', globalPath: '~/.kilocode/skills/' },
-  { name: 'Kiro CLI', agentFlag: 'kiro-cli', projectPath: '.kiro/skills/', globalPath: '~/.kiro/skills/' },
+  {
+    name: 'Claude Code',
+    agentFlag: 'claude-code',
+    projectPath: '.claude/skills/',
+    globalPath: '~/.claude/skills/'
+  },
+  {
+    name: 'OpenClaw',
+    agentFlag: 'openclaw',
+    projectPath: 'skills/',
+    globalPath: '~/.openclaw/skills/'
+  },
+  {
+    name: 'Cline',
+    agentFlag: 'cline',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.agents/skills/'
+  },
+  {
+    name: 'Dexto',
+    agentFlag: 'dexto',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.agents/skills/'
+  },
+  {
+    name: 'Warp',
+    agentFlag: 'warp',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.agents/skills/'
+  },
+  {
+    name: 'CodeArts Agent',
+    agentFlag: 'codearts-agent',
+    projectPath: '.codeartsdoer/skills/',
+    globalPath: '~/.codeartsdoer/skills/'
+  },
+  {
+    name: 'CodeBuddy',
+    agentFlag: 'codebuddy',
+    projectPath: '.codebuddy/skills/',
+    globalPath: '~/.codebuddy/skills/'
+  },
+  {
+    name: 'Codemaker',
+    agentFlag: 'codemaker',
+    projectPath: '.codemaker/skills/',
+    globalPath: '~/.codemaker/skills/'
+  },
+  {
+    name: 'Code Studio',
+    agentFlag: 'codestudio',
+    projectPath: '.codestudio/skills/',
+    globalPath: '~/.codestudio/skills/'
+  },
+  {
+    name: 'Codex',
+    agentFlag: 'codex',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.codex/skills/'
+  },
+  {
+    name: 'Command Code',
+    agentFlag: 'command-code',
+    projectPath: '.commandcode/skills/',
+    globalPath: '~/.commandcode/skills/'
+  },
+  {
+    name: 'Continue',
+    agentFlag: 'continue',
+    projectPath: '.continue/skills/',
+    globalPath: '~/.continue/skills/'
+  },
+  {
+    name: 'Cortex Code',
+    agentFlag: 'cortex',
+    projectPath: '.cortex/skills/',
+    globalPath: '~/.snowflake/cortex/skills/'
+  },
+  {
+    name: 'Crush',
+    agentFlag: 'crush',
+    projectPath: '.crush/skills/',
+    globalPath: '~/.config/crush/skills/'
+  },
+  {
+    name: 'Cursor',
+    agentFlag: 'cursor',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.cursor/skills/'
+  },
+  {
+    name: 'Deep Agents',
+    agentFlag: 'deepagents',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.deepagents/agent/skills/'
+  },
+  {
+    name: 'Devin for Terminal',
+    agentFlag: 'devin',
+    projectPath: '.devin/skills/',
+    globalPath: '~/.config/devin/skills/'
+  },
+  {
+    name: 'Droid',
+    agentFlag: 'droid',
+    projectPath: '.factory/skills/',
+    globalPath: '~/.factory/skills/'
+  },
+  {
+    name: 'Firebender',
+    agentFlag: 'firebender',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.firebender/skills/'
+  },
+  {
+    name: 'ForgeCode',
+    agentFlag: 'forgecode',
+    projectPath: '.forge/skills/',
+    globalPath: '~/.forge/skills/'
+  },
+  {
+    name: 'Gemini CLI',
+    agentFlag: 'gemini-cli',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.gemini/skills/'
+  },
+  {
+    name: 'GitHub Copilot',
+    agentFlag: 'github-copilot',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.copilot/skills/'
+  },
+  {
+    name: 'Goose',
+    agentFlag: 'goose',
+    projectPath: '.goose/skills/',
+    globalPath: '~/.config/goose/skills/'
+  },
+  {
+    name: 'Junie',
+    agentFlag: 'junie',
+    projectPath: '.junie/skills/',
+    globalPath: '~/.junie/skills/'
+  },
+  {
+    name: 'iFlow CLI',
+    agentFlag: 'iflow-cli',
+    projectPath: '.iflow/skills/',
+    globalPath: '~/.iflow/skills/'
+  },
+  {
+    name: 'Kilo Code',
+    agentFlag: 'kilo',
+    projectPath: '.kilocode/skills/',
+    globalPath: '~/.kilocode/skills/'
+  },
+  {
+    name: 'Kiro CLI',
+    agentFlag: 'kiro-cli',
+    projectPath: '.kiro/skills/',
+    globalPath: '~/.kiro/skills/'
+  },
   { name: 'Kode', agentFlag: 'kode', projectPath: '.kode/skills/', globalPath: '~/.kode/skills/' },
-  { name: 'MCPJam', agentFlag: 'mcpjam', projectPath: '.mcpjam/skills/', globalPath: '~/.mcpjam/skills/' },
-  { name: 'Mistral Vibe', agentFlag: 'mistral-vibe', projectPath: '.vibe/skills/', globalPath: '~/.vibe/skills/' },
+  {
+    name: 'MCPJam',
+    agentFlag: 'mcpjam',
+    projectPath: '.mcpjam/skills/',
+    globalPath: '~/.mcpjam/skills/'
+  },
+  {
+    name: 'Mistral Vibe',
+    agentFlag: 'mistral-vibe',
+    projectPath: '.vibe/skills/',
+    globalPath: '~/.vibe/skills/'
+  },
   { name: 'Mux', agentFlag: 'mux', projectPath: '.mux/skills/', globalPath: '~/.mux/skills/' },
-  { name: 'OpenCode', agentFlag: 'opencode', projectPath: '.agents/skills/', globalPath: '~/.config/opencode/skills/' },
-  { name: 'OpenHands', agentFlag: 'openhands', projectPath: '.openhands/skills/', globalPath: '~/.openhands/skills/' },
+  {
+    name: 'OpenCode',
+    agentFlag: 'opencode',
+    projectPath: '.agents/skills/',
+    globalPath: '~/.config/opencode/skills/'
+  },
+  {
+    name: 'OpenHands',
+    agentFlag: 'openhands',
+    projectPath: '.openhands/skills/',
+    globalPath: '~/.openhands/skills/'
+  },
   { name: 'Pi', agentFlag: 'pi', projectPath: '.pi/skills/', globalPath: '~/.pi/agent/skills/' },
-  { name: 'Qoder', agentFlag: 'qoder', projectPath: '.qoder/skills/', globalPath: '~/.qoder/skills/' },
-  { name: 'Qwen Code', agentFlag: 'qwen-code', projectPath: '.qwen/skills/', globalPath: '~/.qwen/skills/' },
-  { name: 'Rovo Dev', agentFlag: 'rovodev', projectPath: '.rovodev/skills/', globalPath: '~/.rovodev/skills/' },
+  {
+    name: 'Qoder',
+    agentFlag: 'qoder',
+    projectPath: '.qoder/skills/',
+    globalPath: '~/.qoder/skills/'
+  },
+  {
+    name: 'Qwen Code',
+    agentFlag: 'qwen-code',
+    projectPath: '.qwen/skills/',
+    globalPath: '~/.qwen/skills/'
+  },
+  {
+    name: 'Rovo Dev',
+    agentFlag: 'rovodev',
+    projectPath: '.rovodev/skills/',
+    globalPath: '~/.rovodev/skills/'
+  },
   { name: 'Roo Code', agentFlag: 'roo', projectPath: '.roo/skills/', globalPath: '~/.roo/skills/' },
-  { name: 'Tabnine CLI', agentFlag: 'tabnine-cli', projectPath: '.tabnine/agent/skills/', globalPath: '~/.tabnine/agent/skills/' },
+  {
+    name: 'Tabnine CLI',
+    agentFlag: 'tabnine-cli',
+    projectPath: '.tabnine/agent/skills/',
+    globalPath: '~/.tabnine/agent/skills/'
+  },
   { name: 'Trae', agentFlag: 'trae', projectPath: '.trae/skills/', globalPath: '~/.trae/skills/' },
-  { name: 'Trae CN', agentFlag: 'trae-cn', projectPath: '.trae/skills/', globalPath: '~/.trae-cn/skills/' },
-  { name: 'Windsurf', agentFlag: 'windsurf', projectPath: '.windsurf/skills/', globalPath: '~/.codeium/windsurf/skills/' },
-  { name: 'Zencoder', agentFlag: 'zencoder', projectPath: '.zencoder/skills/', globalPath: '~/.zencoder/skills/' },
-  { name: 'Neovate', agentFlag: 'neovate', projectPath: '.neovate/skills/', globalPath: '~/.neovate/skills/' },
-  { name: 'Pochi', agentFlag: 'pochi', projectPath: '.pochi/skills/', globalPath: '~/.pochi/skills/' },
+  {
+    name: 'Trae CN',
+    agentFlag: 'trae-cn',
+    projectPath: '.trae/skills/',
+    globalPath: '~/.trae-cn/skills/'
+  },
+  {
+    name: 'Windsurf',
+    agentFlag: 'windsurf',
+    projectPath: '.windsurf/skills/',
+    globalPath: '~/.codeium/windsurf/skills/'
+  },
+  {
+    name: 'Zencoder',
+    agentFlag: 'zencoder',
+    projectPath: '.zencoder/skills/',
+    globalPath: '~/.zencoder/skills/'
+  },
+  {
+    name: 'Neovate',
+    agentFlag: 'neovate',
+    projectPath: '.neovate/skills/',
+    globalPath: '~/.neovate/skills/'
+  },
+  {
+    name: 'Pochi',
+    agentFlag: 'pochi',
+    projectPath: '.pochi/skills/',
+    globalPath: '~/.pochi/skills/'
+  },
   { name: 'AdaL', agentFlag: 'adal', projectPath: '.adal/skills/', globalPath: '~/.adal/skills/' }
 ]
 
@@ -313,6 +553,7 @@ git commit -m "feat: add supported agents constants (40+ agents from SupportedAg
 **Priority:** P1 | **Depends on:** 1.3
 
 **Files:**
+
 - Create: `src/main/services/StoreService.ts`
 
 Thin wrapper around `electron-store`. Persists user settings and environment check results.
@@ -381,6 +622,7 @@ git commit -m "feat: add StoreService (electron-store wrapper)"
 **Priority:** P1 | **Depends on:** 1.3
 
 **Files:**
+
 - Create: `src/main/services/SkillsService.ts`
 
 Core service that wraps all `npx skills` CLI commands via `execa`. Handles error classification, output parsing, and timeout management.
@@ -510,6 +752,7 @@ git commit -m "feat: add SkillsService (execa wrapper for npx skills CLI)"
 **Priority:** P1 | **Depends on:** 1.3
 
 **Files:**
+
 - Create: `src/main/services/EnvService.ts`
 
 Detects Node.js / npx / skills availability. Provides Node.js download + extraction + PATH registration for non-technical users.
@@ -529,7 +772,11 @@ async function checkCommand(
   args: string[]
 ): Promise<{ ok: boolean; version: string | null }> {
   try {
-    const result = await execa(command, args, { timeout: 10000, reject: false, shell: process.platform === 'win32' })
+    const result = await execa(command, args, {
+      timeout: 10000,
+      reject: false,
+      shell: process.platform === 'win32'
+    })
     if (result.exitCode === 0) {
       return { ok: true, version: result.stdout.trim() }
     }
@@ -568,9 +815,7 @@ export function getNodeInstallDir(): string {
   return join(app.getPath('userData'), 'node')
 }
 
-export async function downloadNode(
-  onProgress: (percent: number) => void
-): Promise<string> {
+export async function downloadNode(onProgress: (percent: number) => void): Promise<string> {
   const url = getNodeDownloadUrl()
   const installDir = getNodeInstallDir()
   if (!existsSync(installDir)) {
@@ -606,7 +851,11 @@ export async function extractAndRegisterNode(archivePath: string): Promise<strin
   const installDir = getNodeInstallDir()
   await decompress(archivePath, installDir)
   const extractedDirName = readdirSync(installDir).find(
-    (d) => d.startsWith('node-v') && !d.endsWith('.zip') && !d.endsWith('.tar.gz') && !d.endsWith('.tar.xz')
+    (d) =>
+      d.startsWith('node-v') &&
+      !d.endsWith('.zip') &&
+      !d.endsWith('.tar.gz') &&
+      !d.endsWith('.tar.xz')
   )
   if (!extractedDirName) throw new Error('Extraction failed: no node directory found')
   return join(installDir, extractedDirName)
@@ -631,13 +880,16 @@ git commit -m "feat: add EnvService (env detection + Node.js download)"
 **Priority:** P1 | **Depends on:** 2.2, 2.4
 
 **Files:**
+
 - Create: `src/main/services/WindowManager.ts`
 - Modify: `src/main/index.ts`
 
 > **Note:** Task 2.5 rewrites index.ts which imports `./ipc` (created in task 3.1). Create a minimal `src/main/ipc/index.ts` stub in this step:
+>
 > ```ts
 > export function registerIpcHandlers(): void {}
 > ```
+>
 > This stub will be replaced with the full implementation in task 3.1.
 
 Manages lifecycle of all 3 windows. Each window loads the same `index.html` but with a `?window=<type>` query param to distinguish which view to render. Main entry updated to run env check on startup.
@@ -808,6 +1060,7 @@ git commit -m "feat: add WindowManager and update main entry with startup flow"
 **Priority:** P2 | **Depends on:** 2.2, 2.3, 2.4, 2.5
 
 **Files:**
+
 - Create: `src/main/ipc/skills.ipc.ts`
 - Create: `src/main/ipc/env.ipc.ts`
 - Create: `src/main/ipc/store.ipc.ts`
@@ -844,12 +1097,9 @@ export function registerSkillsIpc(): void {
     }
   )
 
-  ipcMain.handle(
-    'skills:update',
-    async (_, opts: { name: string; global?: boolean }) => {
-      return updateSkill(opts.name, opts.global)
-    }
-  )
+  ipcMain.handle('skills:update', async (_, opts: { name: string; global?: boolean }) => {
+    return updateSkill(opts.name, opts.global)
+  })
 
   ipcMain.handle('skills:update-all', async (_, opts?: { global?: boolean }) => {
     return updateAllSkills(opts?.global)
@@ -952,6 +1202,7 @@ git commit -m "feat: add IPC handlers (skills, env, store, window)"
 **Priority:** P2 | **Depends on:** 3.1
 
 **Files:**
+
 - Modify: `src/preload/index.ts`
 - Modify: `src/preload/index.d.ts`
 
@@ -966,14 +1217,11 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   skills: {
     search: (keyword: string) => ipcRenderer.invoke('skills:search', keyword),
-    list: (opts?: { global?: boolean; agent?: string }) =>
-      ipcRenderer.invoke('skills:list', opts),
+    list: (opts?: { global?: boolean; agent?: string }) => ipcRenderer.invoke('skills:list', opts),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }) =>
       ipcRenderer.invoke('skills:install', opts),
-    update: (opts: { name: string; global?: boolean }) =>
-      ipcRenderer.invoke('skills:update', opts),
-    updateAll: (opts?: { global?: boolean }) =>
-      ipcRenderer.invoke('skills:update-all', opts),
+    update: (opts: { name: string; global?: boolean }) => ipcRenderer.invoke('skills:update', opts),
+    updateAll: (opts?: { global?: boolean }) => ipcRenderer.invoke('skills:update-all', opts),
     remove: (opts: { name: string; agent?: string; global?: boolean }) =>
       ipcRenderer.invoke('skills:remove', opts)
   },
@@ -1068,6 +1316,7 @@ git commit -m "feat: add preload API bridge with shared types"
 **Priority:** P3 | **Depends on:** 3.2
 
 **Files:**
+
 - Modify: `src/renderer/src/main.ts`
 - Create: `src/renderer/src/router/index.ts`
 - Create: `src/renderer/src/stores/skills.ts`
@@ -1083,7 +1332,12 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
   { path: '/', name: 'installed', component: () => import('../views/InstalledList.vue') },
   { path: '/search', name: 'search', component: () => import('../views/SkillsSearch.vue') },
-  { path: '/skill/:packageRef', name: 'skill-detail', component: () => import('../views/SkillDetail.vue'), props: true }
+  {
+    path: '/skill/:packageRef',
+    name: 'skill-detail',
+    component: () => import('../views/SkillDetail.vue'),
+    props: true
+  }
 ]
 
 export const router = createRouter({
@@ -1104,7 +1358,9 @@ export const useSkillsStore = defineStore('skills', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  function clearError() { error.value = null }
+  function clearError() {
+    error.value = null
+  }
 
   async function search(keyword: string) {
     loading.value = true
@@ -1169,7 +1425,18 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  return { searchOutput, installedSkills, loading, error, clearError, search, fetchInstalled, install, update, remove }
+  return {
+    searchOutput,
+    installedSkills,
+    loading,
+    error,
+    clearError,
+    search,
+    fetchInstalled,
+    install,
+    update,
+    remove
+  }
 })
 ```
 
@@ -1249,6 +1516,7 @@ git commit -m "feat: add Vue Router, Pinia stores for skills and env"
 **Priority:** P3 | **Depends on:** 4.1
 
 **Files:**
+
 - Modify: `src/renderer/src/App.vue`
 
 Layout shell with left sidebar navigation. Sidebar shows: installed list, search, settings. The content area renders `<router-view />`. Window-type detection: env/settings windows render their own views, main window renders this shell.
@@ -1305,8 +1573,12 @@ const activeKey = computed(() => route.name as string)
 </template>
 
 <style scoped>
-.app-shell { height: 100vh; }
-.sidebar-header { border-bottom: 1px solid var(--n-border-color); }
+.app-shell {
+  height: 100vh;
+}
+.sidebar-header {
+  border-bottom: 1px solid var(--n-border-color);
+}
 </style>
 ```
 
@@ -1328,6 +1600,7 @@ git commit -m "feat: add app layout shell with sidebar navigation"
 **Priority:** P4 | **Depends on:** 4.2
 
 **Files:**
+
 - Create: `src/renderer/src/components/common/CommandOutput.vue`
 
 Terminal-style output display. Parses skill refs (`owner/repo@skill-name`) into clickable spans that emit navigate events.
@@ -1390,7 +1663,9 @@ const segments = computed(() => {
   cursor: pointer;
   text-decoration: underline;
 }
-.skill-ref:hover { color: #81d4fa; }
+.skill-ref:hover {
+  color: #81d4fa;
+}
 </style>
 ```
 
@@ -1412,6 +1687,7 @@ git commit -m "feat: add CommandOutput component with clickable skill refs"
 **Priority:** P4 | **Depends on:** 5.1, 5.4
 
 **Files:**
+
 - Create: `src/renderer/src/components/skills/SkillSearchBar.vue`
 - Create: `src/renderer/src/views/SkillsSearch.vue`
 
@@ -1501,7 +1777,9 @@ function handleInstallComplete() {
 </template>
 
 <style scoped>
-.search-page { max-width: 900px; }
+.search-page {
+  max-width: 900px;
+}
 </style>
 ```
 
@@ -1523,6 +1801,7 @@ git commit -m "feat: add search page with debounce and clickable results"
 **Priority:** P4 | **Depends on:** 4.2
 
 **Files:**
+
 - Create: `src/renderer/src/views/SkillsList.vue`
 
 Table view of installed skills. Tabs for project/global scope. Update/delete actions per row, plus "Update All" batch action.
@@ -1588,7 +1867,11 @@ const columns: DataTableColumns = [
     render(row: any) {
       return h(NSpace, { size: 'small' }, () => [
         h(NButton, { size: 'small', onClick: () => handleUpdate(row.name) }, () => '更新'),
-        h(NButton, { size: 'small', type: 'error', onClick: () => handleRemove(row.name) }, () => '删除')
+        h(
+          NButton,
+          { size: 'small', type: 'error', onClick: () => handleRemove(row.name) },
+          () => '删除'
+        )
       ])
     }
   }
@@ -1619,7 +1902,9 @@ const columns: DataTableColumns = [
 </template>
 
 <style scoped>
-.list-page { max-width: 900px; }
+.list-page {
+  max-width: 900px;
+}
 .list-header {
   display: flex;
   justify-content: space-between;
@@ -1647,6 +1932,7 @@ git commit -m "feat: add installed skills list page with update/delete"
 **Priority:** P4 | **Depends on:** 2.1, 4.2
 
 **Files:**
+
 - Create: `src/renderer/src/components/skills/SkillInstallDialog.vue`
 
 Multi-select agent picker. Common agents shown in a collapsed group at top, all agents below with search filter. Global install toggle. Inline command output on completion.
@@ -1657,8 +1943,17 @@ Multi-select agent picker. Common agents shown in a collapsed group at top, all 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import {
-  NModal, NCard, NCheckboxGroup, NCheckbox, NSpace, NButton, NInput,
-  NCollapse, NCollapseItem, NText, useMessage
+  NModal,
+  NCard,
+  NCheckboxGroup,
+  NCheckbox,
+  NSpace,
+  NButton,
+  NInput,
+  NCollapse,
+  NCollapseItem,
+  NText,
+  useMessage
 } from 'naive-ui'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import { useSkillsStore } from '../../stores/skills'
@@ -1688,11 +1983,14 @@ const allAgents = computed(() => {
   )
 })
 
-const allCommonSelected = computed(() =>
-  commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
+const allCommonSelected = computed(
+  () =>
+    commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
-const allFilteredSelected = computed(() =>
-  allAgents.value.length > 0 && allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
+const allFilteredSelected = computed(
+  () =>
+    allAgents.value.length > 0 &&
+    allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
 
 function toggleSelectCommon() {
@@ -1755,7 +2053,9 @@ function handleClose() {
 <template>
   <NModal :show="show" @update:show="handleClose">
     <NCard title="安装技能" style="width: 560px">
-      <NText>安装: <strong>{{ packageRef }}</strong></NText>
+      <NText
+        >安装: <strong>{{ packageRef }}</strong></NText
+      >
 
       <div style="margin-top: 16px">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
@@ -1776,27 +2076,43 @@ function handleClose() {
             <NCollapseItem title="常用" name="common">
               <NCheckbox
                 :checked="allCommonSelected"
-                :indeterminate="selectedAgents.some(s => commonAgents.some(a => a.agentFlag === s)) && !allCommonSelected"
+                :indeterminate="
+                  selectedAgents.some((s) => commonAgents.some((a) => a.agentFlag === s)) &&
+                  !allCommonSelected
+                "
                 @update:checked="toggleSelectCommon"
                 style="margin-bottom: 8px"
               >
                 全选常用
               </NCheckbox>
               <NSpace vertical>
-                <NCheckbox v-for="agent in commonAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
+                <NCheckbox
+                  v-for="agent in commonAgents"
+                  :key="agent.agentFlag"
+                  :value="agent.agentFlag"
+                  :label="agent.name"
+                />
               </NSpace>
             </NCollapseItem>
             <NCollapseItem title="全部" name="all">
               <NCheckbox
                 :checked="allFilteredSelected"
-                :indeterminate="selectedAgents.some(s => allAgents.some(a => a.agentFlag === s)) && !allFilteredSelected"
+                :indeterminate="
+                  selectedAgents.some((s) => allAgents.some((a) => a.agentFlag === s)) &&
+                  !allFilteredSelected
+                "
                 @update:checked="toggleSelectAll"
                 style="margin-bottom: 8px"
               >
                 全选当前筛选
               </NCheckbox>
               <NSpace vertical style="max-height: 200px; overflow-y: auto">
-                <NCheckbox v-for="agent in allAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
+                <NCheckbox
+                  v-for="agent in allAgents"
+                  :key="agent.agentFlag"
+                  :value="agent.agentFlag"
+                  :label="agent.name"
+                />
               </NSpace>
             </NCollapseItem>
           </NCollapse>
@@ -1853,6 +2169,7 @@ git commit -m "feat: add install dialog with multi-agent picker and search filte
 **Priority:** P4 | **Depends on:** 5.4
 
 **Files:**
+
 - Create: `src/renderer/src/views/SkillDetail.vue`
 
 Detail page for managing a specific skill. Shows install/update/delete actions with inline command output. Reached from search results (clicking a skill ref navigates here) or from installed list.
@@ -1863,7 +2180,15 @@ Detail page for managing a specific skill. Shows install/update/delete actions w
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NPageHeader, NButton, NSpace, NDescriptions, NDescriptionsItem, NText, useMessage } from 'naive-ui'
+import {
+  NPageHeader,
+  NButton,
+  NSpace,
+  NDescriptions,
+  NDescriptionsItem,
+  NText,
+  useMessage
+} from 'naive-ui'
 import { useSkillsStore } from '../../stores/skills'
 import SkillInstallDialog from '../../components/skills/SkillInstallDialog.vue'
 import CommandOutput from '../../components/common/CommandOutput.vue'
@@ -1935,7 +2260,9 @@ async function handleRemove() {
 </template>
 
 <style scoped>
-.detail-page { max-width: 900px; }
+.detail-page {
+  max-width: 900px;
+}
 </style>
 ```
 
@@ -1959,6 +2286,7 @@ git commit -m "feat: add skill detail page with install/update/delete"
 **Priority:** P5 | **Depends on:** 2.5, 4.2
 
 **Files:**
+
 - Create: `src/renderer/src/views/EnvDetection.vue`
 
 Modal window shown when environment check fails. Displays Node/npx/skills status with download button for Node.js.
@@ -2053,6 +2381,7 @@ git commit -m "feat: add environment detection window with Node.js download"
 **Priority:** P5 | **Depends on:** 4.2, 2.1
 
 **Files:**
+
 - Create: `src/renderer/src/views/SettingsView.vue`
 
 Settings window for default agent selection and env check toggle.
@@ -2101,7 +2430,10 @@ async function handleSave() {
 </template>
 
 <style scoped>
-.settings-page { padding: 24px; height: 100vh; }
+.settings-page {
+  padding: 24px;
+  height: 100vh;
+}
 </style>
 ```
 
@@ -2125,6 +2457,7 @@ git commit -m "feat: add settings window with default agent and env check toggle
 **Priority:** P6 | **Depends on:** 6.1, 6.2
 
 **Files:**
+
 - Modify: `src/renderer/index.html`
 - Modify: `src/renderer/src/assets/main.css`
 
@@ -2142,7 +2475,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-#app { height: 100vh; width: 100vw; overflow: hidden; }
+#app {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
 ```
 
 - [ ] **Step 3: Commit**
@@ -2159,6 +2496,7 @@ git commit -m "chore: update app title and global styles"
 **Priority:** P6 | **Depends on:** 7.1
 
 **Files:**
+
 - Various fixes as needed
 
 - [ ] **Step 1: Full typecheck**

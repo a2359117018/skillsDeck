@@ -10,7 +10,11 @@ async function checkCommand(
   args: string[]
 ): Promise<{ ok: boolean; version: string | null }> {
   try {
-    const result = await execa(command, args, { timeout: 10000, reject: false, shell: process.platform === 'win32' })
+    const result = await execa(command, args, {
+      timeout: 10000,
+      reject: false,
+      shell: process.platform === 'win32'
+    })
     if (result.exitCode === 0) {
       return { ok: true, version: result.stdout.trim() }
     }
@@ -67,9 +71,7 @@ export function getNodeInstallDir(): string {
  * @returns Path to the downloaded archive file
  * @throws Error if download fails or response body is missing
  */
-export async function downloadNode(
-  onProgress: (percent: number) => void
-): Promise<string> {
+export async function downloadNode(onProgress: (percent: number) => void): Promise<string> {
   const url = getNodeDownloadUrl()
   const installDir = getNodeInstallDir()
   if (!existsSync(installDir)) {
@@ -140,7 +142,11 @@ export async function extractAndRegisterNode(archivePath: string): Promise<strin
   const installDir = getNodeInstallDir()
   await decompress(archivePath, installDir)
   const extractedDirName = readdirSync(installDir).find(
-    (d) => d.startsWith('node-v') && !d.endsWith('.zip') && !d.endsWith('.tar.gz') && !d.endsWith('.tar.xz')
+    (d) =>
+      d.startsWith('node-v') &&
+      !d.endsWith('.zip') &&
+      !d.endsWith('.tar.gz') &&
+      !d.endsWith('.tar.xz')
   )
   if (!extractedDirName) throw new Error('Extraction failed: no node directory found')
   const nodeDir = join(installDir, extractedDirName)

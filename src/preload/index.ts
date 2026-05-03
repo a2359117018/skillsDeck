@@ -3,7 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
   skills: {
-    search: (keyword: string): Promise<string> => ipcRenderer.invoke('skills:search', keyword),
+    search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
     list: (opts?: { global?: boolean; agent?: string }): Promise<unknown[]> =>
       ipcRenderer.invoke('skills:list', opts),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
@@ -17,9 +17,11 @@ const api = {
   },
   env: {
     check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),
-    installNode: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('env:install-node'),
+    installNode: (): Promise<{ success: boolean; error?: string }> =>
+      ipcRenderer.invoke('env:install-node'),
     onDownloadProgress: (callback: (percent: number) => void): (() => void) => {
-      const listener = (_event: Electron.IpcRendererEvent, percent: number): void => callback(percent)
+      const listener = (_event: Electron.IpcRendererEvent, percent: number): void =>
+        callback(percent)
       ipcRenderer.on('env:download-progress', listener)
       return () => ipcRenderer.removeListener('env:download-progress', listener)
     }

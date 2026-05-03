@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Skill, CommandResult } from '../../../shared/types'
+import type { Skill, CommandResult, SkillSearchResult } from '../../../shared/types'
 
 export const useSkillsStore = defineStore('skills', () => {
-  const searchOutput = ref('')
+  const searchResults = ref<SkillSearchResult[]>([])
+  const searchDuration = ref(0)
   const installedSkills = ref<Skill[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -16,19 +17,23 @@ export const useSkillsStore = defineStore('skills', () => {
     loading.value = true
     error.value = null
     try {
-      searchOutput.value = await window.api.skills.search(keyword)
+      const response = await window.api.skills.search(keyword)
+      searchResults.value = response.skills
+      searchDuration.value = response.duration_ms
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Search failed'
+      searchResults.value = []
+      searchDuration.value = 0
     } finally {
       loading.value = false
     }
   }
 
-  async function fetchInstalled(global?: boolean): Promise<void> {
+  async function fetchInstalled(global?: boolean, agent?: string): Promise<void> {
     loading.value = true
     error.value = null
     try {
-      installedSkills.value = await window.api.skills.list({ global })
+      installedSkills.value = await window.api.skills.list({ global, agent })
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to load skills'
     } finally {
@@ -36,7 +41,11 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function install(packageRef: string, agents: string[], isGlobal: boolean): Promise<CommandResult> {
+  async function install(
+    packageRef: string,
+    agents: string[],
+    isGlobal: boolean
+  ): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {
@@ -89,7 +98,8 @@ export const useSkillsStore = defineStore('skills', () => {
   }
 
   return {
-    searchOutput,
+    searchResults,
+    searchDuration,
     installedSkills,
     loading,
     error,

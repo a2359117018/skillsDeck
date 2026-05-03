@@ -1,6 +1,9 @@
 import { execa } from 'execa'
-import stripAnsi from 'strip-ansi'
-import type { CommandResult, Skill } from '../../shared/types'
+import stripAnsiModule from 'strip-ansi'
+
+const stripAnsi =
+  (stripAnsiModule as unknown as { default?: typeof stripAnsiModule }).default ?? stripAnsiModule
+import type { CommandResult, Skill, SkillSearchResponse } from '../../shared/types'
 
 const COMMAND_TIMEOUT = 60000
 
@@ -40,7 +43,12 @@ async function execute(args: string[]): Promise<CommandResult> {
     if (err.timedOut) {
       throw new SkillsError('TIMEOUT', `npx skills ${args.join(' ')}`, '', null)
     }
-    throw new SkillsError('UNKNOWN', `npx skills ${args.join(' ')}`, err.message || String(error), null)
+    throw new SkillsError(
+      'UNKNOWN',
+      `npx skills ${args.join(' ')}`,
+      err.message || String(error),
+      null
+    )
   }
 }
 
@@ -77,7 +85,12 @@ export async function listSkills(global?: boolean, agent?: string): Promise<Skil
     return JSON.parse(result.stdout)
   } catch (error) {
     console.error('Failed to parse skills list JSON:', error)
-    throw new SkillsError('EXECUTION_FAILED', 'list', `Invalid JSON: ${result.stdout}`, result.exitCode)
+    throw new SkillsError(
+      'EXECUTION_FAILED',
+      'list',
+      `Invalid JSON: ${result.stdout}`,
+      result.exitCode
+    )
   }
 }
 
@@ -142,4 +155,13 @@ export async function removeSkill(
   if (global) args.push('-g')
   if (agent) args.push('-a', agent)
   return execute(args)
+}
+
+export async function searchSkillsApi(keyword: string): Promise<SkillSearchResponse> {
+  const url = `https://skills.sh/api/search?q=${encodeURIComponent(keyword)}&limit=10`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new SkillsError('EXECUTION_FAILED', 'find', `HTTP ${response.status}`, null)
+  }
+  return response.json() as Promise<SkillSearchResponse>
 }

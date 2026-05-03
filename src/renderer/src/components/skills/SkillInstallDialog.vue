@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import {
-  NModal, NCard, NCheckboxGroup, NCheckbox, NSpace, NButton, NInput,
-  NCollapse, NCollapseItem, NText, useMessage
+  NModal,
+  NCard,
+  NCheckboxGroup,
+  NCheckbox,
+  NSpace,
+  NButton,
+  NInput,
+  NCollapse,
+  NCollapseItem,
+  NText,
+  useMessage
 } from 'naive-ui'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import { useSkillsStore } from '../../stores/skills'
@@ -32,11 +41,14 @@ const allAgents = computed(() => {
   )
 })
 
-const allCommonSelected = computed(() =>
-  commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
+const allCommonSelected = computed(
+  () =>
+    commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
-const allFilteredSelected = computed(() =>
-  allAgents.value.length > 0 && allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
+const allFilteredSelected = computed(
+  () =>
+    allAgents.value.length > 0 &&
+    allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
 
 function toggleSelectCommon(): void {
@@ -100,7 +112,9 @@ function handleClose(): void {
 <template>
   <NModal :show="show" @update:show="handleClose">
     <NCard title="安装技能" style="width: 560px">
-      <NText>安装: <strong>{{ packageRef }}</strong></NText>
+      <NText
+        >安装: <strong>{{ packageRef }}</strong></NText
+      >
 
       <div style="margin-top: 16px">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
@@ -121,27 +135,43 @@ function handleClose(): void {
             <NCollapseItem title="常用" name="common">
               <NCheckbox
                 :checked="allCommonSelected"
-                :indeterminate="selectedAgents.some(s => commonAgents.some(a => a.agentFlag === s)) && !allCommonSelected"
+                :indeterminate="
+                  selectedAgents.some((s) => commonAgents.some((a) => a.agentFlag === s)) &&
+                  !allCommonSelected
+                "
                 @update:checked="toggleSelectCommon"
                 style="margin-bottom: 8px"
               >
                 全选常用
               </NCheckbox>
               <NSpace vertical>
-                <NCheckbox v-for="agent in commonAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
+                <NCheckbox
+                  v-for="agent in commonAgents"
+                  :key="agent.agentFlag"
+                  :value="agent.agentFlag"
+                  :label="agent.name"
+                />
               </NSpace>
             </NCollapseItem>
             <NCollapseItem title="全部" name="all">
               <NCheckbox
                 :checked="allFilteredSelected"
-                :indeterminate="selectedAgents.some(s => allAgents.some(a => a.agentFlag === s)) && !allFilteredSelected"
+                :indeterminate="
+                  selectedAgents.some((s) => allAgents.some((a) => a.agentFlag === s)) &&
+                  !allFilteredSelected
+                "
                 @update:checked="toggleSelectAll"
                 style="margin-bottom: 8px"
               >
                 全选当前筛选
               </NCheckbox>
               <NSpace vertical style="max-height: 200px; overflow-y: auto">
-                <NCheckbox v-for="agent in allAgents" :key="agent.agentFlag" :value="agent.agentFlag" :label="agent.name" />
+                <NCheckbox
+                  v-for="agent in allAgents"
+                  :key="agent.agentFlag"
+                  :value="agent.agentFlag"
+                  :label="agent.name"
+                />
               </NSpace>
             </NCollapseItem>
           </NCollapse>

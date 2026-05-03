@@ -53,5 +53,7 @@ const segments = computed(() => {
   cursor: pointer;
   text-decoration: underline;
 }
-.skill-ref:hover { color: #81d4fa; }
+.skill-ref:hover {
+  color: #81d4fa;
+}
 </style>

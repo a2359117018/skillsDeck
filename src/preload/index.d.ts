@@ -1,14 +1,28 @@
 import type { ElectronAPI } from '@electron-toolkit/preload'
-import type { EnvStatus, Skill, AppSettings, CommandResult } from '../shared/types'
+import type {
+  EnvStatus,
+  Skill,
+  AppSettings,
+  CommandResult,
+  SkillSearchResponse
+} from '../shared/types'
 
 export interface AppApi {
   skills: {
-    search: (keyword: string) => Promise<string>
+    search: (keyword: string) => Promise<SkillSearchResponse>
     list: (opts?: { global?: boolean; agent?: string }) => Promise<Skill[]>
-    install: (opts: { packageRef: string; agents: string[]; global?: boolean }) => Promise<CommandResult>
+    install: (opts: {
+      packageRef: string
+      agents: string[]
+      global?: boolean
+    }) => Promise<CommandResult>
     update: (opts: { packageRef: string; global?: boolean }) => Promise<CommandResult>
     updateAll: (opts?: { global?: boolean }) => Promise<CommandResult>
-    remove: (opts: { packageRef: string; agent?: string; global?: boolean }) => Promise<CommandResult>
+    remove: (opts: {
+      packageRef: string
+      agent?: string
+      global?: boolean
+    }) => Promise<CommandResult>
   }
   env: {
     check: () => Promise<EnvStatus>

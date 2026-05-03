@@ -6,16 +6,16 @@ An Electron-based cross-platform desktop application that provides a graphical i
 
 ## Technology Stack
 
-| Category | Tool | Purpose |
-|----------|------|---------|
-| Framework | Electron 39 + electron-vite | Desktop app runtime |
-| UI | Vue 3 + Naive UI (default light theme) | Component library & reactivity |
-| State Management | Pinia | Global state (skills, env, settings) |
-| Routing | Vue Router 4 | Main window page navigation |
-| Utilities | VueUse | Composable helpers |
-| Command Execution | execa | Spawn `npx skills` commands in main process |
-| Persistence | electron-store | User preferences, env cache |
-| HTTP Download | Node.js built-in `fetch` | Download Node.js for offline users |
+| Category          | Tool                                   | Purpose                                     |
+| ----------------- | -------------------------------------- | ------------------------------------------- |
+| Framework         | Electron 39 + electron-vite            | Desktop app runtime                         |
+| UI                | Vue 3 + Naive UI (default light theme) | Component library & reactivity              |
+| State Management  | Pinia                                  | Global state (skills, env, settings)        |
+| Routing           | Vue Router 4                           | Main window page navigation                 |
+| Utilities         | VueUse                                 | Composable helpers                          |
+| Command Execution | execa                                  | Spawn `npx skills` commands in main process |
+| Persistence       | electron-store                         | User preferences, env cache                 |
+| HTTP Download     | Node.js built-in `fetch`               | Download Node.js for offline users          |
 
 ### Excluded
 
@@ -56,11 +56,11 @@ An Electron-based cross-platform desktop application that provides a graphical i
 
 ### 3 Windows
 
-| Window | Responsibility | Trigger | Lifecycle |
-|--------|---------------|---------|-----------|
-| **Main Window** (1200×800) | Skill search, list, install/update/delete, sidebar nav | App launch | Persistent; closing exits app |
-| **Environment Detection** (500×400) | Node/npx/skills status, one-click fix | Auto on launch if env broken | Auto-close when env OK |
-| **Settings** (600×500) | Default agent, Node.js path, env check toggle | Main window button | On-demand open/close |
+| Window                              | Responsibility                                         | Trigger                      | Lifecycle                     |
+| ----------------------------------- | ------------------------------------------------------ | ---------------------------- | ----------------------------- |
+| **Main Window** (1200×800)          | Skill search, list, install/update/delete, sidebar nav | App launch                   | Persistent; closing exits app |
+| **Environment Detection** (500×400) | Node/npx/skills status, one-click fix                  | Auto on launch if env broken | Auto-close when env OK        |
+| **Settings** (600×500)              | Default agent, Node.js path, env check toggle          | Main window button           | On-demand open/close          |
 
 ### Startup Flow
 
@@ -160,16 +160,19 @@ src/
 ### Pages
 
 **Search (`/search`)**
+
 - Search bar with 300ms debounce auto-search
 - Results in 3-column card grid: name, description, source, install count, [Install] button
 - Empty state prompt
 
 **Installed List (`/list`)**
+
 - Tab groups: Global / per-agent skills
 - Each row: name, version, install location, actions (update/delete)
 - Batch action bar: "Update All"
 
 **Skill Detail (`/detail/:name`)**
+
 - Full skill info (name, description, version, source repo)
 - Action area: Install to (multi-select agents) / Update / Delete
 - Inline command output panel (collapsible)
@@ -178,43 +181,43 @@ src/
 
 ```ts
 // skills.ipc.ts
-'skills:search'       // → { keyword: string }       ← SearchResult[]
-'skills:list'         // → void                       ← Skill[]
-'skills:install'      // → { package, agents[] }      ← InstallResult
-'skills:update'       // → { name, agents[] }         ← UpdateResult
-'skills:update-all'   // → { agents[] }               ← UpdateAllResult
-'skills:remove'       // → { name, agents[] }         ← RemoveResult
+'skills:search' // → { keyword: string }       ← SearchResult[]
+'skills:list' // → void                       ← Skill[]
+'skills:install' // → { package, agents[] }      ← InstallResult
+'skills:update' // → { name, agents[] }         ← UpdateResult
+'skills:update-all' // → { agents[] }               ← UpdateAllResult
+'skills:remove' // → { name, agents[] }         ← RemoveResult
 
 // env.ipc.ts
-'env:check'           // → void                       ← EnvStatus
-'env:install-node'    // → void                       ← DownloadProgress (streaming)
-'env:install-skills'  // → void                       ← InstallResult
+'env:check' // → void                       ← EnvStatus
+'env:install-node' // → void                       ← DownloadProgress (streaming)
+'env:install-skills' // → void                       ← InstallResult
 
 // store.ipc.ts
-'store:get-settings'  // → void                       ← Settings
-'store:set-settings'  // → Partial<Settings>          ← void
+'store:get-settings' // → void                       ← Settings
+'store:set-settings' // → Partial<Settings>          ← void
 ```
 
 ## Command Mapping
 
 ### Verified Commands (based on `npx skills --help`, v1.5.3)
 
-| Function | Command | Notes |
-|----------|---------|-------|
-| **Search** | `npx skills find {keyword}` | No `--json` support; text output with ANSI, needs parsing |
-| **List (project)** | `npx skills list --json` | Returns JSON array |
-| **List (global)** | `npx skills list -g --json` | Returns JSON array |
-| **List (by agent)** | `npx skills list -a {agent} --json` | Filter by agent |
-| **Install** | `npx skills add {package} --agent {a1} {a2} -y` | Multi-agent via space-separated args; `-y` skips prompts |
-| **Install (global)** | `npx skills add {package} -g -y` | Global install |
-| **Install (all agents)** | `npx skills add {package} --all` | Shorthand for `--skill '*' --agent '*' -y` |
-| **Update single** | `npx skills update {name} -y` | Update specific skill |
-| **Update (global)** | `npx skills update -g -y` | Update all global skills |
-| **Update (project)** | `npx skills update -p -y` | Update all project skills |
-| **Remove** | `npx skills remove {name} -y` | Remove by name |
-| **Remove (global)** | `npx skills remove {name} -g -y` | Remove from global |
-| **Remove (by agent)** | `npx skills remove {name} -a {agent} -y` | Remove from specific agent |
-| **Version check** | `npx skills --version` | Verify CLI available |
+| Function                 | Command                                         | Notes                                                     |
+| ------------------------ | ----------------------------------------------- | --------------------------------------------------------- |
+| **Search**               | `npx skills find {keyword}`                     | No `--json` support; text output with ANSI, needs parsing |
+| **List (project)**       | `npx skills list --json`                        | Returns JSON array                                        |
+| **List (global)**        | `npx skills list -g --json`                     | Returns JSON array                                        |
+| **List (by agent)**      | `npx skills list -a {agent} --json`             | Filter by agent                                           |
+| **Install**              | `npx skills add {package} --agent {a1} {a2} -y` | Multi-agent via space-separated args; `-y` skips prompts  |
+| **Install (global)**     | `npx skills add {package} -g -y`                | Global install                                            |
+| **Install (all agents)** | `npx skills add {package} --all`                | Shorthand for `--skill '*' --agent '*' -y`                |
+| **Update single**        | `npx skills update {name} -y`                   | Update specific skill                                     |
+| **Update (global)**      | `npx skills update -g -y`                       | Update all global skills                                  |
+| **Update (project)**     | `npx skills update -p -y`                       | Update all project skills                                 |
+| **Remove**               | `npx skills remove {name} -y`                   | Remove by name                                            |
+| **Remove (global)**      | `npx skills remove {name} -g -y`                | Remove from global                                        |
+| **Remove (by agent)**    | `npx skills remove {name} -a {agent} -y`        | Remove from specific agent                                |
+| **Version check**        | `npx skills --version`                          | Verify CLI available                                      |
 
 ### Output Parsing
 
@@ -246,16 +249,17 @@ Agent list from `SupportedAgents.md` (40+ agents), hardcoded as TypeScript const
 
 ```ts
 interface Agent {
-  name: string           // "Claude Code"
-  agentFlag: string      // "claude-code"
-  projectPath: string    // ".claude/skills/"
-  globalPath: string     // "~/.claude/skills/"
+  name: string // "Claude Code"
+  agentFlag: string // "claude-code"
+  projectPath: string // ".claude/skills/"
+  globalPath: string // "~/.claude/skills/"
 }
 ```
 
 ### Install Dialog
 
 Multi-select agent picker with:
+
 - Search/filter input
 - "Common" group (frequently used: Claude Code, Cursor, GitHub Copilot, Gemini CLI)
 - "All" group (alphabetical, scrollable)
@@ -295,17 +299,19 @@ class SkillsError extends Error {
     public command: string,
     public stderr: string,
     public exitCode: number | null
-  ) { super(message) }
+  ) {
+    super(message)
+  }
 }
 ```
 
-| Scenario | Response |
-|----------|----------|
-| Command not found (ENOENT) | Dialog + redirect to Environment Detection window |
-| Network timeout | Inline toast "Operation timed out" + retry button |
-| Execution failure | Inline error panel showing stderr, non-blocking |
-| Already installed | Toast "Already installed" + offer update |
-| Permission denied | Toast "Requires admin privileges" + relaunch prompt |
+| Scenario                   | Response                                            |
+| -------------------------- | --------------------------------------------------- |
+| Command not found (ENOENT) | Dialog + redirect to Environment Detection window   |
+| Network timeout            | Inline toast "Operation timed out" + retry button   |
+| Execution failure          | Inline error panel showing stderr, non-blocking     |
+| Already installed          | Toast "Already installed" + offer update            |
+| Permission denied          | Toast "Requires admin privileges" + relaunch prompt |
 
 ## Pinia Stores
 

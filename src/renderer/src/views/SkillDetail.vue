@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NPageHeader, NButton, NSpace, NDescriptions, NDescriptionsItem, NText, useMessage } from 'naive-ui'
+import {
+  NPageHeader,
+  NButton,
+  NSpace,
+  NDescriptions,
+  NDescriptionsItem,
+  NText,
+  useMessage
+} from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
 import SkillInstallDialog from '../components/skills/SkillInstallDialog.vue'
 import CommandOutput from '../components/common/CommandOutput.vue'
@@ -73,5 +81,7 @@ async function handleRemove(): Promise<void> {
 </template>
 
 <style scoped>
-.detail-page { max-width: 900px; }
+.detail-page {
+  max-width: 900px;
+}
 </style>

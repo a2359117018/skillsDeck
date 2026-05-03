@@ -1,19 +1,38 @@
 <script setup lang="ts">
-import { onMounted, ref, h } from 'vue'
-import { NDataTable, NButton, NSpace, NTabPane, NTabs, NEmpty, NSpin, useMessage } from 'naive-ui'
+import { onMounted, ref, h, watch } from 'vue'
+import {
+  NDataTable,
+  NButton,
+  NSpace,
+  NTabPane,
+  NTabs,
+  NEmpty,
+  NSpin,
+  NSelect,
+  useMessage
+} from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
+import { AGENTS } from '../constants/agents'
 import type { Skill } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const message = useMessage()
-const currentTab = ref('project')
+const currentTab = ref('global')
+const selectedAgent = ref<string | null>(null)
+
+const agentOptions = [
+  { label: '全部', value: '' },
+  ...AGENTS.map((a) => ({ label: a.name, value: a.agentFlag }))
+]
 
 async function loadSkills(): Promise<void> {
-  await skillsStore.fetchInstalled(currentTab.value === 'global')
+  await skillsStore.fetchInstalled(currentTab.value === 'global', selectedAgent.value || undefined)
 }
 
 onMounted(() => loadSkills())
+
+watch(selectedAgent, () => loadSkills())
 
 async function handleUpdateAll(): Promise<void> {
   const result = await skillsStore.updateAll(currentTab.value === 'global')
@@ -57,7 +76,11 @@ const columns: DataTableColumns<Skill> = [
     render(row: Skill) {
       return h(NSpace, { size: 'small' }, () => [
         h(NButton, { size: 'small', onClick: () => handleUpdate(row.name) }, () => '更新'),
-        h(NButton, { size: 'small', type: 'error', onClick: () => handleRemove(row.name) }, () => '删除')
+        h(
+          NButton,
+          { size: 'small', type: 'error', onClick: () => handleRemove(row.name) },
+          () => '删除'
+        )
       ])
     }
   }
@@ -68,12 +91,26 @@ const columns: DataTableColumns<Skill> = [
   <div class="list-page">
     <div class="list-header">
       <NTabs v-model:value="currentTab" @update:value="loadSkills">
-        <NTabPane name="project" tab="项目技能" />
         <NTabPane name="global" tab="全局技能" />
+        <NTabPane name="project" tab="项目技能" />
       </NTabs>
-      <NButton type="primary" size="small" :loading="skillsStore.loading" @click="handleUpdateAll">
-        全部更新
-      </NButton>
+      <NSpace align="center" :size="12">
+        <NSelect
+          v-model:value="selectedAgent"
+          :options="agentOptions"
+          placeholder="筛选 Agent"
+          clearable
+          style="width: 200px"
+        />
+        <NButton
+          type="primary"
+          size="small"
+          :loading="skillsStore.loading"
+          @click="handleUpdateAll"
+        >
+          全部更新
+        </NButton>
+      </NSpace>
     </div>
     <NSpin :show="skillsStore.loading">
       <NDataTable
@@ -88,7 +125,9 @@ const columns: DataTableColumns<Skill> = [
 </template>
 
 <style scoped>
-.list-page { max-width: 900px; }
+.list-page {
+  max-width: 900px;
+}
 .list-header {
   display: flex;
   justify-content: space-between;

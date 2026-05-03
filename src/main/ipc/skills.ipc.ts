@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import {
-  searchSkills,
+  searchSkillsApi,
   listSkills,
   installSkill,
   updateSkill,
@@ -10,7 +10,7 @@ import {
 
 export function registerSkillsIpc(): void {
   ipcMain.handle('skills:search', async (_, keyword: string) => {
-    return searchSkills(keyword)
+    return searchSkillsApi(keyword)
   })
 
   ipcMain.handle('skills:list', async (_, opts?: { global?: boolean; agent?: string }) => {
@@ -24,12 +24,9 @@ export function registerSkillsIpc(): void {
     }
   )
 
-  ipcMain.handle(
-    'skills:update',
-    async (_, opts: { packageRef: string; global?: boolean }) => {
-      return updateSkill(opts.packageRef, opts.global)
-    }
-  )
+  ipcMain.handle('skills:update', async (_, opts: { packageRef: string; global?: boolean }) => {
+    return updateSkill(opts.packageRef, opts.global)
+  })
 
   ipcMain.handle('skills:update-all', async (_, opts?: { global?: boolean }) => {
     return updateAllSkills(opts?.global)
