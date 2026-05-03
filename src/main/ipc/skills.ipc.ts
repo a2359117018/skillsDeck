@@ -26,8 +26,8 @@ export function registerSkillsIpc(): void {
 
   ipcMain.handle(
     'skills:update',
-    async (_, opts: { name: string; global?: boolean }) => {
-      return updateSkill(opts.name, opts.global)
+    async (_, opts: { packageRef: string; global?: boolean }) => {
+      return updateSkill(opts.packageRef, opts.global)
     }
   )
 
@@ -37,8 +37,8 @@ export function registerSkillsIpc(): void {
 
   ipcMain.handle(
     'skills:remove',
-    async (_, opts: { name: string; agent?: string; global?: boolean }) => {
-      return removeSkill(opts.name, opts.agent, opts.global)
+    async (_, opts: { packageRef: string; agent?: string; global?: boolean }) => {
+      return removeSkill(opts.packageRef, opts.agent, opts.global)
     }
   )
 }

@@ -5,9 +5,9 @@ export interface AppApi {
     search: (keyword: string) => Promise<string>
     list: (opts?: { global?: boolean; agent?: string }) => Promise<any[]>
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }) => Promise<any>
-    update: (opts: { name: string; global?: boolean }) => Promise<any>
+    update: (opts: { packageRef: string; global?: boolean }) => Promise<any>
     updateAll: (opts?: { global?: boolean }) => Promise<any>
-    remove: (opts: { name: string; agent?: string; global?: boolean }) => Promise<any>
+    remove: (opts: { packageRef: string; agent?: string; global?: boolean }) => Promise<any>
   }
   env: {
     check: () => Promise<any>

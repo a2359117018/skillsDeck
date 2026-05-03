@@ -8,11 +8,11 @@ const api = {
       ipcRenderer.invoke('skills:list', opts),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }) =>
       ipcRenderer.invoke('skills:install', opts),
-    update: (opts: { name: string; global?: boolean }) =>
+    update: (opts: { packageRef: string; global?: boolean }) =>
       ipcRenderer.invoke('skills:update', opts),
     updateAll: (opts?: { global?: boolean }) =>
       ipcRenderer.invoke('skills:update-all', opts),
-    remove: (opts: { name: string; agent?: string; global?: boolean }) =>
+    remove: (opts: { packageRef: string; agent?: string; global?: boolean }) =>
       ipcRenderer.invoke('skills:remove', opts)
   },
   env: {
