@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Skill } from '../../../shared/types'
+import type { Skill, CommandResult } from '../../../shared/types'
 
 export const useSkillsStore = defineStore('skills', () => {
   const searchOutput = ref('')
@@ -36,7 +36,7 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function install(packageRef: string, agents: string[], isGlobal: boolean): Promise<unknown> {
+  async function install(packageRef: string, agents: string[], isGlobal: boolean): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {
@@ -49,7 +49,7 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function update(packageRef: string, global?: boolean): Promise<unknown> {
+  async function update(packageRef: string, global?: boolean): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {
@@ -62,7 +62,7 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function updateAll(global?: boolean): Promise<unknown> {
+  async function updateAll(global?: boolean): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {
@@ -75,7 +75,7 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function remove(packageRef: string): Promise<unknown> {
+  async function remove(packageRef: string): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {

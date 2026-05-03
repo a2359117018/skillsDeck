@@ -19,6 +19,10 @@ function handleMenuUpdate(key: string): void {
 }
 
 const activeKey = computed(() => route.name as string)
+
+function openSettings(): void {
+  window.api.window.openSettings()
+}
 </script>
 
 <template>
@@ -30,7 +34,7 @@ const activeKey = computed(() => route.name as string)
         </div>
         <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
         <div style="padding: 16px; margin-top: auto">
-          <NButton @click="window.api.window.openSettings()">设置</NButton>
+          <NButton @click="openSettings">设置</NButton>
         </div>
       </NLayoutSider>
       <NLayout>
