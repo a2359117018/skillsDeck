@@ -6,7 +6,7 @@
 
 **Architecture:** Layered IPC — Main process Services ↔ IPC handlers ↔ Preload bridge ↔ Renderer (Vue 3 + Naive UI + Pinia). 3 windows: Main (skill management), Environment Detection, Settings.
 
-**Tech Stack:** Electron 39, electron-vite, Vue 3, Naive UI, Pinia, Vue Router 4, VueUse, execa, electron-store, strip-ansi
+**Tech Stack:** Electron 39, electron-vite, Vue 3, Naive UI, Pinia, Vue Router 4, VueUse, execa, electron-store, strip-ansi, decompress
 
 ---
 
@@ -56,6 +56,31 @@ P6 — Polish & Integration (depends on P5)
 
 ---
 
+## P-1: Pre-Implementation Verification
+
+### 0.1 Verify npx skills CLI Interface
+
+**Priority:** P-1 (before P0) | **Depends on:** nothing
+
+Before building services, verify all assumed CLI flags against the actual CLI.
+
+- [ ] **Step 1: Run `npx skills --help` and verify these commands exist**
+
+Expected subcommands: `find`, `list`, `add`, `remove`, `update`
+Expected flags: `--json` (list only), `--agent`, `-g`, `-y`, `--all`, `--version`
+
+- [ ] **Step 2: Run `npx skills list --json` and inspect output schema**
+
+Document the JSON structure (field names, types) — this becomes the contract for SkillsService.listSkills() parsing.
+
+- [ ] **Step 3: Run `npx skills find <keyword>` and confirm output format**
+
+Confirm that `find` does NOT support `--json`. Document the raw text format for CommandOutput component parsing.
+
+- [ ] **Step 4: Record verified CLI interface in a comment in SkillsService.ts**
+
+---
+
 ## P0: Project Foundation
 
 ### 1.1 Install Dependencies
@@ -68,13 +93,13 @@ P6 — Polish & Integration (depends on P5)
 - [ ] **Step 1: Install runtime dependencies**
 
 ```bash
-npm install naive-ui pinia vue-router@4 @vueuse/core execa electron-store strip-ansi
+npm install naive-ui pinia vue-router@4 @vueuse/core execa electron-store strip-ansi decompress
 ```
 
 - [ ] **Step 2: Install dev type dependencies**
 
 ```bash
-npm install -D @types/strip-ansi
+npm install -D @types/strip-ansi @types/decompress
 ```
 
 - [ ] **Step 3: Verify existing template still typechecks**
@@ -130,11 +155,13 @@ git commit -m "chore: scaffold directory structure"
 **Priority:** P0 (blocking) | **Depends on:** 1.2
 
 **Files:**
-- Create: `src/main/types.ts`
+- Create: `src/shared/types.ts` (new shared location accessible to both tsconfig.node.json and tsconfig.web.json)
+- Modify: `tsconfig.node.json` (add `src/shared/**/*` to include)
+- Modify: `tsconfig.web.json` (add `src/shared/**/*` to include)
 
-These types are used by both Main process services and Renderer (via Preload declarations). They define the data contracts for IPC communication.
+These types are used by both Main process services and Renderer (via Preload declarations). They define the data contracts for IPC communication. Placing them in `src/shared/` ensures both tsconfig scopes can import them, eliminating the `any` typing problem in the preload bridge.
 
-- [ ] **Step 1: Create `src/main/types.ts`**
+- [ ] **Step 1: Create `src/shared/types.ts`**
 
 ```ts
 export interface EnvStatus {
@@ -177,6 +204,8 @@ git add src/main/types.ts
 git commit -m "feat: add shared type definitions for IPC contracts"
 ```
 
+> **Important:** All subsequent `import type { ... } from '../types'` references in Main process files should use `import type { ... } from '../../shared/types'` (adjusted for relative path). The Preload `index.d.ts` should import from `../../shared/types` to replace `any` return types with proper types.
+
 ---
 
 ## P1: Core Services & Constants
@@ -189,6 +218,8 @@ git commit -m "feat: add shared type definitions for IPC contracts"
 - Create: `src/renderer/src/constants/agents.ts`
 
 Agent list from `SupportedAgents.md`, hardcoded as a TypeScript constant array. This file lives in renderer because it's only used by UI components (install dialog, list page).
+
+> **Maintenance note:** This list must be synced manually when `SupportedAgents.md` is updated. Add a comment at the top of the file documenting this. Consider adding a CI check or build script that compares this file against SupportedAgents.md in the future.
 
 - [ ] **Step 1: Create `src/renderer/src/constants/agents.ts`**
 
@@ -481,16 +512,17 @@ git commit -m "feat: add SkillsService (execa wrapper for npx skills CLI)"
 **Files:**
 - Create: `src/main/services/EnvService.ts`
 
-Detects Node.js / npx / skills availability. Provides Node.js download capability for non-technical users.
+Detects Node.js / npx / skills availability. Provides Node.js download + extraction + PATH registration for non-technical users.
 
 - [ ] **Step 1: Create `src/main/services/EnvService.ts`**
 
 ```ts
 import { execa } from 'execa'
 import { app } from 'electron'
-import { createWriteStream, existsSync, mkdirSync } from 'fs'
+import { createWriteStream, existsSync, mkdirSync, readdirSync } from 'fs'
 import { join } from 'path'
-import type { EnvStatus } from '../types'
+import decompress from 'decompress'
+import type { EnvStatus } from '../../shared/types'
 
 async function checkCommand(
   command: string,
@@ -545,14 +577,14 @@ export async function downloadNode(
     mkdirSync(installDir, { recursive: true })
   }
   const fileName = url.split('/').pop()!
-  const filePath = join(installDir, fileName)
+  const archivePath = join(installDir, fileName)
 
   const response = await fetch(url)
   if (!response.ok) throw new Error(`Download failed: ${response.statusText}`)
   const contentLength = Number(response.headers.get('content-length') || 0)
   let downloaded = 0
 
-  const stream = createWriteStream(filePath)
+  const stream = createWriteStream(archivePath)
   const reader = response.body?.getReader()
   if (!reader) throw new Error('No response body')
 
@@ -566,7 +598,18 @@ export async function downloadNode(
     }
   }
   stream.end()
-  return filePath
+
+  return archivePath
+}
+
+export async function extractAndRegisterNode(archivePath: string): Promise<string> {
+  const installDir = getNodeInstallDir()
+  await decompress(archivePath, installDir)
+  const extractedDirName = readdirSync(installDir).find(
+    (d) => d.startsWith('node-v') && !d.endsWith('.zip') && !d.endsWith('.tar.gz') && !d.endsWith('.tar.xz')
+  )
+  if (!extractedDirName) throw new Error('Extraction failed: no node directory found')
+  return join(installDir, extractedDirName)
 }
 ```
 
@@ -711,7 +754,7 @@ import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
 import { getSettings, setEnvStatus } from './services/StoreService'
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.npx-skills-ui')
 
   app.on('browser-window-created', (_, window) => {
@@ -719,17 +762,17 @@ app.whenReady().then(async () => {
   })
 
   registerIpcHandlers()
+  createMainWindow()
 
   const settings = getSettings()
   if (settings.autoCheckEnv) {
-    const status = await checkAll()
-    setEnvStatus(status)
-    if (!status.nodeInstalled || !status.npxInstalled || !status.skillsInstalled) {
-      createEnvWindow()
-    }
+    checkAll().then((status) => {
+      setEnvStatus(status)
+      if (!status.nodeInstalled || !status.npxInstalled || !status.skillsInstalled) {
+        createEnvWindow()
+      }
+    })
   }
-
-  createMainWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -742,7 +785,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
+}
 ```
 
 - [ ] **Step 3: Verify typecheck**
@@ -825,8 +868,7 @@ export function registerSkillsIpc(): void {
 
 ```ts
 import { ipcMain, BrowserWindow } from 'electron'
-import { checkAll } from '../services/EnvService'
-import { downloadNode } from '../services/EnvService'
+import { checkAll, downloadNode, extractAndRegisterNode } from '../services/EnvService'
 import { setEnvStatus } from '../services/StoreService'
 import { closeEnvWindow, createSettingsWindow } from '../services/WindowManager'
 
@@ -839,10 +881,11 @@ export function registerEnvIpc(): void {
 
   ipcMain.handle('env:install-node', async (event) => {
     try {
-      await downloadNode((percent) => {
+      const archivePath = await downloadNode((percent) => {
         const win = BrowserWindow.fromWebContents(event.sender)
         win?.webContents.send('env:download-progress', percent)
       })
+      await extractAndRegisterNode(archivePath)
       const status = await checkAll()
       setEnvStatus(status)
       if (status.nodeInstalled && status.npxInstalled && status.skillsInstalled) {
@@ -1002,495 +1045,12 @@ declare global {
 }
 ```
 
+- [ ] **Step 2: Add `src/shared` to both tsconfig files**
+
+In `tsconfig.node.json`, add `"src/shared/**/*"` to the `include` array.
+In `tsconfig.web.json`, add `"src/shared/**/*"` to the `include` array.
+
 - [ ] **Step 3: Verify typecheck**
-
-Run: `npm run typecheck`
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add src/preload/
-git commit -m "feat: add typed preload API bridge for IPC"
-```
-
----
-
-## P3: Renderer Foundation
-
-### 4.1 Vue Router + Pinia Setup
-
-**Priority:** P3 | **Depends on:** 3.2
-
-**Files:**
-- Modify: `src/renderer/src/main.ts`
-- Create: `src/renderer/src/router/index.ts`
-- Create: `src/renderer/src/stores/skills.ts`
-- Create: `src/renderer/src/stores/env.ts`
-- Create: `src/renderer/src/stores/settings.ts`
-
-Four files: router with 3 routes, and 3 Pinia stores that wrap IPC calls.
-
-- [ ] **Step 1: Create `src/renderer/src/router/index.ts`**
-
-```ts
-import { createRouter, createWebHashHistory } from 'vue-router'
-
-const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
-    { path: '/', redirect: '/search' },
-    {
-      path: '/search',
-      name: 'search',
-      component: () => import('../views/SkillsSearch.vue')
-    },
-    {
-      path: '/list',
-      name: 'list',
-      component: () => import('../views/SkillsList.vue')
-    },
-    {
-      path: '/detail/:packageRef',
-      name: 'detail',
-      component: () => import('../views/SkillDetail.vue'),
-      props: true
-    }
-  ]
-})
-
-export default router
-```
-
-- [ ] **Step 2: Create `src/renderer/src/stores/skills.ts`**
-
-```ts
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
-export const useSkillsStore = defineStore('skills', () => {
-  const searchOutput = ref('')
-  const installedSkills = ref<any[]>([])
-  const loading = ref(false)
-  const currentOperation = ref<{ type: string; name: string } | null>(null)
-
-  async function search(keyword: string) {
-    loading.value = true
-    try {
-      searchOutput.value = await window.api.skills.search(keyword)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function fetchInstalled(global?: boolean) {
-    loading.value = true
-    try {
-      installedSkills.value = await window.api.skills.list({ global })
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function install(packageRef: string, agents: string[], global?: boolean) {
-    currentOperation.value = { type: 'install', name: packageRef }
-    try {
-      return await window.api.skills.install({ packageRef, agents, global })
-    } finally {
-      currentOperation.value = null
-    }
-  }
-
-  async function update(name: string, global?: boolean) {
-    currentOperation.value = { type: 'update', name }
-    try {
-      return await window.api.skills.update({ name, global })
-    } finally {
-      currentOperation.value = null
-    }
-  }
-
-  async function updateAll(global?: boolean) {
-    currentOperation.value = { type: 'update', name: 'all' }
-    try {
-      return await window.api.skills.updateAll({ global })
-    } finally {
-      currentOperation.value = null
-    }
-  }
-
-  async function remove(name: string, agent?: string, global?: boolean) {
-    currentOperation.value = { type: 'remove', name }
-    try {
-      return await window.api.skills.remove({ name, agent, global })
-    } finally {
-      currentOperation.value = null
-    }
-  }
-
-  return {
-    searchOutput,
-    installedSkills,
-    loading,
-    currentOperation,
-    search,
-    fetchInstalled,
-    install,
-    update,
-    updateAll,
-    remove
-  }
-})
-```
-
-- [ ] **Step 3: Create `src/renderer/src/stores/env.ts`**
-
-```ts
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
-export const useEnvStore = defineStore('env', () => {
-  const nodeInstalled = ref(false)
-  const nodeVersion = ref<string | null>(null)
-  const npxInstalled = ref(false)
-  const skillsInstalled = ref(false)
-  const checking = ref(false)
-
-  async function check() {
-    checking.value = true
-    try {
-      const status = await window.api.env.check()
-      nodeInstalled.value = status.nodeInstalled
-      nodeVersion.value = status.nodeVersion
-      npxInstalled.value = status.npxInstalled
-      skillsInstalled.value = status.skillsInstalled
-    } finally {
-      checking.value = false
-    }
-  }
-
-  return { nodeInstalled, nodeVersion, npxInstalled, skillsInstalled, checking, check }
-})
-```
-
-- [ ] **Step 4: Create `src/renderer/src/stores/settings.ts`**
-
-```ts
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
-export const useSettingsStore = defineStore('settings', () => {
-  const defaultAgent = ref('claude-code')
-  const autoCheckEnv = ref(true)
-
-  async function load() {
-    const s = await window.api.store.getSettings()
-    if (s) {
-      defaultAgent.value = s.defaultAgent
-      autoCheckEnv.value = s.autoCheckEnv
-    }
-  }
-
-  async function save(partial: Record<string, unknown>) {
-    await window.api.store.setSettings(partial)
-    if (partial.defaultAgent !== undefined) defaultAgent.value = partial.defaultAgent as string
-    if (partial.autoCheckEnv !== undefined) autoCheckEnv.value = partial.autoCheckEnv as boolean
-  }
-
-  return { defaultAgent, autoCheckEnv, load, save }
-})
-```
-
-- [ ] **Step 5: Rewrite `src/renderer/src/main.ts`**
-
-```ts
-import './assets/main.css'
-
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import router from './router'
-import App from './App.vue'
-
-const app = createApp(App)
-app.use(createPinia())
-app.use(router)
-app.mount('#app')
-```
-
-- [ ] **Step 6: Verify typecheck**
-
-Run: `npm run typecheck`
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add src/renderer/src/main.ts src/renderer/src/router/ src/renderer/src/stores/
-git commit -m "feat: add Vue Router, Pinia stores (skills, env, settings)"
-```
-
----
-
-### 4.2 App Layout Shell
-
-**Priority:** P3 | **Depends on:** 4.1
-
-**Files:**
-- Modify: `src/renderer/src/App.vue`
-- Create: `src/renderer/src/views/MainView.vue`
-- Create: `src/renderer/src/components/layout/AppSidebar.vue`
-- Create: `src/renderer/src/components/common/EnvStatusBadge.vue`
-
-App.vue detects `?window=` query param to render the correct view. MainView provides sidebar + content layout. EnvStatusBadge shows environment indicators.
-
-- [ ] **Step 1: Create `src/renderer/src/components/common/EnvStatusBadge.vue`**
-
-```vue
-<script setup lang="ts">
-import { NText } from 'naive-ui'
-defineProps<{ label: string; ok: boolean }>()
-</script>
-
-<template>
-  <div class="env-badge">
-    <span :class="ok ? 'dot-ok' : 'dot-err'">{{ ok ? '✓' : '✗' }}</span>
-    <NText :type="ok ? 'success' : 'error'" style="font-size: 12px">{{ label }}</NText>
-  </div>
-</template>
-
-<style scoped>
-.env-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.dot-ok { color: #18a058; }
-.dot-err { color: #d03050; }
-</style>
-```
-
-- [ ] **Step 2: Create `src/renderer/src/components/layout/AppSidebar.vue`**
-
-```vue
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { computed } from 'vue'
-import { NMenu, NButton, NDivider, NText } from 'naive-ui'
-import { useEnvStore } from '../../stores/env'
-import EnvStatusBadge from '../common/EnvStatusBadge.vue'
-
-const router = useRouter()
-const envStore = useEnvStore()
-
-const menuOptions = [
-  { label: '搜索技能', key: 'search' },
-  { label: '已安装列表', key: 'list' }
-]
-
-function handleMenuClick(key: string) {
-  router.push({ name: key })
-}
-
-const currentKey = computed(() => {
-  const name = router.currentRoute.value.name
-  if (name === 'search' || name === 'detail') return 'search'
-  return name as string
-})
-</script>
-
-<template>
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <NText strong style="font-size: 16px">NPX Skills</NText>
-    </div>
-    <NMenu :value="currentKey" :options="menuOptions" @update:value="handleMenuClick" />
-    <NButton quaternary size="small" block @click="window.api.window.openSettings()">
-      设置
-    </NButton>
-    <NDivider style="margin: 8px 0" />
-    <div class="sidebar-env">
-      <NText depth="3" style="font-size: 12px; margin-bottom: 4px">环境状态</NText>
-      <EnvStatusBadge label="Node" :ok="envStore.nodeInstalled" />
-      <EnvStatusBadge label="npx" :ok="envStore.npxInstalled" />
-      <EnvStatusBadge label="skills" :ok="envStore.skillsInstalled" />
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 12px 8px;
-  width: 200px;
-  border-right: 1px solid rgb(239, 239, 245);
-}
-.sidebar-logo { padding: 8px 12px 16px; }
-.sidebar-env {
-  margin-top: auto;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-</style>
-```
-
-- [ ] **Step 3: Create `src/renderer/src/views/MainView.vue`**
-
-```vue
-<script setup lang="ts">
-import AppSidebar from '../components/layout/AppSidebar.vue'
-</script>
-
-<template>
-  <div class="main-layout">
-    <AppSidebar />
-    <div class="main-content">
-      <router-view />
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.main-layout { display: flex; height: 100vh; width: 100vw; }
-.main-content { flex: 1; overflow-y: auto; padding: 16px 24px; }
-</style>
-```
-
-- [ ] **Step 4: Rewrite `src/renderer/src/App.vue`**
-
-```vue
-<script setup lang="ts">
-import { computed } from 'vue'
-import { NConfigProvider, NMessageProvider } from 'naive-ui'
-import MainView from './views/MainView.vue'
-import EnvDetection from './views/EnvDetection.vue'
-import SettingsView from './views/SettingsView.vue'
-
-const windowType = computed(() => {
-  const params = new URLSearchParams(window.location.search)
-  return params.get('window') || 'main'
-})
-</script>
-
-<template>
-  <NConfigProvider>
-    <NMessageProvider>
-      <MainView v-if="windowType === 'main'" />
-      <EnvDetection v-else-if="windowType === 'env'" />
-      <SettingsView v-else-if="windowType === 'settings'" />
-    </NMessageProvider>
-  </NConfigProvider>
-</template>
-```
-
-> **Note:** EnvDetection.vue and SettingsView.vue do not exist yet at this stage. Create empty stub files for both in this step so typecheck passes. They will be replaced with full implementations in tasks 6.1 and 6.2.
-
-**EnvDetection.vue stub:**
-```vue
-<template><div>Environment detection — to be implemented</div></template>
-```
-
-**SettingsView.vue stub:**
-```vue
-<template><div>Settings — to be implemented</div></template>
-```
-
-- [ ] **Step 5: Verify typecheck**
-
-Run: `npm run typecheck`
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add src/renderer/src/App.vue src/renderer/src/views/MainView.vue src/renderer/src/components/layout/AppSidebar.vue src/renderer/src/components/common/EnvStatusBadge.vue
-git commit -m "feat: add app layout shell with sidebar, env badges, window routing"
-```
-
----
-
-## P4: Core UI Pages
-
-### 5.1 CommandOutput Component
-
-**Priority:** P4 | **Depends on:** 4.2
-
-**Files:**
-- Create: `src/renderer/src/components/common/CommandOutput.vue`
-
-Terminal-style output panel. Only `owner/repo@skill-name` patterns are rendered as clickable links; everything else is plain text. Graceful degradation: if regex fails, raw text is shown.
-
-- [ ] **Step 1: Create `src/renderer/src/components/common/CommandOutput.vue`**
-
-```vue
-<script setup lang="ts">
-import { computed } from 'vue'
-
-const props = defineProps<{ content: string }>()
-const emit = defineEmits<{ (e: 'select-skill', packageRef: string): void }>()
-
-interface Segment {
-  id: number
-  type: 'text' | 'skill-ref'
-  text: string
-}
-
-const SKILL_REF_REGEX = /[a-zA-Z0-9_.\-]+\/[a-zA-Z0-9_.\-]+@[a-zA-Z0-9_.\-]+/g
-
-const segments = computed<Segment[]>(() => {
-  const result: Segment[] = []
-  let lastIndex = 0
-  let id = 0
-  const content = props.content
-  const regex = new RegExp(SKILL_REF_REGEX.source, 'g')
-  let match
-  while ((match = regex.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      result.push({ id: id++, type: 'text', text: content.slice(lastIndex, match.index) })
-    }
-    result.push({ id: id++, type: 'skill-ref', text: match[0] })
-    lastIndex = regex.lastIndex
-  }
-  if (lastIndex < content.length) {
-    result.push({ id: id++, type: 'text', text: content.slice(lastIndex) })
-  }
-  return result
-})
-</script>
-
-<template>
-  <div class="command-output">
-    <template v-for="seg in segments" :key="seg.id">
-      <a v-if="seg.type === 'skill-ref'" class="skill-ref" @click="emit('select-skill', seg.text)">
-        {{ seg.text }}
-      </a>
-      <span v-else>{{ seg.text }}</span>
-    </template>
-    <div v-if="!content" class="empty">暂无输出</div>
-  </div>
-</template>
-
-<style scoped>
-.command-output {
-  background-color: #1e1e1e;
-  color: #d4d4d4;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 400px;
-  overflow-y: auto;
-}
-.skill-ref { color: #569cd6; cursor: pointer; text-decoration: underline; }
-.skill-ref:hover { color: #9cdcfe; }
-.empty { color: #666; }
-</style>
-```
-
-- [ ] **Step 2: Verify typecheck**
 
 Run: `npm run typecheck`
 
