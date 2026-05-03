@@ -18,12 +18,12 @@ P0 — Project Foundation (must complete before anything else)
   ├─ 1.2 Create directory structure
   └─ 1.3 Shared type definitions
 
-P1 — Main Process Core (depends on P0)
+P1 — Core Services & Constants (depends on P0)
   ├─ 2.1 Agent constants                    ← depends: 1.3
   ├─ 2.2 StoreService                       ← depends: 1.3
   ├─ 2.3 SkillsService                      ← depends: 1.3
   ├─ 2.4 EnvService                         ← depends: 1.3
-  └─ 2.5 WindowManager                      ← depends: 2.2, 2.4
+  └─ 2.5 WindowManager + main entry         ← depends: 2.2, 2.4
 
 P2 — IPC Bridge (depends on P1)
   ├─ 3.1 IPC handlers (skills/env/store)    ← depends: 2.2, 2.3, 2.4, 2.5
@@ -35,7 +35,7 @@ P3 — Renderer Foundation (depends on P2)
 
 P4 — Core UI Pages (depends on P3)
   ├─ 5.1 CommandOutput component            ← depends: 4.2
-  ├─ 5.2 Search page                        ← depends: 5.1, 2.1
+  ├─ 5.2 Search page                        ← depends: 5.1, 5.4
   ├─ 5.3 Installed list page                ← depends: 4.2
   ├─ 5.4 Install dialog (agent multi-select)← depends: 2.1, 4.2
   └─ 5.5 Skill detail page                  ← depends: 5.4
@@ -51,7 +51,7 @@ P6 — Polish & Integration (depends on P5)
 
 **Parallelizable groups:**
 - P1: 2.1, 2.2, 2.3, 2.4 can run in parallel
-- P4: 5.1, 5.3 can run in parallel; 5.2 and 5.4 need 5.1 or 2.1 respectively
+- P4: 5.1, 5.3, 5.4 can run in parallel; 5.2 needs 5.1 + 5.4; 5.5 needs 5.4
 - P5: 6.1 and 6.2 can run in parallel
 
 ---
@@ -162,7 +162,6 @@ export interface CommandResult {
 export interface AppSettings {
   defaultAgent: string
   autoCheckEnv: boolean
-  nodeCustomPath: string | null
 }
 ```
 
@@ -180,7 +179,7 @@ git commit -m "feat: add shared type definitions for IPC contracts"
 
 ---
 
-## P1: Main Process Core
+## P1: Core Services & Constants
 
 ### 2.1 Agent Constants
 
@@ -298,32 +297,38 @@ interface StoreSchema {
   envStatus: EnvStatus | null
 }
 
-const store = new Store<StoreSchema>({
-  defaults: {
-    settings: {
-      defaultAgent: 'claude-code',
-      autoCheckEnv: true,
-      nodeCustomPath: null
-    },
-    envStatus: null
+let store: Store<StoreSchema> | null = null
+
+function getStore(): Store<StoreSchema> {
+  if (!store) {
+    store = new Store<StoreSchema>({
+      defaults: {
+        settings: {
+          defaultAgent: 'claude-code',
+          autoCheckEnv: true
+        },
+        envStatus: null
+      }
+    })
   }
-})
+  return store
+}
 
 export function getSettings(): AppSettings {
-  return store.get('settings')
+  return getStore().get('settings')
 }
 
 export function setSettings(partial: Partial<AppSettings>): void {
-  const current = store.get('settings')
-  store.set('settings', { ...current, ...partial })
+  const current = getStore().get('settings')
+  getStore().set('settings', { ...current, ...partial })
 }
 
 export function getEnvStatus(): EnvStatus | null {
-  return store.get('envStatus')
+  return getStore().get('envStatus')
 }
 
 export function setEnvStatus(status: EnvStatus): void {
-  store.set('envStatus', status)
+  getStore().set('envStatus', status)
 }
 ```
 
@@ -374,7 +379,8 @@ async function execute(args: string[]): Promise<CommandResult> {
   try {
     const result = await execa('npx', ['skills', ...args], {
       timeout: COMMAND_TIMEOUT,
-      reject: false
+      reject: false,
+      shell: process.platform === 'win32'
     })
     return {
       success: result.exitCode === 0,
@@ -395,6 +401,9 @@ async function execute(args: string[]): Promise<CommandResult> {
 
 export async function searchSkills(keyword: string): Promise<string> {
   const result = await execute(['find', keyword])
+  if (!result.success) {
+    throw new SkillsError('EXECUTION_FAILED', 'find', result.stderr, result.exitCode)
+  }
   return stripAnsi(result.stdout)
 }
 
@@ -488,7 +497,7 @@ async function checkCommand(
   args: string[]
 ): Promise<{ ok: boolean; version: string | null }> {
   try {
-    const result = await execa(command, args, { timeout: 10000, reject: false })
+    const result = await execa(command, args, { timeout: 10000, reject: false, shell: process.platform === 'win32' })
     if (result.exitCode === 0) {
       return { ok: true, version: result.stdout.trim() }
     }
@@ -510,14 +519,17 @@ export async function checkAll(): Promise<EnvStatus> {
   }
 }
 
-const NODE_DOWNLOAD_URLS: Record<string, string> = {
-  win32: 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-win-x64.zip',
-  darwin: 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-arm64.tar.gz',
-  linux: 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-linux-x64.tar.xz'
+const NODE_DOWNLOAD_URLS: Record<string, () => string> = {
+  win32: () => 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-win-x64.zip',
+  darwin: () =>
+    process.arch === 'arm64'
+      ? 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-arm64.tar.gz'
+      : 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-x64.tar.gz',
+  linux: () => 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-linux-x64.tar.xz'
 }
 
 export function getNodeDownloadUrl(): string {
-  return NODE_DOWNLOAD_URLS[process.platform] || NODE_DOWNLOAD_URLS.linux
+  return (NODE_DOWNLOAD_URLS[process.platform] || NODE_DOWNLOAD_URLS.linux)()
 }
 
 export function getNodeInstallDir(): string {
@@ -578,6 +590,12 @@ git commit -m "feat: add EnvService (env detection + Node.js download)"
 **Files:**
 - Create: `src/main/services/WindowManager.ts`
 - Modify: `src/main/index.ts`
+
+> **Note:** Task 2.5 rewrites index.ts which imports `./ipc` (created in task 3.1). Create a minimal `src/main/ipc/index.ts` stub in this step:
+> ```ts
+> export function registerIpcHandlers(): void {}
+> ```
+> This stub will be replaced with the full implementation in task 3.1.
 
 Manages lifecycle of all 3 windows. Each window loads the same `index.html` but with a `?window=<type>` query param to distinguish which view to render. Main entry updated to run env check on startup.
 
@@ -1163,14 +1181,12 @@ import { ref } from 'vue'
 export const useSettingsStore = defineStore('settings', () => {
   const defaultAgent = ref('claude-code')
   const autoCheckEnv = ref(true)
-  const nodeCustomPath = ref<string | null>(null)
 
   async function load() {
     const s = await window.api.store.getSettings()
     if (s) {
       defaultAgent.value = s.defaultAgent
       autoCheckEnv.value = s.autoCheckEnv
-      nodeCustomPath.value = s.nodeCustomPath
     }
   }
 
@@ -1178,11 +1194,9 @@ export const useSettingsStore = defineStore('settings', () => {
     await window.api.store.setSettings(partial)
     if (partial.defaultAgent !== undefined) defaultAgent.value = partial.defaultAgent as string
     if (partial.autoCheckEnv !== undefined) autoCheckEnv.value = partial.autoCheckEnv as boolean
-    if (partial.nodeCustomPath !== undefined)
-      nodeCustomPath.value = partial.nodeCustomPath as string | null
   }
 
-  return { defaultAgent, autoCheckEnv, nodeCustomPath, load, save }
+  return { defaultAgent, autoCheckEnv, load, save }
 })
 ```
 
@@ -1368,15 +1382,18 @@ const windowType = computed(() => {
     </NMessageProvider>
   </NConfigProvider>
 </template>
+```
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-#app { height: 100vh; width: 100vw; overflow: hidden; }
-</style>
+> **Note:** EnvDetection.vue and SettingsView.vue do not exist yet at this stage. Create empty stub files for both in this step so typecheck passes. They will be replaced with full implementations in tasks 6.1 and 6.2.
+
+**EnvDetection.vue stub:**
+```vue
+<template><div>Environment detection — to be implemented</div></template>
+```
+
+**SettingsView.vue stub:**
+```vue
+<template><div>Settings — to be implemented</div></template>
 ```
 
 - [ ] **Step 5: Verify typecheck**
@@ -1644,6 +1661,7 @@ async function handleUpdate(name: string) {
 }
 
 async function handleRemove(name: string) {
+  if (!window.confirm(`确定删除 ${name}? 此操作不可撤销`)) return
   const result = await skillsStore.remove(name)
   if (result.success) {
     message.success(`${name} 已删除`)
