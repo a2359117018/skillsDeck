@@ -48,12 +48,10 @@ const showGlobalLoading = computed(() => skillsStore.fetching)
               </div>
               <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
             </NLayoutSider>
-            <NLayout>
-              <div style="padding: 24px; overflow-y: auto; height: 100vh">
-                <Transition name="fade" mode="out-in">
-                  <router-view />
-                </Transition>
-              </div>
+            <NLayout class="content-area">
+              <Transition name="fade" mode="out-in">
+                <router-view />
+              </Transition>
             </NLayout>
           </NLayout>
           <AppLoading :show="showGlobalLoading" />
@@ -73,5 +71,10 @@ const showGlobalLoading = computed(() => skillsStore.fetching)
 }
 .sidebar-header {
   border-bottom: 1px solid var(--n-border-color);
+}
+.content-area {
+  padding: 24px;
+  height: 100%;
+  overflow: hidden;
 }
 </style>

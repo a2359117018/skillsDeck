@@ -142,7 +142,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
       @update:show="(val: boolean) => { if (!val) closeDrawer() }"
       @mask-click="closeDrawer"
     >
-      <NDrawerContent closable @close="closeDrawer">
+      <NDrawerContent closable :native-scrollbar="false" @close="closeDrawer">
         <template #header>
           <NSpace align="center" :size="8">
             <NText strong style="font-size: 16px">

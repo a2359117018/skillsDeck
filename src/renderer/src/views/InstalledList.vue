@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NButton, NEmpty, NSpace, NText } from 'naive-ui'
+import { NButton, NEmpty, NSpace, NText, NScrollbar } from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
 import { useMessage } from 'naive-ui'
@@ -91,29 +91,39 @@ function handleOpenLocation(path: string): void {
         </NButton>
       </NSpace>
     </div>
-    <div v-if="skillsStore.filteredSkills.length > 0" class="card-grid">
-      <SkillCard
-        v-for="skill in skillsStore.filteredSkills"
-        :key="skill.name"
-        :skill="skill"
-        @update="handleUpdate"
-        @remove="handleRemove"
-        @open-location="handleOpenLocation"
-      />
-    </div>
-    <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
+    <NScrollbar class="list-scroll">
+      <div v-if="skillsStore.filteredSkills.length > 0" class="card-grid">
+        <SkillCard
+          v-for="skill in skillsStore.filteredSkills"
+          :key="skill.name"
+          :skill="skill"
+          @update="handleUpdate"
+          @remove="handleRemove"
+          @open-location="handleOpenLocation"
+        />
+      </div>
+      <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
+    </NScrollbar>
   </div>
 </template>
 
 <style scoped>
 .list-page {
   max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.list-scroll {
+  flex: 1;
+  min-height: 0;
 }
 .count-text {
   font-size: 14px;

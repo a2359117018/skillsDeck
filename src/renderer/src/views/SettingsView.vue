@@ -40,7 +40,6 @@ async function handleSave(): Promise<void> {
 
 <style scoped>
 .settings-page {
-  padding: 24px;
-  height: 100vh;
+  max-width: 600px;
 }
 </style>
