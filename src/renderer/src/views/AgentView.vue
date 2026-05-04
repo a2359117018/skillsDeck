@@ -272,7 +272,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  gap: 16px;
   padding-bottom: 24px;
 }
 
@@ -318,7 +318,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid var(--n-border-color);
+  border-bottom: 1px solid #e8eaee;
 }
 
 .skill-table-row:last-child {
@@ -337,6 +337,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--n-text-color);
+  color: #333;
 }
 </style>

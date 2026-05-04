@@ -22,6 +22,7 @@ const windowType = new URLSearchParams(window.location.search).get('window') || 
 const menuOptions: MenuOption[] = [
   { label: '技能', key: 'installed' },
   { label: '技能搜索', key: 'search' },
+  { type: 'divider', key: 'd0' },
   { label: 'Agents', key: 'agent-view' },
   { type: 'divider', key: 'd1' },
   { label: '设置', key: 'settings' }
@@ -69,8 +70,11 @@ const showGlobalLoading = computed(() => skillsStore.fetching)
   height: 100vh;
   position: relative;
 }
+.app-shell :deep(.n-layout) {
+  height: 100%;
+}
 .sidebar-header {
-  border-bottom: 1px solid var(--n-border-color);
+  border-bottom: 1px solid var(--card-border-color, #e2e4e8);
 }
 .content-area {
   padding: 24px;
