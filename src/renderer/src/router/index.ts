@@ -1,4 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { ref } from 'vue'
+
+export const isNavigating = ref(false)
 
 const routes = [
   { path: '/', name: 'installed', component: () => import('../views/InstalledList.vue') },
@@ -17,4 +20,12 @@ const routes = [
 export const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+router.beforeEach(() => {
+  isNavigating.value = true
+})
+
+router.afterEach(() => {
+  isNavigating.value = false
 })
