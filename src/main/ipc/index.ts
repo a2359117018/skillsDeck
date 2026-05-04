@@ -5,6 +5,7 @@ import { registerStoreIpc } from './store.ipc'
 
 function registerShellIpc(): void {
   ipcMain.handle('shell:open-path', async (_, path: string) => {
+    if (!path || typeof path !== 'string') return
     shell.showItemInFolder(path)
   })
 }
