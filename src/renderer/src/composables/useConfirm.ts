@@ -57,7 +57,8 @@ export function useConfirm(): {
   function confirmUpdateAll(names: string[]): Promise<boolean> {
     const maxShow = 10
     const displayed = names.slice(0, maxShow).join('、')
-    const suffix = names.length > maxShow ? `...等 ${names.length} 个技能` : `共 ${names.length} 个技能`
+    const suffix =
+      names.length > maxShow ? `...等 ${names.length} 个技能` : `共 ${names.length} 个技能`
 
     const contentVNode = h('div', [
       h('p', { style: 'margin-bottom: 8px' }, '确定要更新以下技能？'),
