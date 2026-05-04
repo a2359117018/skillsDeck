@@ -55,13 +55,8 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function fetchInstalled(global?: boolean): Promise<void> {
-    if (global !== false) {
-      await installedCache.ensure()
-    } else {
-      const result = await window.api.skills.list({ global })
-      installedCache.data.value = result
-    }
+  async function fetchInstalled(_global?: boolean): Promise<void> {
+    await installedCache.ensure()
   }
 
   async function install(

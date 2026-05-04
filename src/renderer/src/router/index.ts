@@ -29,3 +29,7 @@ router.beforeEach(() => {
 router.afterEach(() => {
   isNavigating.value = false
 })
+
+router.onError(() => {
+  isNavigating.value = false
+})

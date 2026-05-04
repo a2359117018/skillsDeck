@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { NCollapse, NCollapseItem, NEmpty, NTag, NText, NSpace } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { AGENTS } from '@renderer/constants/agents'
@@ -23,6 +23,8 @@ const groupedByAgent = computed(() => {
 function getAgentName(agentFlag: string): string {
   return agentNameMap.get(agentFlag) || agentFlag
 }
+
+onMounted(() => skillsStore.fetchInstalled(true))
 </script>
 
 <template>

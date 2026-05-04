@@ -1,4 +1,5 @@
 import { useDialog } from 'naive-ui'
+import { h } from 'vue'
 
 export function useConfirm(): {
   confirmInstall: (name: string) => Promise<boolean>
@@ -56,14 +57,18 @@ export function useConfirm(): {
   function confirmUpdateAll(names: string[]): Promise<boolean> {
     const maxShow = 10
     const displayed = names.slice(0, maxShow).join('、')
-    const suffix =
-      names.length > maxShow ? `\n...等 ${names.length} 个技能` : `\n共 ${names.length} 个技能`
-    const content = `确定要更新以下技能？\n${displayed}${suffix}`
+    const suffix = names.length > maxShow ? `...等 ${names.length} 个技能` : `共 ${names.length} 个技能`
+
+    const contentVNode = h('div', [
+      h('p', { style: 'margin-bottom: 8px' }, '确定要更新以下技能？'),
+      h('p', { style: 'color: #666; font-size: 13px' }, displayed),
+      h('p', { style: 'color: #999; font-size: 12px; margin-top: 8px' }, suffix)
+    ])
 
     return new Promise((resolve) => {
       dialog.info({
         title: '全部更新确认',
-        content,
+        content: () => contentVNode,
         positiveText: '确认更新',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),

@@ -32,7 +32,7 @@ async function handleUpdate(): Promise<void> {
   operationLoading.value = true
   operationOutput.value = ''
   try {
-    const result = await skillsStore.update(packageRef)
+    const result = await skillsStore.update(packageRef, true)
     operationOutput.value = result.stdout || result.stderr || ''
     if (result.success) message.success('更新成功')
     else message.error('更新失败')
@@ -47,7 +47,7 @@ async function handleRemove(): Promise<void> {
   operationLoading.value = true
   operationOutput.value = ''
   try {
-    const result = await skillsStore.remove(packageRef)
+    const result = await skillsStore.remove(packageRef, true)
     operationOutput.value = result.stdout || result.stderr || ''
     if (result.success) {
       message.success('删除成功')
