@@ -51,10 +51,24 @@ function getAgentColor(index: number): string {
   return agentColors[index % agentColors.length]
 }
 
+function resolveAgentByPath(skillPath: string): string[] {
+  const normalized = skillPath.replace(/\\/g, '/')
+  const matched: string[] = []
+  for (const agent of AGENTS) {
+    const globalDir = agent.globalPath.replace(/^~/, '').replace(/\\/g, '/')
+    if (normalized.includes(globalDir)) {
+      matched.push(agent.agentFlag)
+    }
+  }
+  return matched.length > 0 ? matched : []
+}
+
 const groupedByAgent = computed(() => {
   const map = new Map<string, Skill[]>()
   for (const skill of skillsStore.installedSkills) {
-    for (const agent of skill.agents) {
+    const resolvedAgents = resolveAgentByPath(skill.path)
+    const agents = resolvedAgents.length > 0 ? resolvedAgents : skill.agents
+    for (const agent of agents) {
       if (!map.has(agent)) map.set(agent, [])
       map.get(agent)!.push(skill)
     }

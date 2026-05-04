@@ -1,0 +1,326 @@
+[
+  {
+    "name": "AiderDesk",
+    "agentFlag": "aider-desk",
+    "projectPath": ".aider-desk/skills/",
+    "globalPath": "~/.aider-desk/skills/"
+  },
+  {
+    "name": "Amp",
+    "agentFlag": "amp",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.config/agents/skills/"
+  },
+  {
+    "name": "Kimi Code CLI",
+    "agentFlag": "kimi-cli",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.config/agents/skills/"
+  },
+  {
+    "name": "Replit",
+    "agentFlag": "replit",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.config/agents/skills/"
+  },
+  {
+    "name": "Universal",
+    "agentFlag": "universal",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.config/agents/skills/"
+  },
+  {
+    "name": "Antigravity",
+    "agentFlag": "antigravity",
+    "projectPath": ".gemini/antigravity/skills/",
+    "globalPath": "~/.gemini/antigravity/skills/"
+  },
+  {
+    "name": "Augment",
+    "agentFlag": "augment",
+    "projectPath": ".augment/skills/",
+    "globalPath": "~/.augment/skills/"
+  },
+  {
+    "name": "IBM Bob",
+    "agentFlag": "bob",
+    "projectPath": ".bob/skills/",
+    "globalPath": "~/.bob/skills/"
+  },
+  {
+    "name": "Claude Code",
+    "agentFlag": "claude-code",
+    "projectPath": ".claude/skills/",
+    "globalPath": "~/.claude/skills/"
+  },
+  {
+    "name": "OpenClaw",
+    "agentFlag": "openclaw",
+    "projectPath": "skills/",
+    "globalPath": "~/.openclaw/skills/"
+  },
+  {
+    "name": "Cline",
+    "agentFlag": "cline",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.agents/skills/"
+  },
+  {
+    "name": "Dexto",
+    "agentFlag": "dexto",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.agents/skills/"
+  },
+  {
+    "name": "Warp",
+    "agentFlag": "warp",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.agents/skills/"
+  },
+  {
+    "name": "CodeArts Agent",
+    "agentFlag": "codearts-agent",
+    "projectPath": ".codeartsdoer/skills/",
+    "globalPath": "~/.codeartsdoer/skills/"
+  },
+  {
+    "name": "CodeBuddy",
+    "agentFlag": "codebuddy",
+    "projectPath": ".codebuddy/skills/",
+    "globalPath": "~/.codebuddy/skills/"
+  },
+  {
+    "name": "Codemaker",
+    "agentFlag": "codemaker",
+    "projectPath": ".codemaker/skills/",
+    "globalPath": "~/.codemaker/skills/"
+  },
+  {
+    "name": "Code Studio",
+    "agentFlag": "codestudio",
+    "projectPath": ".codestudio/skills/",
+    "globalPath": "~/.codestudio/skills/"
+  },
+  {
+    "name": "Codex",
+    "agentFlag": "codex",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.codex/skills/"
+  },
+  {
+    "name": "Command Code",
+    "agentFlag": "command-code",
+    "projectPath": ".commandcode/skills/",
+    "globalPath": "~/.commandcode/skills/"
+  },
+  {
+    "name": "Continue",
+    "agentFlag": "continue",
+    "projectPath": ".continue/skills/",
+    "globalPath": "~/.continue/skills/"
+  },
+  {
+    "name": "Cortex Code",
+    "agentFlag": "cortex",
+    "projectPath": ".cortex/skills/",
+    "globalPath": "~/.snowflake/cortex/skills/"
+  },
+  {
+    "name": "Crush",
+    "agentFlag": "crush",
+    "projectPath": ".crush/skills/",
+    "globalPath": "~/.config/crush/skills/"
+  },
+  {
+    "name": "Cursor",
+    "agentFlag": "cursor",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.cursor/skills/"
+  },
+  {
+    "name": "Deep Agents",
+    "agentFlag": "deepagents",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.deepagents/agent/skills/"
+  },
+  {
+    "name": "Devin for Terminal",
+    "agentFlag": "devin",
+    "projectPath": ".devin/skills/",
+    "globalPath": "~/.config/devin/skills/"
+  },
+  {
+    "name": "Droid",
+    "agentFlag": "droid",
+    "projectPath": ".factory/skills/",
+    "globalPath": "~/.factory/skills/"
+  },
+  {
+    "name": "Firebender",
+    "agentFlag": "firebender",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.firebender/skills/"
+  },
+  {
+    "name": "ForgeCode",
+    "agentFlag": "forgecode",
+    "projectPath": ".forge/skills/",
+    "globalPath": "~/.forge/skills/"
+  },
+  {
+    "name": "Gemini CLI",
+    "agentFlag": "gemini-cli",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.gemini/skills/"
+  },
+  {
+    "name": "GitHub Copilot",
+    "agentFlag": "github-copilot",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.copilot/skills/"
+  },
+  {
+    "name": "Goose",
+    "agentFlag": "goose",
+    "projectPath": ".goose/skills/",
+    "globalPath": "~/.config/goose/skills/"
+  },
+  {
+    "name": "Junie",
+    "agentFlag": "junie",
+    "projectPath": ".junie/skills/",
+    "globalPath": "~/.junie/skills/"
+  },
+  {
+    "name": "iFlow CLI",
+    "agentFlag": "iflow-cli",
+    "projectPath": ".iflow/skills/",
+    "globalPath": "~/.iflow/skills/"
+  },
+  {
+    "name": "Kilo Code",
+    "agentFlag": "kilo",
+    "projectPath": ".kilocode/skills/",
+    "globalPath": "~/.kilocode/skills/"
+  },
+  {
+    "name": "Kiro CLI",
+    "agentFlag": "kiro-cli",
+    "projectPath": ".kiro/skills/",
+    "globalPath": "~/.kiro/skills/"
+  },
+  {
+    "name": "Kode",
+    "agentFlag": "kode",
+    "projectPath": ".kode/skills/",
+    "globalPath": "~/.kode/skills/"
+  },
+  {
+    "name": "MCPJam",
+    "agentFlag": "mcpjam",
+    "projectPath": ".mcpjam/skills/",
+    "globalPath": "~/.mcpjam/skills/"
+  },
+  {
+    "name": "Mistral Vibe",
+    "agentFlag": "mistral-vibe",
+    "projectPath": ".vibe/skills/",
+    "globalPath": "~/.vibe/skills/"
+  },
+  {
+    "name": "Mux",
+    "agentFlag": "mux",
+    "projectPath": ".mux/skills/",
+    "globalPath": "~/.mux/skills/"
+  },
+  {
+    "name": "OpenCode",
+    "agentFlag": "opencode",
+    "projectPath": ".agents/skills/",
+    "globalPath": "~/.config/opencode/skills/"
+  },
+  {
+    "name": "OpenHands",
+    "agentFlag": "openhands",
+    "projectPath": ".openhands/skills/",
+    "globalPath": "~/.openhands/skills/"
+  },
+  {
+    "name": "Pi",
+    "agentFlag": "pi",
+    "projectPath": ".pi/skills/",
+    "globalPath": "~/.pi/agent/skills/"
+  },
+  {
+    "name": "Qoder",
+    "agentFlag": "qoder",
+    "projectPath": ".qoder/skills/",
+    "globalPath": "~/.qoder/skills/"
+  },
+  {
+    "name": "Qwen Code",
+    "agentFlag": "qwen-code",
+    "projectPath": ".qwen/skills/",
+    "globalPath": "~/.qwen/skills/"
+  },
+  {
+    "name": "Rovo Dev",
+    "agentFlag": "rovodev",
+    "projectPath": ".rovodev/skills/",
+    "globalPath": "~/.rovodev/skills/"
+  },
+  {
+    "name": "Roo Code",
+    "agentFlag": "roo",
+    "projectPath": ".roo/skills/",
+    "globalPath": "~/.roo/skills/"
+  },
+  {
+    "name": "Tabnine CLI",
+    "agentFlag": "tabnine-cli",
+    "projectPath": ".tabnine/agent/skills/",
+    "globalPath": "~/.tabnine/agent/skills/"
+  },
+  {
+    "name": "Trae",
+    "agentFlag": "trae",
+    "projectPath": ".trae/skills/",
+    "globalPath": "~/.trae/skills/"
+  },
+  {
+    "name": "Trae CN",
+    "agentFlag": "trae-cn",
+    "projectPath": ".trae/skills/",
+    "globalPath": "~/.trae-cn/skills/"
+  },
+  {
+    "name": "Windsurf",
+    "agentFlag": "windsurf",
+    "projectPath": ".windsurf/skills/",
+    "globalPath": "~/.codeium/windsurf/skills/"
+  },
+  {
+    "name": "Zencoder",
+    "agentFlag": "zencoder",
+    "projectPath": ".zencoder/skills/",
+    "globalPath": "~/.zencoder/skills/"
+  },
+  {
+    "name": "Neovate",
+    "agentFlag": "neovate",
+    "projectPath": ".neovate/skills/",
+    "globalPath": "~/.neovate/skills/"
+  },
+  {
+    "name": "Pochi",
+    "agentFlag": "pochi",
+    "projectPath": ".pochi/skills/",
+    "globalPath": "~/.pochi/skills/"
+  },
+  {
+    "name": "AdaL",
+    "agentFlag": "adal",
+    "projectPath": ".adal/skills/",
+    "globalPath": "~/.adal/skills/"
+  }
+]
