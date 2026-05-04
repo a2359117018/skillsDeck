@@ -11,7 +11,6 @@ import {
 import { useRouter, useRoute } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
 import AppLoading from './components/common/AppLoading.vue'
-import { isNavigating } from './router'
 import { useSkillsStore } from './stores/skills'
 
 const router = useRouter()
@@ -34,7 +33,7 @@ function handleMenuUpdate(key: string): void {
 
 const activeKey = computed(() => route.name as string)
 
-const showGlobalLoading = computed(() => isNavigating.value || skillsStore.fetching)
+const showGlobalLoading = computed(() => skillsStore.fetching)
 </script>
 
 <template>

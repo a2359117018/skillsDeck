@@ -24,10 +24,8 @@ export function useCachedResource<T>(
 
   async function ensure(): Promise<T> {
     if (cache.value && !cache.value.stale) {
-      console.log('[cache] HIT — returning cached data, size:', (cache.value.data as any).length)
       return cache.value.data
     }
-    console.log('[cache] MISS — fetching fresh data')
     return refresh()
   }
 
