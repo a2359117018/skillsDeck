@@ -21,8 +21,8 @@ const windowType = new URLSearchParams(window.location.search).get('window') || 
 
 const menuOptions: MenuOption[] = [
   { label: '技能', key: 'installed' },
-  { label: '搜索', key: 'search' },
-  { label: 'Agent 视图', key: 'agent-view' },
+  { label: '技能搜索', key: 'search' },
+  { label: 'Agents', key: 'agent-view' },
   { type: 'divider', key: 'd1' },
   { label: '设置', key: 'settings' }
 ]

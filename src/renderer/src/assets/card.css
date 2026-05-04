@@ -1,0 +1,33 @@
+.card-base {
+  border-radius: 10px;
+  border: 1px solid var(--n-border-color);
+  background-color: var(--n-color);
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.card-base:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.card-base-accent {
+  width: 3px;
+  flex-shrink: 0;
+  background: var(--card-accent, linear-gradient(180deg, #18a058, #2080f0));
+}
+
+.card-base-body {
+  flex: 1;
+  padding: 14px 16px;
+}
+
+.card-base-text {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--n-text-color);
+}

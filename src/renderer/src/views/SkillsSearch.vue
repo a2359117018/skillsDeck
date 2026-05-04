@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NSpin, NEmpty, NText } from 'naive-ui'
+import { NScrollbar, NSpin, NEmpty, NText } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
@@ -30,28 +30,34 @@ function handleInstallComplete(): void {
 <template>
   <div class="search-page">
     <SkillSearchBar @search="handleSearch" />
-    <NSpin :show="skillsStore.searching" style="margin-top: 16px">
-      <div v-if="hasSearched && !skillsStore.searching">
-        <NText depth="3" style="font-size: 12px">
-          搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
-          {{ skillsStore.searchResults.length }} 个结果
-        </NText>
-        <div style="margin-top: 12px">
-          <SearchResultCard
-            v-for="result in skillsStore.searchResults"
-            :key="result.id"
-            :result="result"
-            @install="handleInstall"
+    <NScrollbar class="search-scroll">
+      <NSpin :show="skillsStore.searching">
+        <div v-if="hasSearched && !skillsStore.searching" class="search-results">
+          <NText depth="3" style="font-size: 12px">
+            搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
+            {{ skillsStore.searchResults.length }} 个结果
+          </NText>
+          <div style="margin-top: 12px">
+            <SearchResultCard
+              v-for="result in skillsStore.searchResults"
+              :key="result.id"
+              :result="result"
+              @install="handleInstall"
+            />
+          </div>
+          <NEmpty
+            v-if="skillsStore.searchResults.length === 0"
+            description="无搜索结果"
+            style="margin-top: 48px"
           />
         </div>
         <NEmpty
-          v-if="skillsStore.searchResults.length === 0"
-          description="无搜索结果"
+          v-else-if="!hasSearched"
+          description="输入关键词搜索技能"
           style="margin-top: 48px"
         />
-      </div>
-      <NEmpty v-else-if="!hasSearched" description="输入关键词搜索技能" style="margin-top: 48px" />
-    </NSpin>
+      </NSpin>
+    </NScrollbar>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
       :package-ref="selectedPackage"
@@ -62,6 +68,18 @@ function handleInstallComplete(): void {
 
 <style scoped>
 .search-page {
-  max-width: 900px;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.search-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.search-results {
+  padding-bottom: 24px;
 }
 </style>

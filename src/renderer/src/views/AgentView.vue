@@ -1,6 +1,18 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import { NDrawer, NDrawerContent, NEmpty, NTag, NText, NSpace, NButton, useMessage } from 'naive-ui'
+import {
+  NDrawer,
+  NDrawerContent,
+  NEmpty,
+  NTag,
+  NText,
+  NSpace,
+  NButton,
+  NIcon,
+  NScrollbar,
+  useMessage
+} from 'naive-ui'
+import { FolderOpenOutline, RefreshOutline, TrashOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useConfirm } from '@renderer/composables/useConfirm'
 import { AGENTS } from '@renderer/constants/agents'
@@ -21,6 +33,23 @@ const selectedAgent = ref<string | null>(null)
 const drawerVisible = ref(false)
 const updatingSkill = ref<string | null>(null)
 const removingSkill = ref<string | null>(null)
+
+const agentColors = [
+  'linear-gradient(135deg, #667eea, #764ba2)',
+  'linear-gradient(135deg, #f093fb, #f5576c)',
+  'linear-gradient(135deg, #4facfe, #00f2fe)',
+  'linear-gradient(135deg, #43e97b, #38f9d7)',
+  'linear-gradient(135deg, #fa709a, #fee140)',
+  'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+  'linear-gradient(135deg, #fccb90, #d57eeb)',
+  'linear-gradient(135deg, #84fab0, #8fd3f4)',
+  'linear-gradient(135deg, #f6d365, #fda085)',
+  'linear-gradient(135deg, #a1c4fd, #c2e9fb)'
+]
+
+function getAgentColor(index: number): string {
+  return agentColors[index % agentColors.length]
+}
 
 const groupedByAgent = computed(() => {
   const map = new Map<string, Skill[]>()
@@ -119,31 +148,41 @@ onMounted(() => skillsStore.fetchInstalled(true))
 
 <template>
   <div class="agent-view">
-    <div v-if="groupedByAgent.size > 0" class="agent-grid">
-      <div
-        v-for="[agent, skills] in groupedByAgent"
-        :key="agent"
-        class="agent-card"
-        @click="openAgentCard(agent)"
-      >
-        <div class="agent-card-header">
-          <NText class="agent-name">{{ getAgentName(agent) }}</NText>
-          <NTag size="small" :bordered="false" round type="info">{{ skills.length }}</NTag>
-        </div>
-        <div class="agent-card-footer">
-          <NText depth="3" style="font-size: 12px">{{ skills.length }} 个技能</NText>
-          <NButton
-            size="tiny"
-            quaternary
-            title="打开技能文件夹"
-            @click="openAgentFolder(agent, $event)"
-          >
-            📂
-          </NButton>
+    <NScrollbar class="agent-scroll">
+      <div v-if="groupedByAgent.size > 0" class="agent-grid">
+        <div
+          v-for="([agent, skills], index) in groupedByAgent"
+          :key="agent"
+          class="card-base agent-card"
+          @click="openAgentCard(agent)"
+        >
+          <div class="card-base-accent" :style="{ '--card-accent': getAgentColor(index) }" />
+          <div class="card-base-body agent-card-body">
+            <div class="agent-card-header">
+              <NText class="card-base-text">{{ getAgentName(agent) }}</NText>
+              <NTag size="small" :bordered="false" round type="info">{{ skills.length }}</NTag>
+            </div>
+            <div class="agent-card-footer">
+              <NText depth="3" style="font-size: 12px">{{ skills.length }} 个技能</NText>
+              <div class="agent-folder-btn">
+                <NButton
+                  size="tiny"
+                  quaternary
+                  circle
+                  title="打开技能文件夹"
+                  @click="openAgentFolder(agent, $event)"
+                >
+                  <template #icon>
+                    <NIcon :size="14"><FolderOpenOutline /></NIcon>
+                  </template>
+                </NButton>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
+      <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
+    </NScrollbar>
 
     <NDrawer
       :show="drawerVisible"
@@ -173,25 +212,41 @@ onMounted(() => skillsStore.fetchInstalled(true))
               <NText strong class="skill-table-name">{{ skill.name }}</NText>
             </div>
             <NSpace :size="4" align="center">
-              <NButton size="tiny" quaternary @click="handleOpenLocation(skill.path)">
-                打开位置
+              <NButton
+                quaternary
+                circle
+                size="tiny"
+                title="打开位置"
+                @click="handleOpenLocation(skill.path)"
+              >
+                <template #icon>
+                  <NIcon :size="15"><FolderOpenOutline /></NIcon>
+                </template>
               </NButton>
               <NButton
-                size="tiny"
                 quaternary
+                circle
+                size="tiny"
+                title="更新"
                 :loading="updatingSkill === skill.name"
                 @click="handleUpdate(skill.name)"
               >
-                更新
+                <template #icon>
+                  <NIcon :size="15"><RefreshOutline /></NIcon>
+                </template>
               </NButton>
               <NButton
-                size="tiny"
                 quaternary
+                circle
+                size="tiny"
                 type="error"
+                title="删除"
                 :loading="removingSkill === skill.name"
                 @click="handleRemove(skill.name)"
               >
-                删除
+                <template #icon>
+                  <NIcon :size="15"><TrashOutline /></NIcon>
+                </template>
               </NButton>
             </NSpace>
           </div>
@@ -204,31 +259,31 @@ onMounted(() => skillsStore.fetchInstalled(true))
 <style scoped>
 .agent-view {
   max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.agent-scroll {
+  flex: 1;
+  min-height: 0;
 }
 
 .agent-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
+  padding-bottom: 24px;
 }
 
 .agent-card {
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--n-border-color);
-  background-color: var(--n-color);
   cursor: pointer;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
-.agent-card:hover {
-  border-color: var(--n-primary-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+.agent-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .agent-card-header {
@@ -237,15 +292,20 @@ onMounted(() => skillsStore.fetchInstalled(true))
   align-items: center;
 }
 
-.agent-name {
-  font-weight: 600;
-  font-size: 15px;
-}
-
 .agent-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.agent-folder-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.agent-card:hover .agent-folder-btn,
+.agent-card:focus-within .agent-folder-btn {
+  opacity: 1;
 }
 
 .skill-table {
@@ -277,5 +337,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--n-text-color);
 }
 </style>
