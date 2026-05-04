@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NButton, NEmpty, NSpin, NSpace, NText } from 'naive-ui'
+import { NButton, NEmpty, NSpace, NText } from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
 import { useMessage } from 'naive-ui'
@@ -91,23 +91,17 @@ function handleOpenLocation(path: string): void {
         </NButton>
       </NSpace>
     </div>
-    <NSpin :show="skillsStore.fetching">
-      <div v-if="skillsStore.filteredSkills.length > 0" class="card-grid">
-        <SkillCard
-          v-for="skill in skillsStore.filteredSkills"
-          :key="skill.name"
-          :skill="skill"
-          @update="handleUpdate"
-          @remove="handleRemove"
-          @open-location="handleOpenLocation"
-        />
-      </div>
-      <NEmpty
-        v-else-if="!skillsStore.fetching"
-        description="暂无已安装的技能"
-        style="margin-top: 48px"
+    <div v-if="skillsStore.filteredSkills.length > 0" class="card-grid">
+      <SkillCard
+        v-for="skill in skillsStore.filteredSkills"
+        :key="skill.name"
+        :skill="skill"
+        @update="handleUpdate"
+        @remove="handleRemove"
+        @open-location="handleOpenLocation"
       />
-    </NSpin>
+    </div>
+    <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
   </div>
 </template>
 
