@@ -1,6 +1,11 @@
 import { useDialog } from 'naive-ui'
 
-export function useConfirm() {
+export function useConfirm(): {
+  confirmInstall: (name: string) => Promise<boolean>
+  confirmUpdate: (name: string) => Promise<boolean>
+  confirmRemove: (name: string) => Promise<boolean>
+  confirmUpdateAll: (names: string[]) => Promise<boolean>
+} {
   const dialog = useDialog()
 
   function confirmInstall(name: string): Promise<boolean> {

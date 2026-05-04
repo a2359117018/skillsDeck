@@ -6,7 +6,17 @@ interface CacheState<T> {
   stale: boolean
 }
 
-export function useCachedResource<T>(fetcher: () => Promise<T>, initialValue: T) {
+export function useCachedResource<T>(
+  fetcher: () => Promise<T>,
+  initialValue: T
+): {
+  data: Ref<T>
+  loading: Ref<boolean>
+  isStale: Ref<boolean>
+  ensure: () => Promise<T>
+  invalidate: () => void
+  refresh: () => Promise<T>
+} {
   const cache = ref<CacheState<T> | null>(null) as Ref<CacheState<T> | null>
   const data = ref<T>(initialValue) as Ref<T>
   const loading = ref(false)

@@ -69,7 +69,7 @@ async function handleInstallClick(): Promise<void> {
 
 <template>
   <div class="detail-page">
-    <NPageHeader @back="router.back()" :title="packageRef" subtitle="技能管理" />
+    <NPageHeader :title="packageRef" subtitle="技能管理" @back="router.back()" />
     <NDescriptions bordered :column="1" label-placement="left" style="margin-top: 16px">
       <NDescriptionsItem label="包名">
         <NText code>{{ packageRef }}</NText>
@@ -77,10 +77,7 @@ async function handleInstallClick(): Promise<void> {
     </NDescriptions>
     <NSpace style="margin-top: 16px">
       <NButton type="primary" @click="handleInstallClick">安装到...</NButton>
-      <NButton
-        :loading="skillsStore.updating || operationLoading"
-        @click="handleUpdate"
-      >
+      <NButton :loading="skillsStore.updating || operationLoading" @click="handleUpdate">
         更新
       </NButton>
       <NButton
