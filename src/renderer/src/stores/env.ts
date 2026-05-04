@@ -1,23 +1,30 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { EnvStatus } from '../../../shared/types'
+import { useCachedResource } from '../composables/useCachedResource'
 
 export const useEnvStore = defineStore('env', () => {
-  const status = ref<EnvStatus | null>(null)
-  const checking = ref(false)
+  const statusCache = useCachedResource<EnvStatus>(() => window.api.env.check(), {
+    nodeInstalled: false,
+    nodeVersion: null,
+    npxInstalled: false,
+    skillsInstalled: false
+  })
+
   const downloading = ref(false)
   const downloadProgress = ref(0)
   const error = ref<string | null>(null)
 
+  const status = computed(() => statusCache.data.value)
+  const fetching = computed(() => statusCache.loading.value)
+  const checking = fetching
+
   async function check(): Promise<void> {
-    checking.value = true
-    error.value = null
     try {
-      status.value = await window.api.env.check()
+      await statusCache.ensure()
+      error.value = null
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Environment check failed'
-    } finally {
-      checking.value = false
     }
   }
 
@@ -28,6 +35,7 @@ export const useEnvStore = defineStore('env', () => {
     try {
       const result = await window.api.env.installNode()
       if (!result.success) throw new Error(result.error)
+      statusCache.invalidate()
       await check()
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Node.js install failed'
@@ -38,6 +46,7 @@ export const useEnvStore = defineStore('env', () => {
 
   return {
     status,
+    fetching,
     checking,
     downloading,
     downloadProgress,

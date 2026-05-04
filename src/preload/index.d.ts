@@ -10,7 +10,7 @@ import type {
 export interface AppApi {
   skills: {
     search: (keyword: string) => Promise<SkillSearchResponse>
-    list: (opts?: { global?: boolean; agent?: string }) => Promise<Skill[]>
+    list: (opts?: { global?: boolean }) => Promise<Skill[]>
     install: (opts: {
       packageRef: string
       agents: string[]
@@ -23,6 +23,9 @@ export interface AppApi {
       agent?: string
       global?: boolean
     }) => Promise<CommandResult>
+  }
+  shell: {
+    openPath: (path: string) => Promise<void>
   }
   env: {
     check: () => Promise<EnvStatus>

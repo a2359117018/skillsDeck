@@ -4,7 +4,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   skills: {
     search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
-    list: (opts?: { global?: boolean; agent?: string }): Promise<unknown[]> =>
+    list: (opts?: { global?: boolean }): Promise<unknown[]> =>
       ipcRenderer.invoke('skills:list', opts),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:install', opts),
@@ -14,6 +14,9 @@ const api = {
       ipcRenderer.invoke('skills:update-all', opts),
     remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:remove', opts)
+  },
+  shell: {
+    openPath: (path: string): Promise<void> => ipcRenderer.invoke('shell:open-path', path)
   },
   env: {
     check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),
