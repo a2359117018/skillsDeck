@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { NCollapse, NCollapseItem, NEmpty, NSpin, NTag, NText, NSpace } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { AGENTS } from '@renderer/constants/agents'
@@ -23,15 +23,11 @@ const groupedByAgent = computed(() => {
 function getAgentName(agentFlag: string): string {
   return agentNameMap.get(agentFlag) || agentFlag
 }
-
-onMounted(() => {
-  skillsStore.fetchInstalled(true)
-})
 </script>
 
 <template>
   <div class="agent-view">
-    <NSpin :show="skillsStore.loading">
+    <NSpin :show="skillsStore.fetching">
       <NCollapse v-if="groupedByAgent.size > 0">
         <NCollapseItem
           v-for="[agent, skills] in groupedByAgent"
