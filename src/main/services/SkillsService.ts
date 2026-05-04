@@ -73,10 +73,9 @@ export async function searchSkills(keyword: string): Promise<string> {
  * @returns Array of Skill objects
  * @throws SkillsError if the command execution fails or JSON parsing fails
  */
-export async function listSkills(global?: boolean, agent?: string): Promise<Skill[]> {
+export async function listSkills(global?: boolean): Promise<Skill[]> {
   const args = ['list', '--json']
   if (global) args.push('-g')
-  if (agent) args.push('-a', agent)
   const result = await execute(args)
   if (!result.success) {
     throw new SkillsError('EXECUTION_FAILED', 'list', result.stderr, result.exitCode)

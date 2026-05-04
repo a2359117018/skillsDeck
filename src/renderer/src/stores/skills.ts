@@ -1,13 +1,22 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Skill, CommandResult, SkillSearchResult } from '../../../shared/types'
 
 export const useSkillsStore = defineStore('skills', () => {
   const searchResults = ref<SkillSearchResult[]>([])
   const searchDuration = ref(0)
   const installedSkills = ref<Skill[]>([])
+  const selectedAgents = ref<string[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  const filteredSkills = computed(() => {
+    if (selectedAgents.value.length === 0) return installedSkills.value
+    const lowered = selectedAgents.value.map((a) => a.toLowerCase())
+    return installedSkills.value.filter((skill) =>
+      skill.agents.some((a) => lowered.includes(a.toLowerCase()))
+    )
+  })
 
   function clearError(): void {
     error.value = null
@@ -29,11 +38,11 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function fetchInstalled(global?: boolean, agent?: string): Promise<void> {
+  async function fetchInstalled(global?: boolean): Promise<void> {
     loading.value = true
     error.value = null
     try {
-      installedSkills.value = await window.api.skills.list({ global, agent })
+      installedSkills.value = await window.api.skills.list({ global })
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to load skills'
     } finally {
@@ -84,11 +93,11 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function remove(packageRef: string): Promise<CommandResult> {
+  async function remove(packageRef: string, global?: boolean): Promise<CommandResult> {
     loading.value = true
     error.value = null
     try {
-      return await window.api.skills.remove({ packageRef })
+      return await window.api.skills.remove({ packageRef, global })
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Remove failed'
       throw e
@@ -97,10 +106,20 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
+  async function openLocation(path: string): Promise<void> {
+    try {
+      await window.api.shell.openPath(path)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Failed to open location'
+    }
+  }
+
   return {
     searchResults,
     searchDuration,
     installedSkills,
+    selectedAgents,
+    filteredSkills,
     loading,
     error,
     clearError,
@@ -109,6 +128,7 @@ export const useSkillsStore = defineStore('skills', () => {
     install,
     update,
     updateAll,
-    remove
+    remove,
+    openLocation
   }
 })

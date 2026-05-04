@@ -13,8 +13,8 @@ export function registerSkillsIpc(): void {
     return searchSkillsApi(keyword)
   })
 
-  ipcMain.handle('skills:list', async (_, opts?: { global?: boolean; agent?: string }) => {
-    return listSkills(opts?.global, opts?.agent)
+  ipcMain.handle('skills:list', async (_, opts?: { global?: boolean }) => {
+    return listSkills(opts?.global)
   })
 
   ipcMain.handle(
