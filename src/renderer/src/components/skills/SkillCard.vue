@@ -27,7 +27,7 @@ function getAgentName(flag: string): string {
       </NTag>
     </div>
     <NSpace class="skill-actions" :size="8" align="center">
-      <NButton size="tiny" quaternary @click="emit('openLocation', props.skill.source)">
+      <NButton size="tiny" quaternary @click="emit('openLocation', props.skill.path)">
         打开位置
       </NButton>
       <NButton size="tiny" quaternary @click="emit('update', props.skill.name)"> 更新 </NButton>

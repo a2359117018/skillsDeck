@@ -9,6 +9,7 @@ export interface Skill {
   name: string
   version: string
   source: string
+  path: string
   scope: 'global' | 'project'
   agents: string[]
 }

@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NButton, NEmpty, NSpace, NText, NScrollbar } from 'naive-ui'
+import { NButton, NEmpty, NSpace, NText, NScrollbar, useMessage } from 'naive-ui'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
-import { useMessage } from 'naive-ui'
 import AgentFilter from '../components/skills/AgentFilter.vue'
 import SkillCard from '../components/skills/SkillCard.vue'
 
 const skillsStore = useSkillsStore()
 const message = useMessage()
 const { confirmUpdateAll, confirmUpdate, confirmRemove } = useConfirm()
+
+skillsStore.setMessageHandler((msg, type) => {
+  message[type](msg)
+})
 
 async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled(true)

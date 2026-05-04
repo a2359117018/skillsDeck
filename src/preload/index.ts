@@ -16,7 +16,8 @@ const api = {
       ipcRenderer.invoke('skills:remove', opts)
   },
   shell: {
-    openPath: (path: string): Promise<void> => ipcRenderer.invoke('shell:open-path', path)
+    openPath: (path: string): Promise<{ success: boolean; error?: string }> =>
+      ipcRenderer.invoke('shell:open-path', path)
   },
   env: {
     check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),

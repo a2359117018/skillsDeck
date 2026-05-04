@@ -10,6 +10,10 @@ const skillsStore = useSkillsStore()
 const message = useMessage()
 const { confirmUpdate, confirmRemove } = useConfirm()
 
+skillsStore.setMessageHandler((msg, type) => {
+  message[type](msg)
+})
+
 const agentNameMap = new Map(AGENTS.map((a) => [a.agentFlag, a.name]))
 const agentPathMap = new Map(AGENTS.map((a) => [a.agentFlag, a.globalPath]))
 
@@ -38,10 +42,6 @@ function getAgentName(agentFlag: string): string {
   return agentNameMap.get(agentFlag) || agentFlag
 }
 
-function getAgentPath(agentFlag: string): string {
-  return agentPathMap.get(agentFlag) || ''
-}
-
 function openAgentCard(agent: string): void {
   selectedAgent.value = agent
   drawerVisible.value = true
@@ -54,7 +54,17 @@ function closeDrawer(): void {
 
 function openAgentFolder(agentFlag: string, e?: Event): void {
   e?.stopPropagation()
-  const folderPath = getAgentPath(agentFlag)
+  let folderPath = agentPathMap.get(agentFlag)
+  if (!folderPath) {
+    const skills = groupedByAgent.value.get(agentFlag)
+    if (skills && skills.length > 0 && skills[0].path) {
+      const parts = skills[0].path.replace(/\\/g, '/').split('/')
+      const idx = parts.lastIndexOf('skills')
+      if (idx !== -1) {
+        folderPath = parts.slice(0, idx + 1).join('/')
+      }
+    }
+  }
   if (folderPath) {
     skillsStore.openLocation(folderPath)
   } else {
@@ -139,7 +149,11 @@ onMounted(() => skillsStore.fetchInstalled(true))
       :show="drawerVisible"
       :width="480"
       placement="right"
-      @update:show="(val: boolean) => { if (!val) closeDrawer() }"
+      @update:show="
+        (val: boolean) => {
+          if (!val) closeDrawer()
+        }
+      "
       @mask-click="closeDrawer"
     >
       <NDrawerContent closable :native-scrollbar="false" @close="closeDrawer">
@@ -157,10 +171,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
           <div v-for="skill in selectedSkills" :key="skill.name" class="skill-table-row">
             <div class="skill-table-info">
               <NText strong class="skill-table-name">{{ skill.name }}</NText>
-              <NText depth="3" class="skill-table-version">v{{ skill.version }}</NText>
             </div>
             <NSpace :size="4" align="center">
-              <NButton size="tiny" quaternary @click="handleOpenLocation(skill.source)">
+              <NButton size="tiny" quaternary @click="handleOpenLocation(skill.path)">
                 打开位置
               </NButton>
               <NButton
@@ -203,6 +216,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
   padding: 16px;
   border-radius: 8px;
   border: 1px solid var(--n-border-color);
+  background-color: var(--n-color);
   cursor: pointer;
   transition:
     border-color 0.2s,
@@ -263,10 +277,5 @@ onMounted(() => skillsStore.fetchInstalled(true))
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.skill-table-version {
-  font-size: 12px;
-  flex-shrink: 0;
 }
 </style>

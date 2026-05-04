@@ -18,6 +18,9 @@ export const useSkillsStore = defineStore('skills', () => {
   const removing = ref(false)
   const searching = ref(false)
   const error = ref<string | null>(null)
+  const _openLocationMessage = ref<
+    ((msg: string, type: 'success' | 'warning' | 'error') => void) | null
+  >(null)
 
   const fetching = computed(() => installedCache.loading.value)
   const installedSkills = computed(() => installedCache.data.value)
@@ -37,6 +40,12 @@ export const useSkillsStore = defineStore('skills', () => {
 
   function clearError(): void {
     error.value = null
+  }
+
+  function setMessageHandler(
+    handler: (msg: string, type: 'success' | 'warning' | 'error') => void
+  ): void {
+    _openLocationMessage.value = handler
   }
 
   async function search(keyword: string): Promise<void> {
@@ -125,7 +134,10 @@ export const useSkillsStore = defineStore('skills', () => {
 
   async function openLocation(path: string): Promise<void> {
     try {
-      await window.api.shell.openPath(path)
+      const result = await window.api.shell.openPath(path)
+      if (!result.success && _openLocationMessage.value) {
+        _openLocationMessage.value(result.error || '无法打开路径', 'warning')
+      }
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to open location'
     }
@@ -146,6 +158,7 @@ export const useSkillsStore = defineStore('skills', () => {
     loading,
     error,
     clearError,
+    setMessageHandler,
     search,
     fetchInstalled,
     install,

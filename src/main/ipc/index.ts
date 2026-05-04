@@ -1,6 +1,7 @@
 import { ipcMain, shell } from 'electron'
 import path from 'path'
 import os from 'os'
+import fs from 'fs'
 import { registerSkillsIpc } from './skills.ipc'
 import { registerEnvIpc } from './env.ipc'
 import { registerStoreIpc } from './store.ipc'
@@ -14,11 +15,25 @@ function resolvePath(p: string): string {
 }
 
 function registerShellIpc(): void {
-  ipcMain.handle('shell:open-path', async (_, rawPath: string) => {
-    if (!rawPath || typeof rawPath !== 'string') return
-    const resolved = resolvePath(rawPath)
-    shell.showItemInFolder(resolved)
-  })
+  ipcMain.handle(
+    'shell:open-path',
+    async (_, rawPath: string): Promise<{ success: boolean; error?: string }> => {
+      if (!rawPath || typeof rawPath !== 'string') {
+        return { success: false, error: '无效路径' }
+      }
+      const resolved = resolvePath(rawPath)
+      if (!fs.existsSync(resolved)) {
+        const parent = path.dirname(resolved)
+        if (fs.existsSync(parent)) {
+          await shell.openPath(parent)
+          return { success: true }
+        }
+        return { success: false, error: `路径不存在: ${rawPath}` }
+      }
+      shell.showItemInFolder(resolved)
+      return { success: true }
+    }
+  )
 }
 
 export function registerIpcHandlers(): void {

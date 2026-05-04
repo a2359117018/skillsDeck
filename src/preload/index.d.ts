@@ -25,7 +25,7 @@ export interface AppApi {
     }) => Promise<CommandResult>
   }
   shell: {
-    openPath: (path: string) => Promise<void>
+    openPath: (path: string) => Promise<{ success: boolean; error?: string }>
   }
   env: {
     check: () => Promise<EnvStatus>
