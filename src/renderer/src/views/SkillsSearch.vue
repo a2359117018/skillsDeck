@@ -30,8 +30,8 @@ function handleInstallComplete(): void {
 <template>
   <div class="search-page">
     <SkillSearchBar @search="handleSearch" />
-    <NSpin :show="skillsStore.loading" style="margin-top: 16px">
-      <div v-if="hasSearched && !skillsStore.loading">
+    <NSpin :show="skillsStore.searching" style="margin-top: 16px">
+      <div v-if="hasSearched && !skillsStore.searching">
         <NText depth="3" style="font-size: 12px">
           搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
           {{ skillsStore.searchResults.length }} 个结果
