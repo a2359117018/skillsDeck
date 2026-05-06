@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NButton, NEmpty, NSpace, NText, NScrollbar, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NEmpty,
+  NSpace,
+  NText,
+  NScrollbar,
+  NInput,
+  NIcon,
+  useMessage
+} from 'naive-ui'
+import { RefreshOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
 import AgentFilter from '../components/skills/AgentFilter.vue'
-import SkillCard from '../components/skills/SkillCard.vue'
+import SkillRow from '../components/skills/SkillRow.vue'
 
 const skillsStore = useSkillsStore()
 const message = useMessage()
@@ -76,34 +86,46 @@ async function handleRemove(name: string): Promise<void> {
 function handleOpenLocation(path: string): void {
   skillsStore.openLocation(path)
 }
+
+function handleSearchInput(val: string): void {
+  skillsStore.setSearchKeyword(val)
+}
 </script>
 
 <template>
   <div class="list-page">
     <div class="list-header">
-      <NText class="count-text">{{ skillsStore.filteredSkills.length }} 个技能</NText>
+      <NInput
+        :value="skillsStore.searchKeyword"
+        placeholder="搜索技能..."
+        clearable
+        round
+        class="search-input"
+        @update:value="handleSearchInput"
+      />
       <NSpace align="center" :size="12">
         <AgentFilter v-model="skillsStore.selectedAgents" />
-        <NButton
-          type="primary"
-          size="small"
-          :loading="skillsStore.updatingAll"
-          @click="handleUpdateAll"
-        >
+        <NText class="count-text">{{ skillsStore.filteredSkills.length }} 个技能</NText>
+        <NButton size="small" round :loading="skillsStore.updatingAll" @click="handleUpdateAll">
+          <template #icon>
+            <NIcon :size="14"><RefreshOutline /></NIcon>
+          </template>
           全部更新
         </NButton>
       </NSpace>
     </div>
     <NScrollbar class="list-scroll">
-      <div v-if="skillsStore.filteredSkills.length > 0" class="card-grid">
-        <SkillCard
-          v-for="skill in skillsStore.filteredSkills"
-          :key="skill.name"
-          :skill="skill"
-          @update="handleUpdate"
-          @remove="handleRemove"
-          @open-location="handleOpenLocation"
-        />
+      <div v-if="skillsStore.filteredSkills.length > 0" class="skill-list">
+        <TransitionGroup name="list" tag="div">
+          <SkillRow
+            v-for="skill in skillsStore.filteredSkills"
+            :key="skill.name"
+            :skill="skill"
+            @update="handleUpdate"
+            @remove="handleRemove"
+            @open-location="handleOpenLocation"
+          />
+        </TransitionGroup>
       </div>
       <NEmpty v-else description="暂无已安装的技能" style="margin-top: 48px" />
     </NScrollbar>
@@ -117,13 +139,26 @@ function handleOpenLocation(path: string): void {
   flex-direction: column;
   height: 100%;
 }
+
 .list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   flex-shrink: 0;
+  gap: 12px;
 }
+
+.search-input {
+  max-width: 240px;
+}
+
+.count-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #45515e;
+}
+
 .list-scroll {
   flex: 1;
   min-height: 0;
@@ -132,13 +167,23 @@ function handleOpenLocation(path: string): void {
 .list-scroll :deep(.n-scrollbar-rail) {
   display: none !important;
 }
-.count-text {
-  font-size: 14px;
-  font-weight: 500;
+
+.skill-list {
+  padding-bottom: 24px;
 }
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.2s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(-12px);
+}
+
+.list-move {
+  transition: transform 0.2s ease;
 }
 </style>
