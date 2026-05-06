@@ -4,25 +4,35 @@ import type {
   Skill,
   AppSettings,
   CommandResult,
-  SkillSearchResponse
+  SkillSearchResponse,
+  CommandErrorInfo
 } from '../shared/types'
+
+type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
 
 export interface AppApi {
   skills: {
-    search: (keyword: string) => Promise<SkillSearchResponse>
-    list: (opts?: { global?: boolean }) => Promise<Skill[]>
+    search: (keyword: string) => Promise<IpcResult<SkillSearchResponse>>
+    list: (opts?: { global?: boolean }) => Promise<IpcResult<Skill[]>>
     install: (opts: {
       packageRef: string
       agents: string[]
       global?: boolean
-    }) => Promise<CommandResult>
-    update: (opts: { packageRef: string; global?: boolean }) => Promise<CommandResult>
-    updateAll: (opts?: { global?: boolean }) => Promise<CommandResult>
+    }) => Promise<IpcResult<CommandResult>>
+    installStreaming: (opts: {
+      packageRef: string
+      agents: string[]
+      global?: boolean
+    }) => Promise<IpcResult<CommandResult>>
+    onInstallOutput: (callback: (text: string) => void) => () => void
+    cancelInstall: () => Promise<void>
+    update: (opts: { packageRef: string; global?: boolean }) => Promise<IpcResult<CommandResult>>
+    updateAll: (opts?: { global?: boolean }) => Promise<IpcResult<CommandResult>>
     remove: (opts: {
       packageRef: string
       agent?: string
       global?: boolean
-    }) => Promise<CommandResult>
+    }) => Promise<IpcResult<CommandResult>>
   }
   shell: {
     openPath: (path: string) => Promise<{ success: boolean; error?: string }>
