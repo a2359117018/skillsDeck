@@ -51,7 +51,7 @@ export const useSkillsStore = defineStore('skills', () => {
     const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
     const matched: string[] = []
     for (const [dir, flags] of pathToAgents) {
-      if (normalized.includes(dir)) {
+      if (normalized.startsWith(dir)) {
         matched.push(...flags)
       }
     }
@@ -212,11 +212,11 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function remove(packageRef: string, global?: boolean): Promise<CommandResult> {
+  async function remove(packageRef: string, global?: boolean, agent?: string): Promise<CommandResult> {
     removing.value = true
     error.value = null
     try {
-      const result = await window.api.skills.remove({ packageRef, global })
+      const result = await window.api.skills.remove({ packageRef, global, agent })
       const data = unwrapResult(result)
       installedCache.invalidate()
       return data

@@ -83,7 +83,7 @@ async function handleRemove(name: string): Promise<void> {
   if (!confirmed) return
   removingSkill.value = name
   try {
-    const result = await skillsStore.remove(name, true)
+    const result = await skillsStore.remove(name, true, selectedAgent.value?.agentFlag)
     if (result.success) {
       message.success(`${name} 已删除`)
       await skillsStore.fetchInstalled(true)
@@ -188,7 +188,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
                 circle
                 size="tiny"
                 title="打开位置"
-                @click="handleOpenLocation(selectedAgent!.globalPath + '/' + skillName)"
+                @click="handleOpenLocation(selectedAgent!.globalPath + '\\' + skillName)"
               >
                 <template #icon>
                   <NIcon :size="15"><FolderOpenOutline /></NIcon>

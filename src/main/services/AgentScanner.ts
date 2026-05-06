@@ -13,25 +13,6 @@ interface AgentDef {
 
 class AgentScanner {
   private agents: AgentDef[] = agentsData as AgentDef[]
-  private reverseMap: Map<string, AgentDef[]> = new Map()
-
-  constructor() {
-    this.buildReverseMap()
-  }
-
-  private buildReverseMap(): void {
-    for (const agent of this.agents) {
-      const normalized = this.normalizeGlobalPath(agent.globalPath)
-      const existing = this.reverseMap.get(normalized) || []
-      existing.push(agent)
-      this.reverseMap.set(normalized, existing)
-    }
-  }
-
-  private normalizeGlobalPath(p: string): string {
-    const expanded = p.startsWith('~') ? path.join(os.homedir(), p.slice(2)) : path.resolve(p)
-    return expanded.replace(/\\/g, '/').toLowerCase()
-  }
 
   private expandPath(p: string): string {
     if (p.startsWith('~')) {
@@ -76,10 +57,6 @@ class AgentScanner {
       skills,
       count: skills.length
     }
-  }
-
-  getReversePathMap(): Map<string, AgentDef[]> {
-    return this.reverseMap
   }
 }
 
