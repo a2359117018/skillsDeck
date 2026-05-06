@@ -26,6 +26,11 @@ const api = {
     remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:remove', opts)
   },
+  agents: {
+    scanAll: (): Promise<unknown> => ipcRenderer.invoke('agent:scan-all'),
+    scanOne: (agentFlag: string): Promise<unknown> =>
+      ipcRenderer.invoke('agent:scan-one', agentFlag)
+  },
   shell: {
     openPath: (path: string): Promise<{ success: boolean; error?: string }> =>
       ipcRenderer.invoke('shell:open-path', path)

@@ -5,7 +5,8 @@ import type {
   AppSettings,
   CommandResult,
   SkillSearchResponse,
-  CommandErrorInfo
+  CommandErrorInfo,
+  AgentScanResult
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -33,6 +34,10 @@ export interface AppApi {
       agent?: string
       global?: boolean
     }) => Promise<IpcResult<CommandResult>>
+  }
+  agents: {
+    scanAll: () => Promise<IpcResult<AgentScanResult[]>>
+    scanOne: (agentFlag: string) => Promise<IpcResult<AgentScanResult | null>>
   }
   shell: {
     openPath: (path: string) => Promise<{ success: boolean; error?: string }>
