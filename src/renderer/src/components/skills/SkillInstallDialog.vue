@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, watch, onUnmounted } from 'vue'
 import {
   NModal,
   NCard,
-  NCheckboxGroup,
+  NSteps,
+  NStep,
   NCheckbox,
-  NSpace,
   NButton,
   NInput,
-  NCollapse,
-  NCollapseItem,
+  NSpace,
   NText,
+  NTag,
+  NIcon,
+  NScrollbar,
   useMessage
 } from 'naive-ui'
+import { DownloadOutline, CloseOutline } from '@vicons/ionicons5'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import { useSkillsStore } from '../../stores/skills'
 
@@ -24,16 +27,18 @@ const emit = defineEmits<{
 const skillsStore = useSkillsStore()
 const message = useMessage()
 
+const currentStep = ref(1)
 const isGlobal = ref(false)
 const selectedAgents = ref<string[]>([])
 const filterText = ref('')
 const installing = ref(false)
 const commandOutput = ref('')
 const commandDone = ref(false)
+const scrollbarRef = ref<InstanceType<typeof NScrollbar> | null>(null)
 
 const commonAgents = getCommonAgents()
 
-const allAgents = computed(() => {
+const filteredAgents = computed(() => {
   const text = filterText.value.toLowerCase()
   if (!text) return AGENTS
   return AGENTS.filter(
@@ -41,27 +46,24 @@ const allAgents = computed(() => {
   )
 })
 
-const allCommonSelected = computed(
-  () =>
-    commonAgents.length > 0 && commonAgents.every((a) => selectedAgents.value.includes(a.agentFlag))
-)
 const allFilteredSelected = computed(
   () =>
-    allAgents.value.length > 0 &&
-    allAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
+    filteredAgents.value.length > 0 &&
+    filteredAgents.value.every((a) => selectedAgents.value.includes(a.agentFlag))
 )
 
-function toggleSelectCommon(): void {
-  const flags = commonAgents.map((a) => a.agentFlag)
-  if (allCommonSelected.value) {
-    selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
+function toggleCommonAgent(agentFlag: string): void {
+  if (isGlobal.value) return
+  const idx = selectedAgents.value.indexOf(agentFlag)
+  if (idx >= 0) {
+    selectedAgents.value.splice(idx, 1)
   } else {
-    selectedAgents.value = [...new Set([...selectedAgents.value, ...flags])]
+    selectedAgents.value.push(agentFlag)
   }
 }
 
 function toggleSelectAll(): void {
-  const flags = allAgents.value.map((a) => a.agentFlag)
+  const flags = filteredAgents.value.map((a) => a.agentFlag)
   if (allFilteredSelected.value) {
     selectedAgents.value = selectedAgents.value.filter((s) => !flags.includes(s))
   } else {
@@ -74,17 +76,53 @@ function toggleGlobal(val: boolean): void {
   if (val) selectedAgents.value = []
 }
 
-async function handleInstall(): Promise<void> {
-  if (!isGlobal.value && selectedAgents.value.length === 0) {
+const canGoNext = computed(() => {
+  if (isGlobal.value) return true
+  return selectedAgents.value.length > 0
+})
+
+function goNext(): void {
+  if (!canGoNext.value) {
     message.warning('请选择至少一个安装目标')
     return
   }
+  currentStep.value = 2
+}
+
+function goBack(): void {
+  if (installing.value) return
+  currentStep.value = 1
+}
+
+let removeOutputListener: (() => void) | null = null
+
+watch(commandOutput, async () => {
+  await nextTick()
+  if (scrollbarRef.value) {
+    const wrapEl = scrollbarRef.value.$el?.querySelector(
+      '.n-scrollbar-container'
+    ) as HTMLElement | null
+    if (wrapEl) {
+      wrapEl.scrollTop = wrapEl.scrollHeight
+    }
+  }
+})
+
+async function handleInstall(): Promise<void> {
   installing.value = true
   commandDone.value = false
   commandOutput.value = ''
+
+  removeOutputListener = window.api.skills.onInstallOutput((text) => {
+    commandOutput.value += text
+  })
+
   try {
-    const result = await skillsStore.install(props.packageRef, selectedAgents.value, isGlobal.value)
-    commandOutput.value = result.stdout || result.stderr || ''
+    const result = await skillsStore.installStreaming(
+      props.packageRef,
+      selectedAgents.value,
+      isGlobal.value
+    )
     commandDone.value = true
     if (result.success) {
       message.success('安装成功')
@@ -93,102 +131,177 @@ async function handleInstall(): Promise<void> {
     }
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
-    commandOutput.value = errMsg
+    commandOutput.value += errMsg
     commandDone.value = true
     message.error('安装失败: ' + errMsg)
   } finally {
     installing.value = false
+    if (removeOutputListener) {
+      removeOutputListener()
+      removeOutputListener = null
+    }
+  }
+}
+
+async function handleCancelInstall(): Promise<void> {
+  await window.api.skills.cancelInstall()
+  commandOutput.value += '\n安装已取消'
+  commandDone.value = true
+  installing.value = false
+  if (removeOutputListener) {
+    removeOutputListener()
+    removeOutputListener = null
   }
 }
 
 function handleClose(): void {
-  if (!installing.value) {
-    emit('update:show', false)
-    if (commandDone.value) emit('complete')
-  }
+  if (installing.value) return
+  emit('update:show', false)
+  if (commandDone.value) emit('complete')
 }
+
+function resetState(): void {
+  currentStep.value = 1
+  isGlobal.value = false
+  selectedAgents.value = []
+  filterText.value = ''
+  installing.value = false
+  commandOutput.value = ''
+  commandDone.value = false
+}
+
+onUnmounted(() => {
+  if (removeOutputListener) {
+    removeOutputListener()
+    removeOutputListener = null
+  }
+})
 </script>
 
 <template>
-  <NModal :show="show" @update:show="handleClose">
-    <NCard title="安装技能" style="width: 560px">
+  <NModal
+    :show="show"
+    :mask-closable="!installing"
+    :on-after-leave="resetState"
+    @update:show="handleClose"
+  >
+    <NCard title="安装技能" style="width: 620px">
       <NText
         >安装: <strong>{{ packageRef }}</strong></NText
       >
 
-      <div style="margin-top: 16px">
+      <NSteps :current="currentStep" style="margin-top: 16px" size="small">
+        <NStep title="选择目标" />
+        <NStep title="确认安装" />
+      </NSteps>
+
+      <div v-if="currentStep === 1" style="margin-top: 16px">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
           全局安装（不指定 agent）
         </NCheckbox>
+
+        <div v-if="!isGlobal" class="agent-section">
+          <NText depth="3" class="section-label">常用 Agent</NText>
+          <NSpace :size="6" :wrap="true" class="common-agents">
+            <NButton
+              v-for="agent in commonAgents"
+              :key="agent.agentFlag"
+              :type="selectedAgents.includes(agent.agentFlag) ? 'primary' : 'default'"
+              size="small"
+              round
+              @click="toggleCommonAgent(agent.agentFlag)"
+            >
+              {{ agent.name }}
+            </NButton>
+          </NSpace>
+
+          <NText depth="3" class="section-label">筛选 Agent</NText>
+          <NInput
+            v-model:value="filterText"
+            placeholder="搜索 agent..."
+            clearable
+            size="small"
+            class="filter-input"
+          />
+
+          <NCheckbox
+            :checked="allFilteredSelected"
+            :indeterminate="
+              selectedAgents.some((s) => filteredAgents.some((a) => a.agentFlag === s)) &&
+              !allFilteredSelected
+            "
+            class="select-all-checkbox"
+            @update:checked="toggleSelectAll"
+          >
+            全选当前筛选
+          </NCheckbox>
+          <div class="agent-list-scroll">
+            <NSpace vertical :size="4">
+              <NCheckbox
+                v-for="agent in filteredAgents"
+                :key="agent.agentFlag"
+                :checked="selectedAgents.includes(agent.agentFlag)"
+                @update:checked="() => toggleCommonAgent(agent.agentFlag)"
+              >
+                {{ agent.name }}
+              </NCheckbox>
+            </NSpace>
+          </div>
+
+          <NText depth="3" class="selected-count">
+            已选: {{ selectedAgents.length }} 个 agent
+          </NText>
+        </div>
       </div>
 
-      <div v-if="!isGlobal" style="margin-top: 12px">
-        <NInput
-          v-model:value="filterText"
-          placeholder="筛选 agent..."
-          clearable
-          size="small"
-          style="margin-bottom: 8px"
-        />
-        <NCheckboxGroup v-model:value="selectedAgents">
-          <NCollapse :default-expanded-names="['common', 'all']">
-            <NCollapseItem title="常用" name="common">
-              <NCheckbox
-                :checked="allCommonSelected"
-                :indeterminate="
-                  selectedAgents.some((s) => commonAgents.some((a) => a.agentFlag === s)) &&
-                  !allCommonSelected
-                "
-                @update:checked="toggleSelectCommon"
-                style="margin-bottom: 8px"
-              >
-                全选常用
-              </NCheckbox>
-              <NSpace vertical>
-                <NCheckbox
-                  v-for="agent in commonAgents"
-                  :key="agent.agentFlag"
-                  :value="agent.agentFlag"
-                  :label="agent.name"
-                />
-              </NSpace>
-            </NCollapseItem>
-            <NCollapseItem title="全部" name="all">
-              <NCheckbox
-                :checked="allFilteredSelected"
-                :indeterminate="
-                  selectedAgents.some((s) => allAgents.some((a) => a.agentFlag === s)) &&
-                  !allFilteredSelected
-                "
-                @update:checked="toggleSelectAll"
-                style="margin-bottom: 8px"
-              >
-                全选当前筛选
-              </NCheckbox>
-              <NSpace vertical style="max-height: 200px; overflow-y: auto">
-                <NCheckbox
-                  v-for="agent in allAgents"
-                  :key="agent.agentFlag"
-                  :value="agent.agentFlag"
-                  :label="agent.name"
-                />
-              </NSpace>
-            </NCollapseItem>
-          </NCollapse>
-        </NCheckboxGroup>
-        <NText depth="3" style="font-size: 12px; margin-top: 8px; display: block">
-          已选: {{ selectedAgents.length }} 个 agent
-        </NText>
-      </div>
+      <div v-if="currentStep === 2" style="margin-top: 16px">
+        <div class="confirm-row">
+          <NText depth="3">安装模式: </NText>
+          <NText>{{ isGlobal ? '全局安装' : '指定 Agent' }}</NText>
+        </div>
+        <div v-if="!isGlobal && selectedAgents.length > 0" class="confirm-row">
+          <NText depth="3">选中 Agent: </NText>
+          <NSpace :size="4" :wrap="true" inline style="display: inline-flex">
+            <NTag v-for="flag in selectedAgents" :key="flag" size="small" round type="info">
+              {{ AGENTS.find((a) => a.agentFlag === flag)?.name || flag }}
+            </NTag>
+          </NSpace>
+        </div>
 
-      <div v-if="commandOutput" style="margin-top: 12px">
-        <div class="mini-terminal">{{ commandOutput }}</div>
+        <div v-if="commandOutput || installing" class="install-terminal">
+          <NScrollbar ref="scrollbarRef" style="max-height: 240px">
+            <pre
+              class="terminal-content">{{ commandOutput }}<span v-if="installing" class="cursor-blink">▌</span></pre>
+          </NScrollbar>
+        </div>
       </div>
 
       <template #footer>
         <NSpace justify="end">
-          <NButton @click="handleClose">取消</NButton>
-          <NButton type="primary" :loading="installing" @click="handleInstall">确认安装</NButton>
+          <NButton v-if="currentStep === 1" @click="handleClose">取消</NButton>
+          <NButton v-if="currentStep === 2 && !commandDone" :disabled="installing" @click="goBack">
+            上一步
+          </NButton>
+          <NButton v-if="currentStep === 1" type="primary" :disabled="!canGoNext" @click="goNext">
+            下一步
+          </NButton>
+          <NButton
+            v-if="currentStep === 2 && !commandDone && !installing"
+            type="primary"
+            @click="handleInstall"
+          >
+            <template #icon>
+              <NIcon :size="16"><DownloadOutline /></NIcon>
+            </template>
+            确认安装
+          </NButton>
+          <NButton v-if="installing" type="warning" @click="handleCancelInstall">
+            <template #icon>
+              <NIcon :size="16"><CloseOutline /></NIcon>
+            </template>
+            取消安装
+          </NButton>
+          <NButton v-if="commandDone" type="primary" @click="handleClose"> 完成 </NButton>
         </NSpace>
       </template>
     </NCard>
@@ -196,15 +309,70 @@ function handleClose(): void {
 </template>
 
 <style scoped>
-.mini-terminal {
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 12px;
-  max-height: 120px;
+.agent-section {
+  margin-top: 12px;
+}
+
+.section-label {
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.common-agents {
+  margin-bottom: 12px;
+}
+
+.filter-input {
+  margin-bottom: 8px;
+}
+
+.select-all-checkbox {
+  margin-bottom: 8px;
+}
+
+.agent-list-scroll {
+  max-height: 180px;
   overflow-y: auto;
+  border: 1px solid var(--n-border-color);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.selected-count {
+  font-size: 12px;
+  margin-top: 8px;
+  display: block;
+}
+
+.confirm-row {
+  margin-bottom: 12px;
+}
+
+.install-terminal {
+  background: #1e1e1e;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.terminal-content {
+  color: #d4d4d4;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
   white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  padding: 8px 12px;
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 </style>

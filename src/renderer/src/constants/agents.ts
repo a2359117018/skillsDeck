@@ -9,7 +9,7 @@ export interface Agent {
 
 export const AGENTS: Agent[] = agentsData
 
-export const COMMON_AGENT_FLAGS = ['claude-code', 'cursor', 'github-copilot', 'gemini-cli']
+export const COMMON_AGENT_FLAGS = ['claude-code', 'codex', 'opencode', 'trae', 'trae-cn', 'cursor']
 
 export function getCommonAgents(): Agent[] {
   return AGENTS.filter((a) => COMMON_AGENT_FLAGS.includes(a.agentFlag))

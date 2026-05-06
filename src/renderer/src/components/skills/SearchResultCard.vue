@@ -13,10 +13,6 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 
 <template>
   <div class="card-base result-card">
-    <div
-      class="card-base-accent"
-      style="--card-accent: linear-gradient(180deg, #2080f0, #18a058)"
-    />
     <div class="card-base-body">
       <div class="result-card-main">
         <div class="result-card-info">

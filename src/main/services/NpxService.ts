@@ -54,11 +54,7 @@ class NpxService {
     }
   }
 
-  async install(
-    packageRef: string,
-    agents: string[],
-    global?: boolean
-  ): Promise<CommandResult> {
+  async install(packageRef: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(packageRef, agents, global)
     return commandRunner.run('npx', args)
   }

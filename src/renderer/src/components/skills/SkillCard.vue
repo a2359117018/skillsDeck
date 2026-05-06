@@ -21,7 +21,6 @@ function getAgentName(flag: string): string {
 
 <template>
   <div class="card-base skill-card">
-    <div class="card-base-accent" />
     <div class="card-base-body skill-card-body">
       <div class="skill-card-top">
         <NText class="card-base-text">{{ props.skill.name }}</NText>

@@ -128,6 +128,10 @@ function handleOpenLocation(path: string): void {
   flex: 1;
   min-height: 0;
 }
+
+.list-scroll :deep(.n-scrollbar-rail) {
+  display: none !important;
+}
 .count-text {
   font-size: 14px;
   font-weight: 500;

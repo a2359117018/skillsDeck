@@ -34,23 +34,6 @@ const drawerVisible = ref(false)
 const updatingSkill = ref<string | null>(null)
 const removingSkill = ref<string | null>(null)
 
-const agentColors = [
-  'linear-gradient(135deg, #667eea, #764ba2)',
-  'linear-gradient(135deg, #f093fb, #f5576c)',
-  'linear-gradient(135deg, #4facfe, #00f2fe)',
-  'linear-gradient(135deg, #43e97b, #38f9d7)',
-  'linear-gradient(135deg, #fa709a, #fee140)',
-  'linear-gradient(135deg, #a18cd1, #fbc2eb)',
-  'linear-gradient(135deg, #fccb90, #d57eeb)',
-  'linear-gradient(135deg, #84fab0, #8fd3f4)',
-  'linear-gradient(135deg, #f6d365, #fda085)',
-  'linear-gradient(135deg, #a1c4fd, #c2e9fb)'
-]
-
-function getAgentColor(index: number): string {
-  return agentColors[index % agentColors.length]
-}
-
 function resolveAgentByPath(skillPath: string): string[] {
   const normalized = skillPath.replace(/\\/g, '/')
   const matched: string[] = []
@@ -165,12 +148,11 @@ onMounted(() => skillsStore.fetchInstalled(true))
     <NScrollbar class="agent-scroll">
       <div v-if="groupedByAgent.size > 0" class="agent-grid">
         <div
-          v-for="([agent, skills], index) in groupedByAgent"
+          v-for="[agent, skills] in groupedByAgent"
           :key="agent"
           class="card-base agent-card"
           @click="openAgentCard(agent)"
         >
-          <div class="card-base-accent" :style="{ '--card-accent': getAgentColor(index) }" />
           <div class="card-base-body agent-card-body">
             <div class="agent-card-header">
               <NText class="card-base-text">{{ getAgentName(agent) }}</NText>

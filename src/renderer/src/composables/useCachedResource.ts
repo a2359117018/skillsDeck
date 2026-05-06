@@ -37,6 +37,9 @@ export function useCachedResource<T>(
       cache.value = { data: result, timestamp: Date.now(), stale: false }
       isStale.value = false
       return result
+    } catch (error) {
+      console.error('Failed to refresh cached resource:', error)
+      throw error
     } finally {
       loading.value = false
     }

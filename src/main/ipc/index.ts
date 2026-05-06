@@ -5,6 +5,7 @@ import fs from 'fs'
 import { registerSkillsIpc } from './skills.ipc'
 import { registerEnvIpc } from './env.ipc'
 import { registerStoreIpc } from './store.ipc'
+import { getMainWindow } from '../services/WindowManager'
 
 function resolvePath(p: string): string {
   if (p === '~') return os.homedir()
@@ -37,7 +38,7 @@ function registerShellIpc(): void {
 }
 
 export function registerIpcHandlers(): void {
-  registerSkillsIpc()
+  registerSkillsIpc(getMainWindow)
   registerEnvIpc()
   registerStoreIpc()
   registerShellIpc()

@@ -10,7 +10,9 @@ function extractError(e: unknown): string {
   return String(e)
 }
 
-function unwrapResult<T>(result: { ok: true; data: T } | { ok: false; error: { message: string } }): T {
+function unwrapResult<T>(
+  result: { ok: true; data: T } | { ok: false; error: { message: string } }
+): T {
   if (result.ok) return result.data
   throw new Error(result.error.message)
 }

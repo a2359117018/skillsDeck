@@ -31,8 +31,11 @@ function handleInstallComplete(): void {
   <div class="search-page">
     <SkillSearchBar @search="handleSearch" />
     <NScrollbar class="search-scroll">
-      <NSpin :show="skillsStore.searching">
-        <div v-if="hasSearched && !skillsStore.searching" class="search-results">
+      <div v-if="skillsStore.searching" class="search-loading">
+        <NSpin size="large" />
+      </div>
+      <template v-else-if="hasSearched">
+        <div class="search-results">
           <NText depth="3" style="font-size: 12px">
             搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
             {{ skillsStore.searchResults.length }} 个结果
@@ -51,12 +54,8 @@ function handleInstallComplete(): void {
             style="margin-top: 48px"
           />
         </div>
-        <NEmpty
-          v-else-if="!hasSearched"
-          description="输入关键词搜索技能"
-          style="margin-top: 48px"
-        />
-      </NSpin>
+      </template>
+      <NEmpty v-else description="输入关键词搜索技能" style="margin-top: 48px" />
     </NScrollbar>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
@@ -77,6 +76,18 @@ function handleInstallComplete(): void {
 .search-scroll {
   flex: 1;
   min-height: 0;
+}
+
+.search-scroll :deep(.n-scrollbar-rail) {
+  display: none !important;
+}
+
+.search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
 }
 
 .search-results {

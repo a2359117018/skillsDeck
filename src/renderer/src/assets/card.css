@@ -24,12 +24,6 @@
   transform: translateY(-2px);
 }
 
-.card-base-accent {
-  width: 3px;
-  flex-shrink: 0;
-  background: var(--card-accent, linear-gradient(180deg, #18a058, #2080f0));
-}
-
 .card-base-body {
   flex: 1;
   padding: 14px 16px;

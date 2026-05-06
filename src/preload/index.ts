@@ -8,6 +8,17 @@ const api = {
       ipcRenderer.invoke('skills:list', opts),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:install', opts),
+    installStreaming: (opts: {
+      packageRef: string
+      agents: string[]
+      global?: boolean
+    }): Promise<unknown> => ipcRenderer.invoke('skills:install-streaming', opts),
+    onInstallOutput: (callback: (text: string) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, text: string): void => callback(text)
+      ipcRenderer.on('skills:install-output', listener)
+      return () => ipcRenderer.removeListener('skills:install-output', listener)
+    },
+    cancelInstall: (): Promise<void> => ipcRenderer.invoke('skills:install-cancel'),
     update: (opts: { packageRef: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:update', opts),
     updateAll: (opts?: { global?: boolean }): Promise<unknown> =>
