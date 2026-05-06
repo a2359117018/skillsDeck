@@ -6,8 +6,20 @@ import type { EnvStatus } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
 import { npxService } from './NpxService'
 
+async function safeRun(
+  command: string,
+  args: string[],
+  timeout: number
+): Promise<{ success: boolean; stdout: string }> {
+  try {
+    return await commandRunner.run(command, args, { timeout })
+  } catch {
+    return { success: false, stdout: '' }
+  }
+}
+
 export async function checkAll(): Promise<EnvStatus> {
-  const node = await commandRunner.run('node', ['--version'], { timeout: 10000 })
+  const node = await safeRun('node', ['--version'], 10000)
   const npx = await npxService.checkNpxVersion()
   const skills = await npxService.checkSkillsVersion()
   return {
