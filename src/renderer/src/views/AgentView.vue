@@ -10,13 +10,13 @@ import {
   NButton,
   NIcon,
   NScrollbar,
+  NInput,
   useMessage
 } from 'naive-ui'
 import { FolderOpenOutline, RefreshOutline, TrashOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useConfirm } from '@renderer/composables/useConfirm'
-import { AGENTS } from '@renderer/constants/agents'
-import type { Skill } from '../../../shared/types'
+import type { AgentScanResult } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const message = useMessage()
@@ -26,49 +26,21 @@ skillsStore.setMessageHandler((msg, type) => {
   message[type](msg)
 })
 
-const agentNameMap = new Map(AGENTS.map((a) => [a.agentFlag, a.name]))
-const agentPathMap = new Map(AGENTS.map((a) => [a.agentFlag, a.globalPath]))
-
-const selectedAgent = ref<string | null>(null)
+const agentSearchKeyword = ref('')
+const selectedAgent = ref<AgentScanResult | null>(null)
 const drawerVisible = ref(false)
 const updatingSkill = ref<string | null>(null)
 const removingSkill = ref<string | null>(null)
 
-function resolveAgentByPath(skillPath: string): string[] {
-  const normalized = skillPath.replace(/\\/g, '/')
-  const matched: string[] = []
-  for (const agent of AGENTS) {
-    const globalDir = agent.globalPath.replace(/^~/, '').replace(/\\/g, '/')
-    if (normalized.includes(globalDir)) {
-      matched.push(agent.agentFlag)
-    }
-  }
-  return matched.length > 0 ? matched : []
-}
+const visibleAgentResults = computed(() =>
+  skillsStore.sortedAgentResults.filter((a) => {
+    if (a.count === 0) return false
+    if (!agentSearchKeyword.value) return true
+    return a.agentName.toLowerCase().includes(agentSearchKeyword.value.toLowerCase())
+  })
+)
 
-const groupedByAgent = computed(() => {
-  const map = new Map<string, Skill[]>()
-  for (const skill of skillsStore.installedSkills) {
-    const resolvedAgents = resolveAgentByPath(skill.path)
-    const agents = resolvedAgents.length > 0 ? resolvedAgents : skill.agents
-    for (const agent of agents) {
-      if (!map.has(agent)) map.set(agent, [])
-      map.get(agent)!.push(skill)
-    }
-  }
-  return new Map([...map.entries()].sort((a, b) => b[1].length - a[1].length))
-})
-
-const selectedSkills = computed(() => {
-  if (!selectedAgent.value) return []
-  return groupedByAgent.value.get(selectedAgent.value) || []
-})
-
-function getAgentName(agentFlag: string): string {
-  return agentNameMap.get(agentFlag) || agentFlag
-}
-
-function openAgentCard(agent: string): void {
+function openAgentCard(agent: AgentScanResult): void {
   selectedAgent.value = agent
   drawerVisible.value = true
 }
@@ -78,24 +50,9 @@ function closeDrawer(): void {
   selectedAgent.value = null
 }
 
-function openAgentFolder(agentFlag: string, e?: Event): void {
+function openAgentFolder(agent: AgentScanResult, e?: Event): void {
   e?.stopPropagation()
-  let folderPath = agentPathMap.get(agentFlag)
-  if (!folderPath) {
-    const skills = groupedByAgent.value.get(agentFlag)
-    if (skills && skills.length > 0 && skills[0].path) {
-      const parts = skills[0].path.replace(/\\/g, '/').split('/')
-      const idx = parts.lastIndexOf('skills')
-      if (idx !== -1) {
-        folderPath = parts.slice(0, idx + 1).join('/')
-      }
-    }
-  }
-  if (folderPath) {
-    skillsStore.openLocation(folderPath)
-  } else {
-    message.warning('未找到此 Agent 的技能文件夹路径')
-  }
+  skillsStore.openLocation(agent.globalPath)
 }
 
 async function handleOpenLocation(path: string): Promise<void> {
@@ -140,26 +97,44 @@ async function handleRemove(name: string): Promise<void> {
   }
 }
 
+async function handleRefresh(): Promise<void> {
+  await skillsStore.fetchInstalled(true)
+}
+
 onMounted(() => skillsStore.fetchInstalled(true))
 </script>
 
 <template>
   <div class="agent-view">
+    <div class="agent-header">
+      <NInput
+        v-model:value="agentSearchKeyword"
+        placeholder="搜索 Agent..."
+        clearable
+        round
+        class="agent-search-input"
+      />
+      <NButton size="small" quaternary circle title="刷新" @click="handleRefresh">
+        <template #icon>
+          <NIcon :size="18"><RefreshOutline /></NIcon>
+        </template>
+      </NButton>
+    </div>
     <NScrollbar class="agent-scroll">
-      <div v-if="groupedByAgent.size > 0" class="agent-grid">
+      <div v-if="visibleAgentResults.length > 0" class="agent-grid">
         <div
-          v-for="[agent, skills] in groupedByAgent"
-          :key="agent"
+          v-for="agent in visibleAgentResults"
+          :key="agent.agentFlag"
           class="card-base agent-card"
           @click="openAgentCard(agent)"
         >
           <div class="card-base-body agent-card-body">
             <div class="agent-card-header">
-              <NText class="card-base-text">{{ getAgentName(agent) }}</NText>
-              <NTag size="small" :bordered="false" round type="info">{{ skills.length }}</NTag>
+              <NText class="card-base-text">{{ agent.agentName }}</NText>
+              <NTag size="small" :bordered="false" round type="info">{{ agent.count }}</NTag>
             </div>
             <div class="agent-card-footer">
-              <NText depth="3" style="font-size: 12px">{{ skills.length }} 个技能</NText>
+              <NText depth="3" style="font-size: 12px">{{ agent.count }} 个技能</NText>
               <div class="agent-folder-btn">
                 <NButton
                   size="tiny"
@@ -195,17 +170,17 @@ onMounted(() => skillsStore.fetchInstalled(true))
         <template #header>
           <NSpace align="center" :size="8">
             <NText strong style="font-size: 16px">
-              {{ selectedAgent ? getAgentName(selectedAgent) : '' }}
+              {{ selectedAgent ? selectedAgent.agentName : '' }}
             </NText>
             <NTag size="small" :bordered="false" type="info">
-              {{ selectedSkills.length }} 个技能
+              {{ selectedAgent ? selectedAgent.count : 0 }} 个技能
             </NTag>
           </NSpace>
         </template>
-        <div class="skill-table">
-          <div v-for="skill in selectedSkills" :key="skill.name" class="skill-table-row">
+        <div v-if="selectedAgent" class="skill-table">
+          <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-table-row">
             <div class="skill-table-info">
-              <NText strong class="skill-table-name">{{ skill.name }}</NText>
+              <NText strong class="skill-table-name">{{ skillName }}</NText>
             </div>
             <NSpace :size="4" align="center">
               <NButton
@@ -213,7 +188,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
                 circle
                 size="tiny"
                 title="打开位置"
-                @click="handleOpenLocation(skill.path)"
+                @click="handleOpenLocation(selectedAgent!.globalPath + '/' + skillName)"
               >
                 <template #icon>
                   <NIcon :size="15"><FolderOpenOutline /></NIcon>
@@ -224,8 +199,8 @@ onMounted(() => skillsStore.fetchInstalled(true))
                 circle
                 size="tiny"
                 title="更新"
-                :loading="updatingSkill === skill.name"
-                @click="handleUpdate(skill.name)"
+                :loading="updatingSkill === skillName"
+                @click="handleUpdate(skillName)"
               >
                 <template #icon>
                   <NIcon :size="15"><RefreshOutline /></NIcon>
@@ -237,8 +212,8 @@ onMounted(() => skillsStore.fetchInstalled(true))
                 size="tiny"
                 type="error"
                 title="删除"
-                :loading="removingSkill === skill.name"
-                @click="handleRemove(skill.name)"
+                :loading="removingSkill === skillName"
+                @click="handleRemove(skillName)"
               >
                 <template #icon>
                   <NIcon :size="15"><TrashOutline /></NIcon>
@@ -258,6 +233,19 @@ onMounted(() => skillsStore.fetchInstalled(true))
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.agent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.agent-search-input {
+  max-width: 240px;
 }
 
 .agent-scroll {
