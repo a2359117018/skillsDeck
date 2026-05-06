@@ -14,6 +14,14 @@ export interface Skill {
   agents: string[]
 }
 
+export interface AgentScanResult {
+  agentFlag: string
+  agentName: string
+  globalPath: string
+  skills: string[]
+  count: number
+}
+
 export interface CommandResult {
   success: boolean
   stdout: string
