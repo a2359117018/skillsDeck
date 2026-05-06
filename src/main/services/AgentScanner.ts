@@ -29,9 +29,7 @@ class AgentScanner {
   }
 
   private normalizeGlobalPath(p: string): string {
-    const expanded = p.startsWith('~')
-      ? path.join(os.homedir(), p.slice(2))
-      : path.resolve(p)
+    const expanded = p.startsWith('~') ? path.join(os.homedir(), p.slice(2)) : path.resolve(p)
     return expanded.replace(/\\/g, '/').toLowerCase()
   }
 
