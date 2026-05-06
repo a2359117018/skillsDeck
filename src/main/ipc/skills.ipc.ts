@@ -1,41 +1,99 @@
 import { ipcMain } from 'electron'
-import {
-  searchSkillsApi,
-  listSkills,
-  installSkill,
-  updateSkill,
-  updateAllSkills,
-  removeSkill
-} from '../services/SkillsService'
+import { npxService } from '../services/NpxService'
+import { CommandError } from '../services/CommandRunner'
+import { searchSkillsApi } from '../api/skills'
 
-export function registerSkillsIpc(): void {
+function serializeError(e: unknown) {
+  if (e instanceof CommandError) {
+    return e.toJSON()
+  }
+  return {
+    code: 'UNKNOWN' as const,
+    command: '',
+    stderr: '',
+    exitCode: null,
+    message: e instanceof Error ? e.message : String(e)
+  }
+}
+
+export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | null): void {
   ipcMain.handle('skills:search', async (_, keyword: string) => {
-    return searchSkillsApi(keyword)
+    try {
+      return { ok: true, data: await searchSkillsApi(keyword) }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
   })
 
   ipcMain.handle('skills:list', async (_, opts?: { global?: boolean }) => {
-    return listSkills(opts?.global)
+    try {
+      return { ok: true, data: await npxService.list(opts?.global) }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
   })
 
   ipcMain.handle(
     'skills:install',
     async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
-      return installSkill(opts.packageRef, opts.agents, opts.global)
+      try {
+        return { ok: true, data: await npxService.install(opts.packageRef, opts.agents, opts.global) }
+      } catch (e) {
+        return { ok: false, error: serializeError(e) }
+      }
     }
   )
 
-  ipcMain.handle('skills:update', async (_, opts: { packageRef: string; global?: boolean }) => {
-    return updateSkill(opts.packageRef, opts.global)
+  ipcMain.handle(
+    'skills:install-streaming',
+    async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
+      const mainWindow = getMainWindow()
+      if (!mainWindow) {
+        return { ok: false, error: { code: 'UNKNOWN', command: '', stderr: '', exitCode: null, message: 'Main window not available' } }
+      }
+      try {
+        const onOutput = (text: string): void => {
+          if (mainWindow.isDestroyed()) return
+          mainWindow.webContents.send('skills:install-output', text)
+        }
+        return { ok: true, data: await npxService.installStreaming(onOutput, opts.packageRef, opts.agents, opts.global) }
+      } catch (e) {
+        return { ok: false, error: serializeError(e) }
+      }
+    }
+  )
+
+  ipcMain.handle('skills:install-cancel', () => {
+    npxService.cancelInstall()
   })
 
+  ipcMain.handle(
+    'skills:update',
+    async (_, opts: { packageRef: string; global?: boolean }) => {
+      try {
+        return { ok: true, data: await npxService.update(opts.packageRef, opts.global) }
+      } catch (e) {
+        return { ok: false, error: serializeError(e) }
+      }
+    }
+  )
+
   ipcMain.handle('skills:update-all', async (_, opts?: { global?: boolean }) => {
-    return updateAllSkills(opts?.global)
+    try {
+      return { ok: true, data: await npxService.updateAll(opts?.global) }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
   })
 
   ipcMain.handle(
     'skills:remove',
     async (_, opts: { packageRef: string; agent?: string; global?: boolean }) => {
-      return removeSkill(opts.packageRef, opts.agent, opts.global)
+      try {
+        return { ok: true, data: await npxService.remove(opts.packageRef, opts.agent, opts.global) }
+      } catch (e) {
+        return { ok: false, error: serializeError(e) }
+      }
     }
   )
 }
