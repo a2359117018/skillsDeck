@@ -1,0 +1,115 @@
+import type { CommandResult, Skill } from '../../shared/types'
+import { commandRunner, CommandError } from './CommandRunner'
+
+class NpxService {
+  async checkNpxVersion(): Promise<{ ok: boolean; version: string | null }> {
+    try {
+      const result = await commandRunner.run('npx', ['--version'], { timeout: 10000 })
+      if (result.success) {
+        return { ok: true, version: result.stdout.trim() }
+      }
+      return { ok: false, version: null }
+    } catch {
+      return { ok: false, version: null }
+    }
+  }
+
+  async checkSkillsVersion(): Promise<{ ok: boolean; version: string | null }> {
+    try {
+      const result = await commandRunner.run('npx', ['skills', '--version'], {
+        timeout: 10000
+      })
+      if (result.success) {
+        return { ok: true, version: result.stdout.trim() }
+      }
+      return { ok: false, version: null }
+    } catch {
+      return { ok: false, version: null }
+    }
+  }
+
+  async list(global?: boolean): Promise<Skill[]> {
+    const args = this.buildArgs('list', '--json')
+    if (global) args.push('-g')
+    const result = await commandRunner.run('npx', args)
+    if (!result.success) {
+      throw new CommandError(
+        'EXECUTION_FAILED',
+        `npx ${args.join(' ')}`,
+        result.stderr,
+        result.exitCode
+      )
+    }
+    const cleaned = result.stdout.trim()
+    if (!cleaned) return []
+    try {
+      return JSON.parse(cleaned)
+    } catch {
+      throw new CommandError(
+        'EXECUTION_FAILED',
+        `npx ${args.join(' ')}`,
+        `Invalid JSON: ${cleaned}`,
+        result.exitCode
+      )
+    }
+  }
+
+  async install(
+    packageRef: string,
+    agents: string[],
+    global?: boolean
+  ): Promise<CommandResult> {
+    const args = this.buildInstallArgs(packageRef, agents, global)
+    return commandRunner.run('npx', args)
+  }
+
+  async installStreaming(
+    onOutput: (text: string) => void,
+    packageRef: string,
+    agents: string[],
+    global?: boolean
+  ): Promise<CommandResult> {
+    const args = this.buildInstallArgs(packageRef, agents, global)
+    return commandRunner.run('npx', args, { onOutput })
+  }
+
+  cancelInstall(): void {
+    commandRunner.cancel()
+  }
+
+  async update(name: string, global?: boolean): Promise<CommandResult> {
+    const args = this.buildArgs('update', name, '-y')
+    if (global) args.push('-g')
+    return commandRunner.run('npx', args)
+  }
+
+  async updateAll(global?: boolean): Promise<CommandResult> {
+    const args = this.buildArgs('update', '-y')
+    if (global) args.push('-g')
+    return commandRunner.run('npx', args)
+  }
+
+  async remove(name: string, agent?: string, global?: boolean): Promise<CommandResult> {
+    const args = this.buildArgs('remove', name, '-y')
+    if (global) args.push('-g')
+    if (agent) args.push('-a', agent)
+    return commandRunner.run('npx', args)
+  }
+
+  private buildArgs(subcommand: string, ...parts: string[]): string[] {
+    return ['skills', subcommand, ...parts]
+  }
+
+  private buildInstallArgs(packageRef: string, agents: string[], global?: boolean): string[] {
+    const args = this.buildArgs('add', packageRef)
+    if (global) {
+      args.push('--agent', '*')
+    } else if (agents.length > 0) {
+      args.push('--agent', ...agents)
+    }
+    args.push('-g', '-y')
+    return args
+  }
+}
+
+export const npxService = new NpxService()
