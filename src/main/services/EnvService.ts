@@ -1,40 +1,18 @@
-import { execa } from 'execa'
 import { app } from 'electron'
 import { createWriteStream, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import decompress from 'decompress'
 import type { EnvStatus } from '../../shared/types'
+import { commandRunner } from './CommandRunner'
+import { npxService } from './NpxService'
 
-async function checkCommand(
-  command: string,
-  args: string[]
-): Promise<{ ok: boolean; version: string | null }> {
-  try {
-    const result = await execa(command, args, {
-      timeout: 10000,
-      reject: false,
-      shell: process.platform === 'win32'
-    })
-    if (result.exitCode === 0) {
-      return { ok: true, version: result.stdout.trim() }
-    }
-    return { ok: false, version: null }
-  } catch {
-    return { ok: false, version: null }
-  }
-}
-
-/**
- * Check environment status for Node.js, npx, and npx skills CLI
- * @returns Environment status object with installation info and versions
- */
 export async function checkAll(): Promise<EnvStatus> {
-  const node = await checkCommand('node', ['--version'])
-  const npx = await checkCommand('npx', ['--version'])
-  const skills = await checkCommand('npx', ['skills', '--version'])
+  const node = await commandRunner.run('node', ['--version'], { timeout: 10000 })
+  const npx = await npxService.checkNpxVersion()
+  const skills = await npxService.checkSkillsVersion()
   return {
-    nodeInstalled: node.ok,
-    nodeVersion: node.version,
+    nodeInstalled: node.success,
+    nodeVersion: node.success ? node.stdout.trim() : null,
     npxInstalled: npx.ok,
     skillsInstalled: skills.ok
   }
