@@ -21,6 +21,14 @@ export interface CommandResult {
   exitCode: number | null
 }
 
+export interface CommandErrorInfo {
+  code: 'COMMAND_NOT_FOUND' | 'TIMEOUT' | 'EXECUTION_FAILED' | 'UNKNOWN'
+  command: string
+  stderr: string
+  exitCode: number | null
+  message: string
+}
+
 export interface AppSettings {
   defaultAgent: string
   autoCheckEnv: boolean
