@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { NSelect } from 'naive-ui'
-import { AGENTS } from '@renderer/constants/agents'
+import { useSkillsStore } from '@renderer/stores/skills'
 
+const skillsStore = useSkillsStore()
 const selectedAgents = defineModel<string[]>({ default: () => [] })
 
 const agentOptions = computed(() =>
-  AGENTS.map((a) => ({
-    label: a.name,
-    value: a.agentFlag
-  }))
+  (skillsStore.sortedAgentResults || [])
+    .filter((a) => a.count > 0)
+    .map((a) => ({
+      label: `${a.agentName} (${a.count})`,
+      value: a.agentFlag
+    }))
 )
 </script>
 
