@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Skill, CommandResult, SkillSearchResult } from '../../../shared/types'
+import type {
+  Skill,
+  CommandResult,
+  SkillSearchResult,
+  AgentScanResult
+} from '../../../shared/types'
 import { useCachedResource } from '../composables/useCachedResource'
 
 function extractError(e: unknown): string {
@@ -24,6 +29,7 @@ export const useSkillsStore = defineStore('skills', () => {
   )
 
   const selectedAgents = ref<string[]>([])
+  const searchKeyword = ref('')
   const _searchResults = ref<SkillSearchResult[]>([])
   const _searchDuration = ref(0)
   const installing = ref(false)
@@ -41,19 +47,72 @@ export const useSkillsStore = defineStore('skills', () => {
 
   const loading = computed(() => fetching.value || searching.value)
 
-  const filteredSkills = computed(() => {
-    if (selectedAgents.value.length === 0) return installedSkills.value
-    const lowered = selectedAgents.value.map((a) => a.toLowerCase())
-    return installedSkills.value.filter((skill) =>
-      skill.agents.some((a) => lowered.includes(a.toLowerCase()))
-    )
+  function resolveAgentsByPath(
+    skillPath: string,
+    pathToAgents: Map<string, string[]>
+  ): string[] {
+    const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
+    const matched: string[] = []
+    for (const [dir, flags] of pathToAgents) {
+      if (normalized.includes(dir)) {
+        matched.push(...flags)
+      }
+    }
+    return matched
+  }
+
+  const agentScanCache = useCachedResource<AgentScanResult[]>(
+    async () => unwrapResult(await window.api.agents.scanAll()),
+    []
+  )
+
+  const enrichedSkills = computed(() => {
+    const scanData = agentScanCache.data.value
+    if (!scanData || scanData.length === 0) return installedCache.data.value
+
+    const pathToAgents = new Map<string, string[]>()
+    for (const result of scanData) {
+      const normalized = result.globalPath.replace(/\\/g, '/').toLowerCase()
+      const existing = pathToAgents.get(normalized) || []
+      existing.push(result.agentFlag)
+      pathToAgents.set(normalized, existing)
+    }
+
+    return installedCache.data.value.map((skill) => ({
+      ...skill,
+      agents: resolveAgentsByPath(skill.path, pathToAgents)
+    }))
   })
+
+  const filteredSkills = computed(() => {
+    let skills = enrichedSkills.value
+
+    if (selectedAgents.value.length > 0) {
+      const lowered = selectedAgents.value.map((a) => a.toLowerCase())
+      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.toLowerCase())))
+    }
+
+    if (searchKeyword.value) {
+      const kw = searchKeyword.value.toLowerCase()
+      skills = skills.filter((s) => s.name.toLowerCase().includes(kw))
+    }
+
+    return skills
+  })
+
+  const sortedAgentResults = computed(() =>
+    [...(agentScanCache.data.value || [])].sort((a, b) => b.count - a.count)
+  )
 
   const searchResults = computed(() => _searchResults.value)
   const searchDuration = computed(() => _searchDuration.value)
 
   function clearError(): void {
     error.value = null
+  }
+
+  function setSearchKeyword(keyword: string): void {
+    searchKeyword.value = keyword
   }
 
   function setMessageHandler(
@@ -81,7 +140,7 @@ export const useSkillsStore = defineStore('skills', () => {
 
   async function fetchInstalled(_global?: boolean): Promise<void> {
     void _global
-    await installedCache.ensure()
+    await Promise.all([installedCache.ensure(), agentScanCache.ensure()])
   }
 
   async function doInstall(
@@ -189,6 +248,8 @@ export const useSkillsStore = defineStore('skills', () => {
     installedSkills,
     selectedAgents,
     filteredSkills,
+    enrichedSkills,
+    sortedAgentResults,
     fetching,
     searching,
     installing,
@@ -197,7 +258,9 @@ export const useSkillsStore = defineStore('skills', () => {
     removing,
     loading,
     error,
+    searchKeyword,
     clearError,
+    setSearchKeyword,
     setMessageHandler,
     search,
     fetchInstalled,
