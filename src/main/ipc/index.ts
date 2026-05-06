@@ -32,7 +32,12 @@ function registerShellIpc(): void {
         }
         return { success: false, error: `路径不存在: ${rawPath}` }
       }
-      shell.showItemInFolder(resolved)
+      const stat = fs.statSync(resolved)
+      if (stat.isDirectory()) {
+        await shell.openPath(resolved)
+      } else {
+        shell.showItemInFolder(resolved)
+      }
       return { success: true }
     }
   )
