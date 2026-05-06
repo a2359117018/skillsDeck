@@ -7,5 +7,5 @@ export async function searchSkillsApi(keyword: string): Promise<SkillSearchRespo
   if (!response.ok) {
     throw new CommandError('EXECUTION_FAILED', `GET ${url}`, `HTTP ${response.status}`, null)
   }
-  return response.json() as Promise<SkillSearchResponse>
+  return (await response.json()) as Promise<SkillSearchResponse>
 }

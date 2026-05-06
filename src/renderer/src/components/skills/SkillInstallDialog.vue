@@ -98,14 +98,17 @@ let removeOutputListener: (() => void) | null = null
 
 watch(commandOutput, async () => {
   await nextTick()
-  if (scrollbarRef.value) {
-    const wrapEl = scrollbarRef.value.$el?.querySelector(
-      '.n-scrollbar-container'
-    ) as HTMLElement | null
-    if (wrapEl) {
-      wrapEl.scrollTop = wrapEl.scrollHeight
+  try {
+    if (scrollbarRef.value) {
+      const el = scrollbarRef.value.$el
+      const wrapEl = (el instanceof HTMLElement ? el : el?.$el)?.querySelector(
+        '.n-scrollbar-container'
+      ) as HTMLElement | null
+      if (wrapEl) {
+        wrapEl.scrollTop = wrapEl.scrollHeight
+      }
     }
-  }
+  } catch {}
 })
 
 async function handleInstall(): Promise<void> {

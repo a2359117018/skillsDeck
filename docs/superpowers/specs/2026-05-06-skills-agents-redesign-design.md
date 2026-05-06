@@ -34,7 +34,7 @@ interface AgentScanResult {
   agentFlag: string
   agentName: string
   globalPath: string // absolute path after ~ expansion
-  skills: string[]   // subdirectory names = skill names
+  skills: string[] // subdirectory names = skill names
   count: number
 }
 
@@ -50,7 +50,7 @@ interface AgentDef {
 
 ```typescript
 class AgentScanner {
-  private agents: AgentDef[]               // loaded from agents.json
+  private agents: AgentDef[] // loaded from agents.json
   private reverseMap: Map<string, AgentDef[]> // normalized globalPath → AgentDef[]
 
   async scanAll(): Promise<AgentScanResult[]>
@@ -69,9 +69,9 @@ class AgentScanner {
 
 ### New file: `src/main/ipc/agents.ipc.ts`
 
-| Channel | Input | Return |
-|---------|-------|--------|
-| `agent:scan-all` | none | `AgentScanResult[]` |
+| Channel          | Input               | Return                    |
+| ---------------- | ------------------- | ------------------------- |
+| `agent:scan-all` | none                | `AgentScanResult[]`       |
 | `agent:scan-one` | `agentFlag: string` | `AgentScanResult \| null` |
 
 ### Preload update: `src/preload/index.ts`
@@ -129,16 +129,13 @@ const enrichedSkills = computed(() => {
     pathToAgents.set(normalized, existing)
   }
 
-  return installedCache.data.value.map(skill => ({
+  return installedCache.data.value.map((skill) => ({
     ...skill,
     agents: resolveAgentsByPath(skill.path, pathToAgents)
   }))
 })
 
-function resolveAgentsByPath(
-  skillPath: string,
-  pathToAgents: Map<string, string[]>
-): string[] {
+function resolveAgentsByPath(skillPath: string, pathToAgents: Map<string, string[]>): string[] {
   const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
   const matched: string[] = []
   for (const [dir, flags] of pathToAgents) {
@@ -154,7 +151,9 @@ function resolveAgentsByPath(
 
 ```typescript
 const searchKeyword = ref('')
-function setSearchKeyword(keyword: string): void { searchKeyword.value = keyword }
+function setSearchKeyword(keyword: string): void {
+  searchKeyword.value = keyword
+}
 ```
 
 **Updated filteredSkills**:
@@ -165,14 +164,14 @@ const filteredSkills = computed(() => {
 
   // Agent filter
   if (selectedAgents.value.length > 0) {
-    const lowered = selectedAgents.value.map(a => a.toLowerCase())
-    skills = skills.filter(s => s.agents.some(a => lowered.includes(a.toLowerCase())))
+    const lowered = selectedAgents.value.map((a) => a.toLowerCase())
+    skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.toLowerCase())))
   }
 
   // Name search filter
   if (searchKeyword.value) {
     const kw = searchKeyword.value.toLowerCase()
-    skills = skills.filter(s => s.name.toLowerCase().includes(kw))
+    skills = skills.filter((s) => s.name.toLowerCase().includes(kw))
   }
 
   return skills
@@ -183,10 +182,7 @@ const filteredSkills = computed(() => {
 
 ```typescript
 async function fetchInstalled(global?: boolean): Promise<void> {
-  await Promise.all([
-    installedCache.ensure(),
-    agentScanCache.ensure()
-  ])
+  await Promise.all([installedCache.ensure(), agentScanCache.ensure()])
 }
 ```
 
@@ -202,7 +198,7 @@ return {
   searchKeyword,
   setSearchKeyword,
   enrichedSkills,
-  filteredSkills, // updated
+  filteredSkills // updated
 }
 ```
 
@@ -315,36 +311,36 @@ Click card → right drawer opens with skill list.
 
 All UI follows the design system defined in AGENTS.md:
 
-| Element | Design Token |
-|---------|-------------|
-| Search input | bg `canvas`, border `hairline`, focus `brand-blue-deep`, radius `full` |
-| Agent tags | bg `brand-blue-200`, text `brand-blue-deep`, radius `full`, font `micro` |
-| Action buttons | `rounded-full`, ghost/tertiary style |
-| List row borders | `1px solid hairline-soft` (`#eaecf0`) |
-| Row hover bg | `surface` (`#f7f8fa`) |
-| Hover elevation | Level 1: `rgba(0,0,0,0.04) 0 1px 2px` |
-| Card style | bg `canvas`, radius `xl` (16px), border `1px solid hairline` |
-| Skill name font | `body-sm-medium` (14px/500) |
-| Count/badge font | `micro` (12px/400) |
-| Header bg | `surface`, bottom border `hairline` |
-| No heavy shadows | Flat-with-borders default |
-| No gradients | Per design system do's/don'ts |
+| Element          | Design Token                                                             |
+| ---------------- | ------------------------------------------------------------------------ |
+| Search input     | bg `canvas`, border `hairline`, focus `brand-blue-deep`, radius `full`   |
+| Agent tags       | bg `brand-blue-200`, text `brand-blue-deep`, radius `full`, font `micro` |
+| Action buttons   | `rounded-full`, ghost/tertiary style                                     |
+| List row borders | `1px solid hairline-soft` (`#eaecf0`)                                    |
+| Row hover bg     | `surface` (`#f7f8fa`)                                                    |
+| Hover elevation  | Level 1: `rgba(0,0,0,0.04) 0 1px 2px`                                    |
+| Card style       | bg `canvas`, radius `xl` (16px), border `1px solid hairline`             |
+| Skill name font  | `body-sm-medium` (14px/500)                                              |
+| Count/badge font | `micro` (12px/400)                                                       |
+| Header bg        | `surface`, bottom border `hairline`                                      |
+| No heavy shadows | Flat-with-borders default                                                |
+| No gradients     | Per design system do's/don'ts                                            |
 
 ---
 
 ## Files Changed Summary
 
-| Action | File |
-|--------|------|
-| **New** | `src/main/services/AgentScanner.ts` |
-| **New** | `src/main/ipc/agents.ipc.ts` |
-| **New** | `src/renderer/src/components/skills/SkillRow.vue` |
-| **Modify** | `src/shared/types.ts` — add `AgentScanResult` |
-| **Modify** | `src/preload/index.ts` — add `api.agents` namespace |
-| **Modify** | `src/preload/index.d.ts` — add agents type declarations |
-| **Modify** | `src/main/ipc/index.ts` — register agents IPC |
-| **Modify** | `src/renderer/src/stores/skills.ts` — dual data source, enriched skills, search keyword |
-| **Modify** | `src/renderer/src/views/InstalledList.vue` — list layout, search input, updated header |
+| Action     | File                                                                                      |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| **New**    | `src/main/services/AgentScanner.ts`                                                       |
+| **New**    | `src/main/ipc/agents.ipc.ts`                                                              |
+| **New**    | `src/renderer/src/components/skills/SkillRow.vue`                                         |
+| **Modify** | `src/shared/types.ts` — add `AgentScanResult`                                             |
+| **Modify** | `src/preload/index.ts` — add `api.agents` namespace                                       |
+| **Modify** | `src/preload/index.d.ts` — add agents type declarations                                   |
+| **Modify** | `src/main/ipc/index.ts` — register agents IPC                                             |
+| **Modify** | `src/renderer/src/stores/skills.ts` — dual data source, enriched skills, search keyword   |
+| **Modify** | `src/renderer/src/views/InstalledList.vue` — list layout, search input, updated header    |
 | **Modify** | `src/renderer/src/views/AgentView.vue` — scan-based data, search header, simplified logic |
-| **Modify** | `src/renderer/src/components/skills/AgentFilter.vue` — scan-based options |
-| **Modify** | `src/renderer/src/components/skills/SkillCard.vue` — becomes unused, consider removal |
+| **Modify** | `src/renderer/src/components/skills/AgentFilter.vue` — scan-based options                 |
+| **Modify** | `src/renderer/src/components/skills/SkillCard.vue` — becomes unused, consider removal     |

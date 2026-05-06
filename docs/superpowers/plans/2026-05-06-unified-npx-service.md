@@ -13,6 +13,7 @@
 ## Task 1: Add CommandErrorInfo to shared types
 
 **Files:**
+
 - Modify: `src/shared/types.ts`
 
 - [ ] **Step 1: Add CommandErrorInfo interface**
@@ -46,6 +47,7 @@ git commit -m "feat: add CommandErrorInfo type for IPC error serialization"
 ## Task 2: Create CommandRunner
 
 **Files:**
+
 - Create: `src/main/services/CommandRunner.ts`
 
 - [ ] **Step 1: Write CommandRunner implementation**
@@ -203,6 +205,7 @@ git commit -m "feat: add CommandRunner — generic execa wrapper with unified er
 ## Task 3: Create NpxService
 
 **Files:**
+
 - Create: `src/main/services/NpxService.ts`
 
 - [ ] **Step 1: Write NpxService implementation**
@@ -245,7 +248,12 @@ class NpxService {
     if (global) args.push('-g')
     const result = await commandRunner.run('npx', args)
     if (!result.success) {
-      throw new CommandError('EXECUTION_FAILED', `npx ${args.join(' ')}`, result.stderr, result.exitCode)
+      throw new CommandError(
+        'EXECUTION_FAILED',
+        `npx ${args.join(' ')}`,
+        result.stderr,
+        result.exitCode
+      )
     }
     const cleaned = result.stdout.trim()
     if (!cleaned) return []
@@ -261,11 +269,7 @@ class NpxService {
     }
   }
 
-  async install(
-    packageRef: string,
-    agents: string[],
-    global?: boolean
-  ): Promise<CommandResult> {
+  async install(packageRef: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(packageRef, agents, global)
     return commandRunner.run('npx', args)
   }
@@ -339,6 +343,7 @@ git commit -m "feat: add NpxService — all npx CLI commands through CommandRunn
 ## Task 4: Create HTTP API module
 
 **Files:**
+
 - Create: `src/main/api/skills.ts`
 
 - [ ] **Step 1: Create api directory and skills.ts**
@@ -376,6 +381,7 @@ git commit -m "feat: add api/skills.ts — HTTP search API extracted from Skills
 ## Task 5: Rewrite skills.ipc.ts to use NpxService
 
 **Files:**
+
 - Modify: `src/main/ipc/skills.ipc.ts`
 
 - [ ] **Step 1: Replace skills.ipc.ts content**
@@ -422,7 +428,10 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     'skills:install',
     async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
       try {
-        return { ok: true, data: await npxService.install(opts.packageRef, opts.agents, opts.global) }
+        return {
+          ok: true,
+          data: await npxService.install(opts.packageRef, opts.agents, opts.global)
+        }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
       }
@@ -434,14 +443,31 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
       const mainWindow = getMainWindow()
       if (!mainWindow) {
-        return { ok: false, error: { code: 'UNKNOWN', command: '', stderr: '', exitCode: null, message: 'Main window not available' } }
+        return {
+          ok: false,
+          error: {
+            code: 'UNKNOWN',
+            command: '',
+            stderr: '',
+            exitCode: null,
+            message: 'Main window not available'
+          }
+        }
       }
       try {
         const onOutput = (text: string): void => {
           if (mainWindow.isDestroyed()) return
           mainWindow.webContents.send('skills:install-output', text)
         }
-        return { ok: true, data: await npxService.installStreaming(onOutput, opts.packageRef, opts.agents, opts.global) }
+        return {
+          ok: true,
+          data: await npxService.installStreaming(
+            onOutput,
+            opts.packageRef,
+            opts.agents,
+            opts.global
+          )
+        }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
       }
@@ -452,16 +478,13 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     npxService.cancelInstall()
   })
 
-  ipcMain.handle(
-    'skills:update',
-    async (_, opts: { packageRef: string; global?: boolean }) => {
-      try {
-        return { ok: true, data: await npxService.update(opts.packageRef, opts.global) }
-      } catch (e) {
-        return { ok: false, error: serializeError(e) }
-      }
+  ipcMain.handle('skills:update', async (_, opts: { packageRef: string; global?: boolean }) => {
+    try {
+      return { ok: true, data: await npxService.update(opts.packageRef, opts.global) }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
     }
-  )
+  })
 
   ipcMain.handle('skills:update-all', async (_, opts?: { global?: boolean }) => {
     try {
@@ -501,6 +524,7 @@ git commit -m "refactor: rewrite skills.ipc.ts to use NpxService with unified er
 ## Task 6: Update EnvService to use NpxService
 
 **Files:**
+
 - Modify: `src/main/services/EnvService.ts`
 
 - [ ] **Step 1: Remove checkCommand and update checkAll**
@@ -551,6 +575,7 @@ git commit -m "refactor: EnvService uses NpxService for npx/skills version check
 ## Task 7: Update preload types and bridge
 
 **Files:**
+
 - Modify: `src/preload/index.d.ts`
 - Modify: `src/preload/index.ts`
 
@@ -641,6 +666,7 @@ git commit -m "refactor: update preload types to IpcResult<T> pattern"
 ## Task 8: Update renderer skills store
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/skills.ts`
 
 - [ ] **Step 1: Rewrite skills store to handle IpcResult**
@@ -660,7 +686,9 @@ function extractError(e: unknown): string {
   return String(e)
 }
 
-function unwrapResult<T>(result: { ok: true; data: T } | { ok: false; error: { message: string } }): T {
+function unwrapResult<T>(
+  result: { ok: true; data: T } | { ok: false; error: { message: string } }
+): T {
   if (result.ok) return result.data
   throw new Error(result.error.message)
 }
@@ -876,6 +904,7 @@ git commit -m "refactor: skills store uses unwrapResult for IpcResult pattern"
 ## Task 9: Delete SkillsService.ts
 
 **Files:**
+
 - Delete: `src/main/services/SkillsService.ts`
 
 - [ ] **Step 1: Delete the file**
@@ -905,6 +934,7 @@ git commit -m "chore: delete SkillsService.ts — replaced by NpxService + Comma
 ## Task 10: Final verification
 
 **Files:**
+
 - No changes
 
 - [ ] **Step 1: Run full typecheck**
@@ -926,6 +956,7 @@ Expected: No matches
 
 Run: `rg "npxService|commandRunner|searchSkillsApi" src/`
 Expected: Matches in:
+
 - `src/main/services/CommandRunner.ts` (commandRunner export)
 - `src/main/services/NpxService.ts` (npxService export, commandRunner import)
 - `src/main/services/EnvService.ts` (commandRunner, npxService imports)

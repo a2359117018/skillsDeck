@@ -98,12 +98,12 @@ class NpxService {
 
   private buildInstallArgs(packageRef: string, agents: string[], global?: boolean): string[] {
     const args = this.buildArgs('add', packageRef)
+    args.push('-g', '-y')
     if (global) {
       args.push('--agent', '*')
     } else if (agents.length > 0) {
       args.push('--agent', ...agents)
     }
-    args.push('-g', '-y')
     return args
   }
 }

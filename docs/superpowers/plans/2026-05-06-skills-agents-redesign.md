@@ -14,25 +14,26 @@
 
 ## File Structure
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Create | `src/main/services/AgentScanner.ts` | Scan agent directories, build reverse path map |
-| Create | `src/main/ipc/agents.ipc.ts` | IPC handlers for agent scanning |
-| Create | `src/renderer/src/components/skills/SkillRow.vue` | Two-line list row for installed skills |
-| Modify | `src/shared/types.ts` | Add `AgentScanResult` interface |
-| Modify | `src/preload/index.ts` | Add `api.agents` namespace |
-| Modify | `src/preload/index.d.ts` | Add agents type declarations |
-| Modify | `src/main/ipc/index.ts` | Register agents IPC |
-| Modify | `src/renderer/src/stores/skills.ts` | Dual data source, enriched skills, search keyword |
-| Modify | `src/renderer/src/views/InstalledList.vue` | List layout, search input, new header |
-| Modify | `src/renderer/src/views/AgentView.vue` | Scan-based data, search header, simplified logic |
-| Modify | `src/renderer/src/components/skills/AgentFilter.vue` | Scan-based options |
+| Action | File                                                 | Responsibility                                    |
+| ------ | ---------------------------------------------------- | ------------------------------------------------- |
+| Create | `src/main/services/AgentScanner.ts`                  | Scan agent directories, build reverse path map    |
+| Create | `src/main/ipc/agents.ipc.ts`                         | IPC handlers for agent scanning                   |
+| Create | `src/renderer/src/components/skills/SkillRow.vue`    | Two-line list row for installed skills            |
+| Modify | `src/shared/types.ts`                                | Add `AgentScanResult` interface                   |
+| Modify | `src/preload/index.ts`                               | Add `api.agents` namespace                        |
+| Modify | `src/preload/index.d.ts`                             | Add agents type declarations                      |
+| Modify | `src/main/ipc/index.ts`                              | Register agents IPC                               |
+| Modify | `src/renderer/src/stores/skills.ts`                  | Dual data source, enriched skills, search keyword |
+| Modify | `src/renderer/src/views/InstalledList.vue`           | List layout, search input, new header             |
+| Modify | `src/renderer/src/views/AgentView.vue`               | Scan-based data, search header, simplified logic  |
+| Modify | `src/renderer/src/components/skills/AgentFilter.vue` | Scan-based options                                |
 
 ---
 
 ### Task 1: Add `AgentScanResult` type to shared types
 
 **Files:**
+
 - Modify: `src/shared/types.ts`
 
 - [ ] **Step 1: Add the interface after the existing `Skill` interface**
@@ -61,6 +62,7 @@ git commit -m "feat: add AgentScanResult type to shared types"
 ### Task 2: Create `AgentScanner` service
 
 **Files:**
+
 - Create: `src/main/services/AgentScanner.ts`
 
 - [ ] **Step 1: Create the file with full implementation**
@@ -97,9 +99,7 @@ class AgentScanner {
   }
 
   private normalizeGlobalPath(p: string): string {
-    const expanded = p.startsWith('~')
-      ? path.join(os.homedir(), p.slice(2))
-      : path.resolve(p)
+    const expanded = p.startsWith('~') ? path.join(os.homedir(), p.slice(2)) : path.resolve(p)
     return expanded.replace(/\\/g, '/').toLowerCase()
   }
 
@@ -168,6 +168,7 @@ git commit -m "feat: add AgentScanner service for filesystem-based agent scannin
 ### Task 3: Create agents IPC handlers
 
 **Files:**
+
 - Create: `src/main/ipc/agents.ipc.ts`
 - Modify: `src/main/ipc/index.ts`
 
@@ -240,6 +241,7 @@ git commit -m "feat: add agents IPC handlers for filesystem scanning"
 ### Task 4: Update preload to expose agents API
 
 **Files:**
+
 - Modify: `src/preload/index.ts`
 - Modify: `src/preload/index.d.ts`
 
@@ -292,6 +294,7 @@ git commit -m "feat: expose agents scanning API via preload"
 ### Task 5: Update skills store with dual data source
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/skills.ts`
 
 This is the largest change. The store gains a second data source (agent scan), enriched skill computation, and search keyword state.
@@ -383,10 +386,7 @@ const sortedAgentResults = computed(() =>
 Add after `unwrapResult` function (after line 24):
 
 ```typescript
-function resolveAgentsByPath(
-  skillPath: string,
-  pathToAgents: Map<string, string[]>
-): string[] {
+function resolveAgentsByPath(skillPath: string, pathToAgents: Map<string, string[]>): string[] {
   const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
   const matched: string[] = []
   for (const [dir, flags] of pathToAgents) {
@@ -472,6 +472,7 @@ git commit -m "feat: add dual data source and enriched agent attribution to skil
 ### Task 6: Create `SkillRow` component
 
 **Files:**
+
 - Create: `src/renderer/src/components/skills/SkillRow.vue`
 
 - [ ] **Step 1: Create the component**
@@ -611,6 +612,7 @@ git commit -m "feat: add SkillRow two-line list component"
 ### Task 7: Redesign `InstalledList` view
 
 **Files:**
+
 - Modify: `src/renderer/src/views/InstalledList.vue`
 
 - [ ] **Step 1: Replace entire file content**
@@ -618,16 +620,7 @@ git commit -m "feat: add SkillRow two-line list component"
 ```vue
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import {
-  NButton,
-  NEmpty,
-  NSpace,
-  NText,
-  NScrollbar,
-  NInput,
-  NIcon,
-  useMessage
-} from 'naive-ui'
+import { NButton, NEmpty, NSpace, NText, NScrollbar, NInput, NIcon, useMessage } from 'naive-ui'
 import { RefreshOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
@@ -819,6 +812,7 @@ git commit -m "feat: redesign InstalledList with search, list layout, and enrich
 ### Task 8: Update `AgentFilter` to use scan-based options
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/AgentFilter.vue`
 
 - [ ] **Step 1: Replace entire file content**
@@ -868,6 +862,7 @@ git commit -m "feat: update AgentFilter to use scan-based agent options"
 ### Task 9: Redesign `AgentView` with scan-based data
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue`
 
 - [ ] **Step 1: Replace entire file content**
@@ -1238,6 +1233,7 @@ git commit -m "fix: lint and typecheck fixes"
 ### Task 11: Remove unused `SkillCard.vue`
 
 **Files:**
+
 - Delete: `src/renderer/src/components/skills/SkillCard.vue`
 
 - [ ] **Step 1: Verify `SkillCard` is not imported anywhere**

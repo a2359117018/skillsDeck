@@ -48,19 +48,19 @@ Also: `src/main/api/skills.ts` for HTTP search API calls, separate from CLI.
 
 ## File Changes
 
-| File | Action | Description |
-|------|--------|-------------|
-| `src/main/services/CommandRunner.ts` | **Create** | Generic execa wrapper, singleton `commandRunner` |
-| `src/main/services/NpxService.ts` | **Create** | All npx CLI methods, singleton `npxService` |
-| `src/main/api/skills.ts` | **Create** | HTTP search API (`searchSkillsApi`) |
-| `src/main/services/SkillsService.ts` | **Delete** | Replaced by NpxService + CommandRunner |
-| `src/shared/types.ts` | **Modify** | Add `CommandErrorInfo` interface |
-| `src/main/services/EnvService.ts` | **Modify** | `checkAll()` uses npxService, remove `checkCommand()` |
-| `src/main/ipc/skills.ipc.ts` | **Modify** | Calls npxService + api/skills, unified try/catch error serialization |
-| `src/main/ipc/env.ipc.ts` | **Modify** | Adapt to new EnvService interface |
-| `src/preload/index.ts` | **Modify** | Adapt return types to `{ok, data} | {ok, error}` pattern |
-| `src/preload/index.d.ts` | **Modify** | Update type declarations |
-| `src/renderer/src/stores/skills.ts` | **Modify** | Adapt to new return structure |
+| File                                 | Action     | Description                                                          |
+| ------------------------------------ | ---------- | -------------------------------------------------------------------- | -------------------- |
+| `src/main/services/CommandRunner.ts` | **Create** | Generic execa wrapper, singleton `commandRunner`                     |
+| `src/main/services/NpxService.ts`    | **Create** | All npx CLI methods, singleton `npxService`                          |
+| `src/main/api/skills.ts`             | **Create** | HTTP search API (`searchSkillsApi`)                                  |
+| `src/main/services/SkillsService.ts` | **Delete** | Replaced by NpxService + CommandRunner                               |
+| `src/shared/types.ts`                | **Modify** | Add `CommandErrorInfo` interface                                     |
+| `src/main/services/EnvService.ts`    | **Modify** | `checkAll()` uses npxService, remove `checkCommand()`                |
+| `src/main/ipc/skills.ipc.ts`         | **Modify** | Calls npxService + api/skills, unified try/catch error serialization |
+| `src/main/ipc/env.ipc.ts`            | **Modify** | Adapt to new EnvService interface                                    |
+| `src/preload/index.ts`               | **Modify** | Adapt return types to `{ok, data}                                    | {ok, error}` pattern |
+| `src/preload/index.d.ts`             | **Modify** | Update type declarations                                             |
+| `src/renderer/src/stores/skills.ts`  | **Modify** | Adapt to new return structure                                        |
 
 **Unchanged**: Vue components, WindowManager, StoreService, Node.js download/install/extract logic in EnvService.
 
@@ -70,9 +70,9 @@ Also: `src/main/api/skills.ts` for HTTP search API calls, separate from CLI.
 // src/main/services/CommandRunner.ts
 
 interface RunOptions {
-  timeout?: number        // default 60000ms
-  cwd?: string            // default os.homedir()
-  onOutput?: (text: string) => void  // present = streaming, absent = normal
+  timeout?: number // default 60000ms
+  cwd?: string // default os.homedir()
+  onOutput?: (text: string) => void // present = streaming, absent = normal
 }
 
 interface CommandResult {
@@ -100,6 +100,7 @@ export const commandRunner = new CommandRunner()
 ```
 
 Key decisions:
+
 - Singleton export — shared across main process, `cancel()` can terminate running process
 - `stripAnsi` applied at runner level — callers never need to worry about it
 - Errors thrown as `CommandError` class (same structure as current `SkillsError`)
@@ -154,6 +155,7 @@ export const npxService = new NpxService()
 ```
 
 Key decisions:
+
 - Singleton — IPC layer imports and calls directly
 - `checkNpxVersion()` and `checkSkillsVersion()` absorb env detection from EnvService
 - `installStreaming` accepts `onOutput` callback — IPC layer wraps `mainWindow.webContents.send`, NpxService doesn't know about BrowserWindow
@@ -197,7 +199,10 @@ ipcMain.handle('skills:list', async (_, opts) => {
     if (e instanceof CommandError) {
       return { ok: false, error: e.toJSON() }
     }
-    return { ok: false, error: { code: 'UNKNOWN', message: String(e), command: '', stderr: '', exitCode: null } }
+    return {
+      ok: false,
+      error: { code: 'UNKNOWN', message: String(e), command: '', stderr: '', exitCode: null }
+    }
   }
 })
 ```

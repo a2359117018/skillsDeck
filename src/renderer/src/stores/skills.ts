@@ -47,10 +47,7 @@ export const useSkillsStore = defineStore('skills', () => {
 
   const loading = computed(() => fetching.value || searching.value)
 
-  function resolveAgentsByPath(
-    skillPath: string,
-    pathToAgents: Map<string, string[]>
-  ): string[] {
+  function resolveAgentsByPath(skillPath: string, pathToAgents: Map<string, string[]>): string[] {
     const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
     const matched: string[] = []
     for (const [dir, flags] of pathToAgents) {
