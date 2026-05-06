@@ -3,9 +3,21 @@ import { ref, computed } from 'vue'
 import type { Skill, CommandResult, SkillSearchResult } from '../../../shared/types'
 import { useCachedResource } from '../composables/useCachedResource'
 
+function extractError(e: unknown): string {
+  if (typeof e === 'object' && e !== null && 'message' in e) {
+    return (e as { message: string }).message
+  }
+  return String(e)
+}
+
+function unwrapResult<T>(result: { ok: true; data: T } | { ok: false; error: { message: string } }): T {
+  if (result.ok) return result.data
+  throw new Error(result.error.message)
+}
+
 export const useSkillsStore = defineStore('skills', () => {
   const installedCache = useCachedResource<Skill[]>(
-    () => window.api.skills.list({ global: true }),
+    async () => unwrapResult(await window.api.skills.list({ global: true })),
     []
   )
 
@@ -52,11 +64,12 @@ export const useSkillsStore = defineStore('skills', () => {
     searching.value = true
     error.value = null
     try {
-      const response = await window.api.skills.search(keyword)
+      const result = await window.api.skills.search(keyword)
+      const response = unwrapResult(result)
       _searchResults.value = response.skills
       _searchDuration.value = response.duration_ms
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Search failed'
+      error.value = extractError(e)
       _searchResults.value = []
       _searchDuration.value = 0
     } finally {
@@ -65,7 +78,32 @@ export const useSkillsStore = defineStore('skills', () => {
   }
 
   async function fetchInstalled(_global?: boolean): Promise<void> {
+    void _global
     await installedCache.ensure()
+  }
+
+  async function doInstall(
+    packageRef: string,
+    agents: string[],
+    isGlobal: boolean,
+    streaming: boolean
+  ): Promise<CommandResult> {
+    installing.value = true
+    error.value = null
+    try {
+      const opts = { packageRef, agents: [...agents], global: isGlobal }
+      const result = streaming
+        ? await window.api.skills.installStreaming(opts)
+        : await window.api.skills.install(opts)
+      const data = unwrapResult(result)
+      installedCache.invalidate()
+      return data
+    } catch (e) {
+      error.value = extractError(e)
+      throw e
+    } finally {
+      installing.value = false
+    }
   }
 
   async function install(
@@ -73,18 +111,15 @@ export const useSkillsStore = defineStore('skills', () => {
     agents: string[],
     isGlobal: boolean
   ): Promise<CommandResult> {
-    installing.value = true
-    error.value = null
-    try {
-      const result = await window.api.skills.install({ packageRef, agents, global: isGlobal })
-      installedCache.invalidate()
-      return result
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Install failed'
-      throw e
-    } finally {
-      installing.value = false
-    }
+    return doInstall(packageRef, agents, isGlobal, false)
+  }
+
+  async function installStreaming(
+    packageRef: string,
+    agents: string[],
+    isGlobal: boolean
+  ): Promise<CommandResult> {
+    return doInstall(packageRef, agents, isGlobal, true)
   }
 
   async function update(packageRef: string, global?: boolean): Promise<CommandResult> {
@@ -92,10 +127,11 @@ export const useSkillsStore = defineStore('skills', () => {
     error.value = null
     try {
       const result = await window.api.skills.update({ packageRef, global })
+      const data = unwrapResult(result)
       installedCache.invalidate()
-      return result
+      return data
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Update failed'
+      error.value = extractError(e)
       throw e
     } finally {
       updating.value = false
@@ -107,10 +143,11 @@ export const useSkillsStore = defineStore('skills', () => {
     error.value = null
     try {
       const result = await window.api.skills.updateAll({ global })
+      const data = unwrapResult(result)
       installedCache.invalidate()
-      return result
+      return data
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Update all failed'
+      error.value = extractError(e)
       throw e
     } finally {
       updatingAll.value = false
@@ -122,10 +159,11 @@ export const useSkillsStore = defineStore('skills', () => {
     error.value = null
     try {
       const result = await window.api.skills.remove({ packageRef, global })
+      const data = unwrapResult(result)
       installedCache.invalidate()
-      return result
+      return data
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Remove failed'
+      error.value = extractError(e)
       throw e
     } finally {
       removing.value = false
@@ -139,7 +177,7 @@ export const useSkillsStore = defineStore('skills', () => {
         _openLocationMessage.value(result.error || '无法打开路径', 'warning')
       }
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to open location'
+      error.value = extractError(e)
     }
   }
 
@@ -162,6 +200,7 @@ export const useSkillsStore = defineStore('skills', () => {
     search,
     fetchInstalled,
     install,
+    installStreaming,
     update,
     updateAll,
     remove,
