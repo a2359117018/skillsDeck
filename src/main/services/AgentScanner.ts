@@ -42,7 +42,7 @@ class AgentScanner {
     try {
       const entries = await fs.promises.readdir(absPath, { withFileTypes: true })
       for (const entry of entries) {
-        if (entry.isDirectory()) {
+        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== '.system') {
           skills.push(entry.name)
         }
       }

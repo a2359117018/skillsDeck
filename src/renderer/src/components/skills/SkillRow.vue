@@ -9,6 +9,7 @@ const emit = defineEmits<{
   update: [name: string]
   remove: [name: string]
   openLocation: [path: string]
+  filterAgent: [agentFlag: string]
 }>()
 </script>
 
@@ -60,7 +61,8 @@ const emit = defineEmits<{
         size="small"
         :bordered="false"
         round
-        class="skill-row-tag"
+        class="skill-row-tag skill-row-tag--clickable"
+        @click="emit('filterAgent', agent)"
       >
         {{ agent }}
       </NTag>
@@ -116,5 +118,15 @@ const emit = defineEmits<{
   font-size: 12px;
   font-weight: 400;
   --n-border-radius: 9999px;
+}
+
+.skill-row-tag--clickable {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.skill-row-tag--clickable:hover {
+  --n-color: #e5e7eb;
+  color: #0a0a0a;
 }
 </style>

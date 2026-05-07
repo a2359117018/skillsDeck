@@ -112,6 +112,19 @@ export const useSkillsStore = defineStore('skills', () => {
     searchKeyword.value = keyword
   }
 
+  function toggleAgent(agentFlag: string): void {
+    const idx = selectedAgents.value.indexOf(agentFlag)
+    if (idx >= 0) {
+      selectedAgents.value = selectedAgents.value.filter((a) => a !== agentFlag)
+    } else {
+      selectedAgents.value = [...selectedAgents.value, agentFlag]
+    }
+  }
+
+  function clearAgentFilter(): void {
+    selectedAgents.value = []
+  }
+
   function setMessageHandler(
     handler: (msg: string, type: 'success' | 'warning' | 'error') => void
   ): void {
@@ -212,7 +225,11 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function remove(packageRef: string, global?: boolean, agent?: string): Promise<CommandResult> {
+  async function remove(
+    packageRef: string,
+    global?: boolean,
+    agent?: string
+  ): Promise<CommandResult> {
     removing.value = true
     error.value = null
     try {
@@ -258,6 +275,8 @@ export const useSkillsStore = defineStore('skills', () => {
     searchKeyword,
     clearError,
     setSearchKeyword,
+    toggleAgent,
+    clearAgentFilter,
     setMessageHandler,
     search,
     fetchInstalled,
