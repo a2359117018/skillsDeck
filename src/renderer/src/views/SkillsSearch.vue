@@ -36,11 +36,13 @@ function handleInstallComplete(): void {
       </div>
       <template v-else-if="hasSearched">
         <div class="search-results">
-          <NText depth="3" style="font-size: 12px">
-            搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
-            {{ skillsStore.searchResults.length }} 个结果
-          </NText>
-          <div style="margin-top: 12px">
+          <div class="search-meta">
+            <NText depth="3" class="search-meta-text">
+              搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
+              {{ skillsStore.searchResults.length }} 个结果
+            </NText>
+          </div>
+          <div class="search-grid">
             <SearchResultCard
               v-for="result in skillsStore.searchResults"
               :key="result.id"
@@ -51,11 +53,11 @@ function handleInstallComplete(): void {
           <NEmpty
             v-if="skillsStore.searchResults.length === 0"
             description="无搜索结果"
-            style="margin-top: 48px"
+            class="search-empty"
           />
         </div>
       </template>
-      <NEmpty v-else description="输入关键词搜索技能" style="margin-top: 48px" />
+      <NEmpty v-else description="输入关键词搜索技能" class="search-empty" />
     </NScrollbar>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
@@ -91,6 +93,25 @@ function handleInstallComplete(): void {
 }
 
 .search-results {
-  padding-bottom: 24px;
+  padding-bottom: var(--space-xl);
+}
+
+.search-meta {
+  margin-bottom: var(--space-md);
+}
+
+.search-meta-text {
+  font-size: var(--text-caption);
+  color: var(--color-stone);
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.search-empty {
+  margin-top: var(--space-xxxl);
 }
 </style>
