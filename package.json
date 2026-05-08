@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@fontsource/dm-sans": "^5.2.8",
     "@vicons/ionicons5": "^0.13.0",
     "@vueuse/core": "^14.3.0",
     "decompress": "^4.2.1",

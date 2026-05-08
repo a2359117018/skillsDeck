@@ -1,0 +1,97 @@
+/* ============================================
+   Design Token System
+   Single source of truth for all visual decisions.
+   ============================================ */
+
+:root {
+  /* --- Colors --- */
+  --color-primary: #0a0a0a;
+  --color-ink: #1a1a1a;
+  --color-stone: #6b7280;
+  --color-muted: #9ca3af;
+  --color-canvas: #ffffff;
+  --color-surface: #f7f8fa;
+  --color-hairline: #e5e7eb;
+
+  /* Brand */
+  --color-brand-coral: #ff5530;
+  --color-brand-blue: #1456f0;
+  --color-brand-magenta: #ea5ec1;
+  --color-brand-purple: #a855f7;
+
+  /* Brand extended */
+  --color-brand-blue-200: #dbeafe;
+  --color-brand-blue-deep: #1e40af;
+
+  /* Semantic */
+  --color-success-bg: #dcfce7;
+  --color-success-text: #166534;
+  --color-error: #d45656;
+  --color-error-bg: #fef2f2;
+
+  /* Sidebar */
+  --sidebar-bg-start: #0a0a0a;
+  --sidebar-bg-end: #1a1a2e;
+  --sidebar-width: 60px;
+  --sidebar-icon-color: rgba(255, 255, 255, 0.55);
+  --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
+  --sidebar-icon-active-color: #ffffff;
+  --sidebar-active-bar-color: var(--color-brand-coral);
+  --sidebar-divider-color: rgba(255, 255, 255, 0.12);
+
+  /* --- Spacing --- */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+  --space-xxxl: 48px;
+  --space-section: 64px;
+  --space-section-lg: 80px;
+
+  /* --- Radius --- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 20px;
+  --radius-hero: 32px;
+  --radius-full: 9999px;
+
+  /* --- Shadows --- */
+  --shadow-0: none;
+  --shadow-1: 0 1px 2px rgba(36, 36, 36, 0.06);
+  --shadow-2: rgba(36, 36, 36, 0.06) 0 2px 6px -2px;
+  --shadow-3: rgba(36, 36, 36, 0.08) 0 4px 12px -2px;
+  --shadow-4: rgba(36, 36, 36, 0.08) 0 12px 16px -4px;
+
+  /* --- Typography (sizes) --- */
+  --text-hero: 2rem;
+  --text-heading-lg: 1.5rem;
+  --text-heading-md: 1.25rem;
+  --text-heading-sm: 1.125rem;
+  --text-body-lg: 1.0625rem;
+  --text-body-md: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.8125rem;
+  --text-micro: 0.75rem;
+
+  /* --- Typography (weights) --- */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* --- Typography (line heights) --- */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* --- Transitions --- */
+  --transition-fast: 100ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 200ms ease;
+}

@@ -1,12 +1,29 @@
+@import '@fontsource/dm-sans/400.css';
+@import '@fontsource/dm-sans/500.css';
+@import '@fontsource/dm-sans/600.css';
+@import '@fontsource/dm-sans/700.css';
+@import './tokens.css';
 @import './card.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
 
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-family: 'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--text-body-md);
+  line-height: var(--leading-normal);
+  color: var(--color-ink);
+  background-color: var(--color-canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 #app {
   height: 100vh;
   width: 100vw;
