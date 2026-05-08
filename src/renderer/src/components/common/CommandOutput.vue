@@ -38,8 +38,8 @@ const segments = computed(() => {
 .terminal-output {
   background: #1e1e1e;
   color: #d4d4d4;
-  padding: 12px 16px;
-  border-radius: 6px;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.5;
@@ -47,13 +47,15 @@ const segments = computed(() => {
   word-break: break-all;
   max-height: 400px;
   overflow-y: auto;
+  box-shadow: var(--shadow-1);
 }
 .skill-ref {
-  color: #4fc3f7;
+  color: var(--color-brand-blue);
   cursor: pointer;
   text-decoration: underline;
+  transition: color var(--transition-fast);
 }
 .skill-ref:hover {
-  color: #81d4fa;
+  color: var(--color-brand-blue-200);
 }
 </style>

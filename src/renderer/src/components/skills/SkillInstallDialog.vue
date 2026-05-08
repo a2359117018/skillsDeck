@@ -193,19 +193,19 @@ onUnmounted(() => {
         >安装: <strong>{{ packageRef }}</strong></NText
       >
 
-      <NSteps :current="currentStep" style="margin-top: 16px" size="small">
+      <NSteps :current="currentStep" style="margin-top: var(--space-md)" size="small">
         <NStep title="选择目标" />
         <NStep title="确认安装" />
       </NSteps>
 
-      <div v-if="currentStep === 1" style="margin-top: 16px">
+      <div v-if="currentStep === 1" style="margin-top: var(--space-md)">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
           全局安装（不指定 agent）
         </NCheckbox>
 
         <div v-if="!isGlobal" class="agent-section">
           <NText depth="3" class="section-label">常用 Agent</NText>
-          <NSpace :size="6" :wrap="true" class="common-agents">
+          <NSpace :size="var(--space-xs)" :wrap="true" class="common-agents">
             <NButton
               v-for="agent in commonAgents"
               :key="agent.agentFlag"
@@ -239,7 +239,7 @@ onUnmounted(() => {
             全选当前筛选
           </NCheckbox>
           <div class="agent-list-scroll">
-            <NSpace vertical :size="4">
+            <NSpace vertical :size="var(--space-xxs)">
               <NCheckbox
                 v-for="agent in filteredAgents"
                 :key="agent.agentFlag"
@@ -257,14 +257,14 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div v-if="currentStep === 2" style="margin-top: 16px">
+      <div v-if="currentStep === 2" style="margin-top: var(--space-md)">
         <div class="confirm-row">
           <NText depth="3">安装模式: </NText>
           <NText>{{ isGlobal ? '全局安装' : '指定 Agent' }}</NText>
         </div>
         <div v-if="!isGlobal && selectedAgents.length > 0" class="confirm-row">
           <NText depth="3">选中 Agent: </NText>
-          <NSpace :size="4" :wrap="true" inline style="display: inline-flex">
+          <NSpace :size="var(--space-xxs)" :wrap="true" inline style="display: inline-flex">
             <NTag v-for="flag in selectedAgents" :key="flag" size="small" round type="info">
               {{ AGENTS.find((a) => a.agentFlag === flag)?.name || flag }}
             </NTag>
@@ -313,49 +313,53 @@ onUnmounted(() => {
 
 <style scoped>
 .agent-section {
-  margin-top: 12px;
+  margin-top: var(--space-md);
 }
 
 .section-label {
   font-size: 13px;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
   display: block;
+  color: var(--color-muted);
 }
 
 .common-agents {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-md);
 }
 
 .filter-input {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .select-all-checkbox {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .agent-list-scroll {
   max-height: 180px;
   overflow-y: auto;
-  border: 1px solid var(--n-border-color);
-  border-radius: 6px;
-  padding: 8px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  background: var(--color-surface);
 }
 
 .selected-count {
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: var(--space-sm);
   display: block;
+  color: var(--color-muted);
 }
 
 .confirm-row {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-md);
 }
 
 .install-terminal {
   background: #1e1e1e;
-  border-radius: 6px;
-  padding: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
+  box-shadow: var(--shadow-1);
 }
 
 .terminal-content {
@@ -366,7 +370,7 @@ onUnmounted(() => {
   white-space: pre-wrap;
   word-break: break-all;
   margin: 0;
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-md);
 }
 
 .cursor-blink {
