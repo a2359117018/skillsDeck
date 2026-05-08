@@ -205,7 +205,7 @@ onUnmounted(() => {
 
         <div v-if="!isGlobal" class="agent-section">
           <NText depth="3" class="section-label">常用 Agent</NText>
-          <NSpace :size="var(--space-xs)" :wrap="true" class="common-agents">
+          <NSpace :size="8" :wrap="true" class="common-agents">
             <NButton
               v-for="agent in commonAgents"
               :key="agent.agentFlag"
@@ -239,7 +239,7 @@ onUnmounted(() => {
             全选当前筛选
           </NCheckbox>
           <div class="agent-list-scroll">
-            <NSpace vertical :size="var(--space-xxs)">
+            <NSpace vertical :size="4">
               <NCheckbox
                 v-for="agent in filteredAgents"
                 :key="agent.agentFlag"
@@ -264,7 +264,7 @@ onUnmounted(() => {
         </div>
         <div v-if="!isGlobal && selectedAgents.length > 0" class="confirm-row">
           <NText depth="3">选中 Agent: </NText>
-          <NSpace :size="var(--space-xxs)" :wrap="true" inline style="display: inline-flex">
+          <NSpace :size="4" :wrap="true" inline style="display: inline-flex">
             <NTag v-for="flag in selectedAgents" :key="flag" size="small" round type="info">
               {{ AGENTS.find((a) => a.agentFlag === flag)?.name || flag }}
             </NTag>

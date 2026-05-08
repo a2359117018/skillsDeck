@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NEmpty, NSpace, NText, NScrollbar, NInput, NIcon, NButton, useMessage } from 'naive-ui'
+import { NEmpty, NText, NScrollbar, NInput, NIcon, NButton, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'

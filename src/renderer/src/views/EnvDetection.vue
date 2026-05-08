@@ -32,7 +32,7 @@ async function handleInstallNode(): Promise<void> {
   <div class="env-page">
     <NCard title="环境检测" class="env-card">
       <NSpin :show="envStore.checking">
-        <NSpace vertical :size="var(--space-lg)" class="env-checks">
+        <NSpace vertical :size="20" class="env-checks">
           <div class="env-check-item">
             <div class="env-check-icon" :class="{ success: envStore.status?.nodeInstalled, error: !envStore.status?.nodeInstalled }">
               <svg v-if="envStore.status?.nodeInstalled" width="20" height="20" viewBox="0 0 20 20" fill="none">
