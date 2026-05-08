@@ -14,14 +14,15 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="skill-row">
-    <div class="skill-row-line1">
-      <NText class="skill-row-name">{{ props.skill.name }}</NText>
-      <div class="skill-row-actions">
+  <div class="skill-card">
+    <div class="skill-card-main">
+      <NText class="skill-name">{{ props.skill.name }}</NText>
+      <div class="skill-actions">
         <NButton
           quaternary
           circle
           size="tiny"
+          class="action-btn"
           title="打开位置"
           @click="emit('openLocation', props.skill.path)"
         >
@@ -33,6 +34,7 @@ const emit = defineEmits<{
           quaternary
           circle
           size="tiny"
+          class="action-btn"
           title="更新"
           @click="emit('update', props.skill.name)"
         >
@@ -45,6 +47,7 @@ const emit = defineEmits<{
           circle
           size="tiny"
           type="error"
+          class="action-btn action-btn--danger"
           title="删除"
           @click="emit('remove', props.skill.name)"
         >
@@ -54,14 +57,14 @@ const emit = defineEmits<{
         </NButton>
       </div>
     </div>
-    <div v-if="props.skill.agents.length > 0" class="skill-row-agents">
+    <div v-if="props.skill.agents.length > 0" class="skill-agents">
       <NTag
         v-for="agent in props.skill.agents"
         :key="agent"
         size="small"
         :bordered="false"
         round
-        class="skill-row-tag skill-row-tag--clickable"
+        class="agent-tag agent-tag--clickable"
         @click="emit('filterAgent', agent)"
       >
         {{ agent }}
@@ -71,62 +74,83 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.skill-row {
+.skill-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 12px;
-  border-bottom: 1px solid #eaecf0;
-  transition: background 0.15s ease;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+  transition: all var(--transition-base);
 }
 
-.skill-row:hover {
-  background: #f7f8fa;
-  box-shadow: rgba(0, 0, 0, 0.04) 0 1px 2px;
+.skill-card:hover {
+  box-shadow: var(--shadow-2);
+  border-color: var(--color-muted);
 }
 
-.skill-row-line1 {
+.skill-card-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-md);
 }
 
-.skill-row-name {
-  font-weight: 500;
-  font-size: 14px;
-  color: #222222;
+.skill-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-body-md);
+  color: var(--color-ink);
+  flex: 1;
 }
 
-.skill-row-actions {
+.skill-actions {
   display: flex;
-  gap: 2px;
+  gap: var(--space-xxs);
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-base);
 }
 
-.skill-row:hover .skill-row-actions {
+.skill-card:hover .skill-actions {
   opacity: 1;
 }
 
-.skill-row-agents {
+.action-btn {
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+  background: var(--color-surface);
+}
+
+.action-btn--danger:hover {
+  background: var(--color-error-bg);
+}
+
+.skill-agents {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--space-xxs);
 }
 
-.skill-row-tag {
-  font-size: 12px;
-  font-weight: 400;
-  --n-border-radius: 9999px;
+.agent-tag {
+  font-size: var(--text-micro);
+  font-weight: var(--weight-regular);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-stone);
+  border: 1px solid var(--color-hairline);
+  transition: all var(--transition-fast);
 }
 
-.skill-row-tag--clickable {
+.agent-tag--clickable {
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
-.skill-row-tag--clickable:hover {
-  --n-color: #e5e7eb;
-  color: #0a0a0a;
+.agent-tag--clickable:hover {
+  background: var(--color-muted);
+  color: var(--color-ink);
+  border-color: var(--color-muted);
 }
 </style>

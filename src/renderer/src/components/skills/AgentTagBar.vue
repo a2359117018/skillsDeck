@@ -65,9 +65,10 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 <style scoped>
 .agent-filter-panel {
   flex-shrink: 0;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
   overflow: hidden;
+  margin-bottom: var(--space-md);
 }
 
 .panel-header {
@@ -75,25 +76,25 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 8px 12px;
-  background: #ffffff;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-canvas);
   border: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: #45515e;
-  transition: background 0.15s ease;
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-stone);
+  transition: background var(--transition-base);
 }
 
 .panel-header:hover {
-  background: #f7f8fa;
+  background: var(--color-surface);
 }
 
 .panel-header-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xxs);
 }
 
 .panel-header-badge {
@@ -102,31 +103,31 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 5px;
-  border-radius: 9999px;
-  background: #0a0a0a;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 0 var(--space-xxs);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-canvas);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
 }
 
 .panel-header-icon {
-  color: #8e8e93;
-  transition: transform 0.2s ease;
+  color: var(--color-muted);
+  transition: transform var(--transition-slow);
 }
 
 .panel-body {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 12px 12px;
-  border-top: 1px solid #e5e7eb;
-  background: #f7f8fa;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border-top: 1px solid var(--color-hairline);
+  background: var(--color-surface);
 }
 
 .panel-slide-enter-active,
 .panel-slide-leave-active {
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
 }
 
 .panel-slide-enter-from,
@@ -137,40 +138,39 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 .agent-tag-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 9999px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #45515e;
-  font-size: 13px;
-  font-weight: 500;
+  gap: var(--space-xxs);
+  padding: var(--space-xxs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+  color: var(--color-stone);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-base);
   font-family: inherit;
-  line-height: 1.4;
+  line-height: var(--leading-normal);
 }
 
 .agent-tag-pill:hover {
-  border-color: #222222;
-  color: #222222;
+  border-color: var(--color-ink);
+  color: var(--color-ink);
 }
 
 .agent-tag-pill--active {
-  background: #0a0a0a;
-  color: #ffffff;
-  border-color: #0a0a0a;
+  background: var(--color-primary);
+  color: var(--color-canvas);
+  border-color: var(--color-primary);
 }
 
 .agent-tag-pill--active:hover {
-  background: #222222;
-  color: #ffffff;
-  border-color: #222222;
+  background: var(--color-ink);
+  border-color: var(--color-ink);
 }
 
 .agent-tag-count {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-regular);
   opacity: 0.7;
 }
 </style>

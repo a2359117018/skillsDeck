@@ -28,7 +28,7 @@ function handleKeydown(e: KeyboardEvent): void {
         @keydown="handleKeydown"
       >
         <template #prefix>
-          <NIcon :size="18" color="#999"><SearchOutline /></NIcon>
+          <NIcon :size="18" :color="'var(--color-muted)'"><SearchOutline /></NIcon>
         </template>
       </NInput>
       <NButton type="primary" size="large" round class="search-btn" @click="handleSearch">
@@ -45,12 +45,12 @@ function handleKeydown(e: KeyboardEvent): void {
 .search-bar-wrapper {
   display: flex;
   justify-content: center;
-  padding: 8px 0 20px;
+  padding: var(--space-sm) 0 var(--space-lg);
 }
 
 .search-bar-container {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
   width: 100%;
   max-width: 680px;
   align-items: center;
@@ -60,7 +60,21 @@ function handleKeydown(e: KeyboardEvent): void {
   flex: 1;
 }
 
+.search-input :deep(.n-input__input-el) {
+  height: 40px;
+}
+
 .search-btn {
   flex-shrink: 0;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-canvas);
+  font-weight: var(--weight-medium);
+  transition: all var(--transition-base);
+}
+
+.search-btn:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
 }
 </style>
