@@ -1,60 +1,67 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type CSSProperties } from 'vue'
 import {
-  NLayout,
-  NLayoutSider,
-  NMenu,
-  NMessageProvider,
   NConfigProvider,
-  NDialogProvider
+  NMessageProvider,
+  NDialogProvider,
+  type GlobalThemeOverrides
 } from 'naive-ui'
-import { useRouter, useRoute } from 'vue-router'
-import type { MenuOption } from 'naive-ui'
+import AppSidebar from './components/layout/AppSidebar.vue'
 import AppLoading from './components/common/AppLoading.vue'
 import { useSkillsStore } from './stores/skills'
 
-const router = useRouter()
-const route = useRoute()
-const skillsStore = useSkillsStore()
-
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
 
-const menuOptions: MenuOption[] = [
-  { label: '技能', key: 'installed' },
-  { label: '技能搜索', key: 'search' },
-  { type: 'divider', key: 'd0' },
-  { label: 'Agents', key: 'agent-view' },
-  { type: 'divider', key: 'd1' },
-  { label: '设置', key: 'settings' }
-]
-
-function handleMenuUpdate(key: string): void {
-  router.push({ name: key })
-}
-
-const activeKey = computed(() => route.name as string)
-
+const skillsStore = useSkillsStore()
 const showGlobalLoading = computed(() => skillsStore.fetching)
+
+const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: '#0a0a0a',
+    primaryColorHover: '#2a2a2a',
+    primaryColorPressed: '#000000',
+    fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif",
+    borderRadius: '9999px',
+    borderRadiusSmall: '8px'
+  },
+  Button: {
+    borderRadius: '9999px',
+    fontWeight: '500'
+  },
+  Tag: {
+    borderRadius: '9999px'
+  },
+  Input: {
+    borderRadius: '8px',
+    height: '40px'
+  },
+  Card: {
+    borderRadius: '16px'
+  },
+  Modal: {
+    borderRadius: '20px'
+  },
+  Select: {
+    peers: {
+      InternalSelection: {
+        borderRadius: '8px'
+      }
+    }
+  }
+}
 </script>
 
 <template>
-  <NConfigProvider>
+  <NConfigProvider :theme-overrides="themeOverrides">
     <NDialogProvider>
       <NMessageProvider>
         <div v-if="windowType === 'main'" class="app-shell">
-          <NLayout has-sider>
-            <NLayoutSider bordered :width="180" :collapsed-width="0" collapse-mode="width">
-              <div class="sidebar-header" style="padding: 16px; font-weight: 600; font-size: 14px">
-                NPX Skills
-              </div>
-              <NMenu :options="menuOptions" :value="activeKey" @update:value="handleMenuUpdate" />
-            </NLayoutSider>
-            <NLayout class="content-area">
-              <Transition name="fade" mode="out-in">
-                <router-view />
-              </Transition>
-            </NLayout>
-          </NLayout>
+          <AppSidebar />
+          <main class="content-area">
+            <Transition name="fade" mode="out-in">
+              <router-view />
+            </Transition>
+          </main>
           <AppLoading :show="showGlobalLoading" />
         </div>
         <div v-else-if="windowType === 'env'">
@@ -68,17 +75,14 @@ const showGlobalLoading = computed(() => skillsStore.fetching)
 <style scoped>
 .app-shell {
   height: 100vh;
+  display: flex;
   position: relative;
 }
-.app-shell :deep(.n-layout) {
-  height: 100%;
-}
-.sidebar-header {
-  border-bottom: 1px solid var(--card-border-color, #e2e4e8);
-}
+
 .content-area {
-  padding: 24px;
-  height: 100%;
-  overflow: hidden;
+  flex: 1;
+  height: 100vh;
+  overflow: auto;
+  background-color: var(--color-canvas);
 }
 </style>
