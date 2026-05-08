@@ -11,7 +11,7 @@
 }
 
 .card-base:hover {
-  border-color: #c8ccd4;
+  border-color: var(--color-muted);
   box-shadow: var(--shadow-3);
 }
 

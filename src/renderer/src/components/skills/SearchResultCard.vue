@@ -107,7 +107,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 }
 
 .install-btn:hover {
-  background: #e64720;
-  border-color: #e64720;
+  background: var(--color-brand-coral-dark);
+  border-color: var(--color-brand-coral-dark);
 }
 </style>

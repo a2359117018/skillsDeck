@@ -189,7 +189,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
                 circle
                 size="tiny"
                 title="打开位置"
-                @click="handleOpenLocation(selectedAgent!.globalPath + '\\' + skillName)"
+                @click="handleOpenLocation([selectedAgent!.globalPath, skillName].join('/'))"
               >
                 <template #icon>
                   <NIcon :size="15"><FolderOpenOutline /></NIcon>
@@ -280,7 +280,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
 }
 
 .agent-card:nth-child(4n+1) {
-  background: linear-gradient(135deg, var(--color-brand-coral), #ff7a59);
+  background: linear-gradient(135deg, var(--color-brand-coral), var(--color-brand-coral-light));
 }
 
 .agent-card:nth-child(4n+2) {
@@ -292,7 +292,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
 }
 
 .agent-card:nth-child(4n+4) {
-  background: linear-gradient(135deg, var(--color-brand-magenta), #ff6ec7);
+  background: linear-gradient(135deg, var(--color-brand-magenta), var(--color-brand-magenta-light));
 }
 
 .agent-card:hover {

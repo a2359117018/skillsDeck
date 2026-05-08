@@ -22,6 +22,9 @@
   /* Brand extended */
   --color-brand-blue-200: #dbeafe;
   --color-brand-blue-deep: #1e40af;
+  --color-brand-coral-light: #ff7a59;
+  --color-brand-magenta-light: #ff6ec7;
+  --color-brand-coral-dark: #e64720;
 
   /* Semantic */
   --color-success-bg: #dcfce7;
