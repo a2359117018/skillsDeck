@@ -57,8 +57,8 @@ async function handleUpdateAll(): Promise<void> {
 
 <template>
   <div class="settings-page">
-    <NCard title="设置">
-      <NForm label-placement="left" label-width="140">
+    <NCard title="设置" class="settings-card">
+      <NForm label-placement="left" label-width="140" class="settings-form">
         <NFormItem label="默认安装目标">
           <NSelect v-model:value="settingsStore.defaultAgent" :options="agentOptions" filterable />
         </NFormItem>
@@ -79,8 +79,8 @@ async function handleUpdateAll(): Promise<void> {
           </NButton>
         </NFormItem>
       </NForm>
-      <NSpace justify="end" style="margin-top: 16px">
-        <NButton type="primary" @click="handleSave">保存</NButton>
+      <NSpace justify="end" style="margin-top: var(--space-lg)">
+        <NButton type="primary" round @click="handleSave">保存</NButton>
       </NSpace>
     </NCard>
   </div>
@@ -88,6 +88,18 @@ async function handleUpdateAll(): Promise<void> {
 
 <style scoped>
 .settings-page {
-  max-width: 600px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+}
+
+.settings-card {
+  border-radius: var(--radius-xl);
+}
+
+.settings-form :deep(.n-form-item-label) {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
 }
 </style>

@@ -125,22 +125,23 @@ onMounted(() => skillsStore.fetchInstalled(true))
         <div
           v-for="agent in visibleAgentResults"
           :key="agent.agentFlag"
-          class="card-base agent-card"
+          class="agent-card"
           @click="openAgentCard(agent)"
         >
-          <div class="card-base-body agent-card-body">
+          <div class="agent-card-body">
             <div class="agent-card-header">
               <NText class="card-base-text">{{ agent.agentName }}</NText>
-              <NTag size="small" :bordered="false" round type="info">{{ agent.count }}</NTag>
+              <NTag size="small" :bordered="false" round style="background: rgba(255, 255, 255, 0.25); color: white;">{{ agent.count }}</NTag>
             </div>
             <div class="agent-card-footer">
-              <NText depth="3" style="font-size: 12px">{{ agent.count }} 个技能</NText>
+              <NText style="font-size: var(--text-body-sm)">{{ agent.count }} 个技能</NText>
               <div class="agent-folder-btn">
                 <NButton
                   size="tiny"
                   quaternary
                   circle
                   title="打开技能文件夹"
+                  style="color: white"
                   @click="openAgentFolder(agent, $event)"
                 >
                   <template #icon>
@@ -239,9 +240,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-lg);
   flex-shrink: 0;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .agent-search-input {
@@ -256,24 +257,79 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  padding-bottom: 24px;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-xl);
 }
 
 .agent-card {
   cursor: pointer;
+  position: relative;
+  border-radius: var(--radius-hero);
+  padding: var(--space-lg);
+  color: white;
+  transition: all var(--transition-base);
+}
+
+.agent-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-hero);
+  pointer-events: none;
+}
+
+.agent-card:nth-child(4n+1) {
+  background: linear-gradient(135deg, var(--color-brand-coral), #ff7a59);
+}
+
+.agent-card:nth-child(4n+2) {
+  background: linear-gradient(135deg, var(--color-brand-blue), var(--color-brand-blue-200));
+}
+
+.agent-card:nth-child(4n+3) {
+  background: linear-gradient(135deg, var(--color-brand-purple), var(--color-brand-magenta));
+}
+
+.agent-card:nth-child(4n+4) {
+  background: linear-gradient(135deg, var(--color-brand-magenta), #ff6ec7);
+}
+
+.agent-card:hover {
+  box-shadow: var(--shadow-3), 0 0 20px rgba(255, 85, 48, 0.3);
+  transform: translateY(-2px);
+}
+
+.agent-card:nth-child(4n+2):hover {
+  box-shadow: var(--shadow-3), 0 0 20px rgba(20, 86, 240, 0.3);
+}
+
+.agent-card:nth-child(4n+3):hover {
+  box-shadow: var(--shadow-3), 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.agent-card:nth-child(4n+4):hover {
+  box-shadow: var(--shadow-3), 0 0 20px rgba(234, 94, 193, 0.3);
 }
 
 .agent-card-body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-md);
+  position: relative;
+  z-index: 1;
 }
 
 .agent-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.agent-card-header .card-base-text {
+  color: white !important;
+  font-size: var(--text-heading-md);
+  font-weight: var(--weight-semibold);
 }
 
 .agent-card-footer {
@@ -284,12 +340,16 @@ onMounted(() => skillsStore.fetchInstalled(true))
 
 .agent-folder-btn {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--transition-fast);
 }
 
 .agent-card:hover .agent-folder-btn,
 .agent-card:focus-within .agent-folder-btn {
   opacity: 1;
+}
+
+.agent-card-footer :deep(.n-text) {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .skill-table {
@@ -301,8 +361,8 @@ onMounted(() => skillsStore.fetchInstalled(true))
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #e8eaee;
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .skill-table-row:last-child {
@@ -312,7 +372,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .skill-table-info {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--space-sm);
   min-width: 0;
   flex: 1;
 }
@@ -321,6 +381,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333;
+  color: var(--color-ink);
 }
 </style>
