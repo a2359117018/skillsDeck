@@ -2,7 +2,6 @@
 import { computed, ref, onMounted } from 'vue'
 import {
   NDrawer,
-  NDrawerContent,
   NEmpty,
   NText,
   NSpace,
@@ -16,7 +15,8 @@ import {
   FolderOpenOutline,
   RefreshOutline,
   TrashOutline,
-  SearchOutline
+  SearchOutline,
+  CloseOutline
 } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useConfirm } from '@renderer/composables/useConfirm'
@@ -209,6 +209,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
       :show="drawerVisible"
       :width="500"
       placement="right"
+      :native-scrollbar="false"
       @update:show="
         (val: boolean) => {
           if (!val) closeDrawer()
@@ -216,90 +217,90 @@ onMounted(() => skillsStore.fetchInstalled(true))
       "
       @mask-click="closeDrawer"
     >
-      <NDrawerContent closable :native-scrollbar="false" @close="closeDrawer">
-        <template #header>
-          <div
-            v-if="selectedAgent"
-            class="drawer-header"
-            :class="[
-              'drawer-color-' +
-                getAgentColorIndex(
-                  visibleAgentResults.findIndex(
-                    (a) => a.agentFlag === selectedAgent!.agentFlag
-                  )
+      <div v-if="selectedAgent" class="drawer-wrapper">
+        <div
+          class="drawer-header"
+          :class="[
+            'drawer-color-' +
+              getAgentColorIndex(
+                visibleAgentResults.findIndex(
+                  (a) => a.agentFlag === selectedAgent!.agentFlag
                 )
-            ]"
-          >
-            <div class="drawer-header-content">
-              <div>
-                <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
-                <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
+              )
+          ]"
+        >
+          <div class="drawer-header-content">
+            <div>
+              <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
+              <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
+            </div>
+            <NButton
+              size="small"
+              class="drawer-folder-btn"
+              @click="openAgentFolder(selectedAgent!)"
+            >
+              <template #icon>
+                <NIcon :size="16"><FolderOpenOutline /></NIcon>
+              </template>
+              打开文件夹
+            </NButton>
+          </div>
+          <NButton quaternary circle class="drawer-close-btn" @click="closeDrawer">
+            <template #icon>
+              <NIcon :size="20" color="white"><CloseOutline /></NIcon>
+            </template>
+          </NButton>
+        </div>
+        <NScrollbar class="drawer-scroll">
+          <div class="drawer-body">
+            <div
+              v-for="skillName in selectedAgent.skills"
+              :key="skillName"
+              class="skill-row"
+            >
+              <div class="skill-row-info">
+                <NText strong class="skill-row-name">{{ skillName }}</NText>
+                <NText depth="3" class="skill-row-path">
+                  {{
+                    selectedAgent.globalPath
+                      .split(/[/\\]/)
+                      .slice(-2)
+                      .join('/')
+                  }}/{{ skillName }}
+                </NText>
               </div>
-              <NButton
-                size="small"
-                class="drawer-folder-btn"
-                @click="openAgentFolder(selectedAgent!)"
-              >
-                <template #icon>
-                  <NIcon :size="16"><FolderOpenOutline /></NIcon>
-                </template>
-                打开文件夹
-              </NButton>
+              <NSpace :size="8" align="center">
+                <NButton
+                  text
+                  size="small"
+                  type="primary"
+                  title="更新"
+                  :loading="updatingSkill === skillName"
+                  @click="handleUpdate(skillName)"
+                >
+                  <template #icon>
+                    <NIcon :size="16"><RefreshOutline /></NIcon>
+                  </template>
+                  更新
+                </NButton>
+                <NButton
+                  text
+                  size="small"
+                  type="error"
+                  title="删除"
+                  :loading="removingSkill === skillName"
+                  @click="handleRemove(skillName)"
+                >
+                  <template #icon>
+                    <NIcon :size="16"><TrashOutline /></NIcon>
+                  </template>
+                  删除
+                </NButton>
+              </NSpace>
             </div>
           </div>
-        </template>
-        <div v-if="selectedAgent" class="drawer-body">
-          <NScrollbar class="drawer-scroll">
-            <div class="drawer-body">
-              <div
-                v-for="skillName in selectedAgent.skills"
-                :key="skillName"
-                class="skill-row"
-              >
-                <div class="skill-row-info">
-                  <NText strong class="skill-row-name">{{ skillName }}</NText>
-                  <NText depth="3" class="skill-row-path">
-                    {{
-                      selectedAgent.globalPath
-                        .split(/[/\\]/)
-                        .slice(-2)
-                        .join('/')
-                    }}/{{ skillName }}
-                  </NText>
-                </div>
-                <NSpace :size="8" align="center">
-                  <NButton
-                    text
-                    size="small"
-                    type="primary"
-                    title="更新"
-                    :loading="updatingSkill === skillName"
-                    @click="handleUpdate(skillName)"
-                  >
-                    <template #icon>
-                      <NIcon :size="16"><RefreshOutline /></NIcon>
-                    </template>
-                    更新
-                  </NButton>
-                  <NButton
-                    text
-                    size="small"
-                    type="error"
-                    title="删除"
-                    :loading="removingSkill === skillName"
-                    @click="handleRemove(skillName)"
-                  >
-                    <template #icon>
-                      <NIcon :size="16"><TrashOutline /></NIcon>
-                    </template>
-                    删除
-                  </NButton>
-                </NSpace>
-              </div>
-            </div>
-          </NScrollbar>
-        </div>
-      </NDrawerContent>
+        </NScrollbar>
+      </div>
     </NDrawer>
   </div>
 </template>
@@ -572,15 +573,18 @@ onMounted(() => skillsStore.fetchInstalled(true))
 }
 
 /* Drawer Wrapper */
-.drawer-body {
-  padding: var(--space-lg);
+.drawer-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Drawer Header */
 .drawer-header {
-  margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) 0;
-  padding: var(--space-lg) var(--space-xxl);
+  padding: var(--space-xl) var(--space-xxl);
   color: white;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .drawer-header-content {
@@ -612,6 +616,13 @@ onMounted(() => skillsStore.fetchInstalled(true))
 
 .drawer-folder-btn:hover {
   background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.drawer-close-btn {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  color: white;
 }
 
 /* Drawer Header Colors */
@@ -646,7 +657,12 @@ onMounted(() => skillsStore.fetchInstalled(true))
 
 /* Drawer Scroll */
 .drawer-scroll {
-  max-height: calc(100vh - 200px);
+  flex: 1;
+  min-height: 0;
+}
+
+.drawer-body {
+  padding: var(--space-lg);
 }
 
 /* Skill Row */
