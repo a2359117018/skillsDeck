@@ -218,10 +218,8 @@ onMounted(() => skillsStore.fetchInstalled(true))
     >
       <NDrawerContent closable :native-scrollbar="false" @close="closeDrawer">
         <template #header>
-          <span></span>
-        </template>
-        <div v-if="selectedAgent" class="drawer-wrapper">
           <div
+            v-if="selectedAgent"
             class="drawer-header"
             :class="[
               'drawer-color-' +
@@ -249,6 +247,8 @@ onMounted(() => skillsStore.fetchInstalled(true))
               </NButton>
             </div>
           </div>
+        </template>
+        <div v-if="selectedAgent" class="drawer-body">
           <NScrollbar class="drawer-scroll">
             <div class="drawer-body">
               <div
@@ -572,17 +572,15 @@ onMounted(() => skillsStore.fetchInstalled(true))
 }
 
 /* Drawer Wrapper */
-.drawer-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.drawer-body {
+  padding: var(--space-lg);
 }
 
 /* Drawer Header */
 .drawer-header {
-  padding: var(--space-xl) var(--space-xxl);
+  margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) 0;
+  padding: var(--space-lg) var(--space-xxl);
   color: white;
-  flex-shrink: 0;
 }
 
 .drawer-header-content {
@@ -646,14 +644,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   );
 }
 
-/* Drawer Scroll + Body */
+/* Drawer Scroll */
 .drawer-scroll {
-  flex: 1;
-  min-height: 0;
-}
-
-.drawer-body {
-  padding: var(--space-lg);
+  max-height: calc(100vh - 200px);
 }
 
 /* Skill Row */
