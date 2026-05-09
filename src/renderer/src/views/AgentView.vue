@@ -209,8 +209,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
       :show="drawerVisible"
       :width="500"
       placement="right"
-      :native-scrollbar="false"
-      closable
       @update:show="
         (val: boolean) => {
           if (!val) closeDrawer()
@@ -218,7 +216,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
       "
       @mask-click="closeDrawer"
     >
-      <NDrawerContent :closable="true" @close="closeDrawer">
+      <NDrawerContent closable :native-scrollbar="false" @close="closeDrawer">
         <template #header>
           <span></span>
         </template>
