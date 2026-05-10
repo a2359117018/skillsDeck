@@ -9,3 +9,5 @@ build
 .vscode
 
 .worktrees/
+bun.lock
+debug-*.png
