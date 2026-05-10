@@ -8,6 +8,7 @@ import {
   NButton,
   NIcon,
   NInput,
+  NSpin,
   useMessage
 } from 'naive-ui'
 import {
@@ -157,7 +158,10 @@ onMounted(() => skillsStore.fetchInstalled(true))
       </div>
 
       <!-- Agent Grid -->
-      <div v-if="visibleAgentResults.length > 0" class="agent-grid">
+      <div v-if="skillsStore.fetching && visibleAgentResults.length === 0" class="page-loading">
+        <NSpin size="large" />
+      </div>
+      <div v-else-if="visibleAgentResults.length > 0" class="agent-grid">
         <div
           v-for="(agent, index) in visibleAgentResults"
           :key="agent.agentFlag"
@@ -325,6 +329,13 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .toolbar-actions {
   display: flex;
   gap: var(--space-sm);
+}
+
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
 }
 
 /* Agent Grid */
