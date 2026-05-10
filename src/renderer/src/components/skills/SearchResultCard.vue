@@ -13,21 +13,23 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 
 <template>
   <div class="result-card">
-    <div class="result-card-main">
-      <div class="result-card-header">
-        <div class="result-card-title-row">
-          <NText strong class="result-name">{{ result.name }}</NText>
-          <div class="install-badge">{{ formatInstalls(result.installs) }} 次下载</div>
-        </div>
-        <NText depth="3" code class="package-ref">{{ packageRef }}</NText>
-        <a :href="detailUrl" target="_blank" class="result-link">{{ detailUrl }}</a>
+    <div class="result-card-header">
+      <NText strong class="result-name">{{ result.name }}</NText>
+      <div class="result-card-actions">
+        <div class="install-badge">{{ formatInstalls(result.installs) }} 次下载</div>
+        <NButton size="small" round @click="emit('install', packageRef)">
+          <template #icon>
+            <NIcon :size="16"><DownloadOutline /></NIcon>
+          </template>
+          安装
+        </NButton>
       </div>
-      <NButton size="small" round @click="emit('install', packageRef)">
-        <template #icon>
-          <NIcon :size="16"><DownloadOutline /></NIcon>
-        </template>
-        安装
-      </NButton>
+    </div>
+    <div class="result-card-body">
+      <NText depth="3" code class="package-ref">{{ packageRef }}</NText>
+    </div>
+    <div class="result-card-footer">
+      <a :href="detailUrl" target="_blank" class="result-link">前往技能页面 ↗</a>
     </div>
   </div>
 </template>
@@ -38,39 +40,34 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-xl);
   padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   transition: all var(--transition-base);
 }
 
 .result-card:hover {
   border-color: var(--color-muted);
-  box-shadow: var(--shadow-3);
-}
-
-.result-card-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-sm);
+  box-shadow: var(--shadow-2);
 }
 
 .result-card-header {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  min-width: 0;
-}
-
-.result-card-title-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
 }
 
 .result-name {
   font-size: var(--text-body-md);
   color: var(--color-ink);
   font-weight: var(--weight-semibold);
+}
+
+.result-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .install-badge {
@@ -81,6 +78,12 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   border-radius: var(--radius-full);
   font-weight: var(--weight-medium);
   white-space: nowrap;
+}
+
+.result-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
 }
 
 .package-ref {
@@ -94,6 +97,12 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   color: var(--color-brand-blue);
   text-decoration: none;
   word-break: break-all;
+}
+
+.result-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
 }
 
 .result-link:hover {
