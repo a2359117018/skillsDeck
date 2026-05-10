@@ -108,7 +108,9 @@ watch(commandOutput, async () => {
         wrapEl.scrollTop = wrapEl.scrollHeight
       }
     }
-  } catch {}
+  } catch {
+    // scroll error ignored
+  }
 })
 
 async function handleInstall(): Promise<void> {

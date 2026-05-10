@@ -2,12 +2,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
-import {
-  CubeOutline,
-  SearchOutline,
-  GitMergeOutline,
-  SettingsOutline
-} from '@vicons/ionicons5'
+import { CubeOutline, SearchOutline, GitMergeOutline, SettingsOutline } from '@vicons/ionicons5'
 
 const router = useRouter()
 const route = useRoute()
@@ -46,8 +41,8 @@ function navigate(key: string): void {
         <button
           class="sidebar-item"
           :class="{ active: activeKey === item.key }"
-          @click="navigate(item.key)"
           :title="item.label"
+          @click="navigate(item.key)"
         >
           <div class="active-bar"></div>
           <NIcon :size="20">

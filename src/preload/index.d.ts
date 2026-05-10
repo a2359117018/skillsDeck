@@ -1,7 +1,6 @@
 import type { ElectronAPI } from '@electron-toolkit/preload'
 import type {
   EnvStatus,
-  Skill,
   AppSettings,
   CommandResult,
   SkillSearchResponse,
