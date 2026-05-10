@@ -22,6 +22,16 @@ export interface AgentScanResult {
   count: number
 }
 
+export interface InstalledSkillAgent {
+  name: string
+  path: string
+}
+
+export interface InstalledSkill {
+  name: string
+  agents: InstalledSkillAgent[]
+}
+
 export interface CommandResult {
   success: boolean
   stdout: string
