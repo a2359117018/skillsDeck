@@ -16,7 +16,7 @@ skillsStore.setMessageHandler((msg, type) => {
 })
 
 async function loadSkills(): Promise<void> {
-  await skillsStore.fetchInstalled(true)
+  await skillsStore.fetchInstalled()
 }
 
 onMounted(() => loadSkills())

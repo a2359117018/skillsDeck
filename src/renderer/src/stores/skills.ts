@@ -119,8 +119,7 @@ export const useSkillsStore = defineStore('skills', () => {
     }
   }
 
-  async function fetchInstalled(_global?: boolean): Promise<void> {
-    void _global
+  async function fetchInstalled(): Promise<void> {
     installedCache.invalidate()
     agentScanCache.invalidate()
     await Promise.all([installedCache.ensure(), agentScanCache.ensure()])

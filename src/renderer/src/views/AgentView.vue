@@ -67,7 +67,7 @@ async function handleUpdate(name: string): Promise<void> {
     const result = await skillsStore.update(name, true)
     if (result.success) {
       message.success(`${name} 更新成功`)
-      await skillsStore.fetchInstalled(true)
+      await skillsStore.fetchInstalled()
     } else {
       message.error(`${name} 更新失败`)
     }
@@ -86,7 +86,7 @@ async function handleRemove(name: string): Promise<void> {
     const result = await skillsStore.remove(name, true, selectedAgent.value?.agentFlag)
     if (result.success) {
       message.success(`${name} 已删除`)
-      await skillsStore.fetchInstalled(true)
+      await skillsStore.fetchInstalled()
     } else {
       message.error(`${name} 删除失败`)
     }
@@ -98,10 +98,10 @@ async function handleRemove(name: string): Promise<void> {
 }
 
 async function handleRefresh(): Promise<void> {
-  await skillsStore.fetchInstalled(true)
+  await skillsStore.fetchInstalled()
 }
 
-onMounted(() => skillsStore.fetchInstalled(true))
+onMounted(() => skillsStore.fetchInstalled())
 </script>
 
 <template>

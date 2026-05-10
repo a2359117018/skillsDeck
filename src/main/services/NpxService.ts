@@ -1,5 +1,5 @@
-import type { CommandResult, Skill } from '../../shared/types'
-import { commandRunner, CommandError } from './CommandRunner'
+import type { CommandResult } from '../../shared/types'
+import { commandRunner } from './CommandRunner'
 
 class NpxService {
   async checkNpxVersion(): Promise<{ ok: boolean; version: string | null }> {
@@ -25,32 +25,6 @@ class NpxService {
       return { ok: false, version: null }
     } catch {
       return { ok: false, version: null }
-    }
-  }
-
-  async list(global?: boolean): Promise<Skill[]> {
-    const args = this.buildArgs('list', '--json')
-    if (global) args.push('-g')
-    const result = await commandRunner.run('npx', args)
-    if (!result.success) {
-      throw new CommandError(
-        'EXECUTION_FAILED',
-        `npx ${args.join(' ')}`,
-        result.stderr,
-        result.exitCode
-      )
-    }
-    const cleaned = result.stdout.trim()
-    if (!cleaned) return []
-    try {
-      return JSON.parse(cleaned)
-    } catch {
-      throw new CommandError(
-        'EXECUTION_FAILED',
-        `npx ${args.join(' ')}`,
-        `Invalid JSON: ${cleaned}`,
-        result.exitCode
-      )
     }
   }
 

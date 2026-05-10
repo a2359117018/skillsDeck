@@ -4,8 +4,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   skills: {
     search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
-    list: (opts?: { global?: boolean }): Promise<unknown[]> =>
-      ipcRenderer.invoke('skills:list', opts),
+    list: (): Promise<unknown[]> => ipcRenderer.invoke('skills:list'),
     install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:install', opts),
     installStreaming: (opts: {
