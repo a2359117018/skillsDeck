@@ -13,22 +13,22 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 
 <template>
   <div class="result-card">
-    <div class="result-card-header">
-      <div class="result-card-title-row">
-        <NText strong class="result-name">{{ result.name }}</NText>
-        <div class="install-badge">
-          {{ formatInstalls(result.installs) }} 次下载
+    <div class="result-card-main">
+      <div class="result-card-header">
+        <div class="result-card-title-row">
+          <NText strong class="result-name">{{ result.name }}</NText>
+          <div class="install-badge">{{ formatInstalls(result.installs) }} 次下载</div>
         </div>
+        <NText depth="3" code class="package-ref">{{ packageRef }}</NText>
+        <a :href="detailUrl" target="_blank" class="result-link">{{ detailUrl }}</a>
       </div>
-      <NText depth="3" code class="package-ref">{{ packageRef }}</NText>
-      <a :href="detailUrl" target="_blank" class="result-link">{{ detailUrl }}</a>
+      <NButton size="small" round @click="emit('install', packageRef)">
+        <template #icon>
+          <NIcon :size="16"><DownloadOutline /></NIcon>
+        </template>
+        安装
+      </NButton>
     </div>
-    <NButton size="small" round class="install-btn" @click="emit('install', packageRef)">
-      <template #icon>
-        <NIcon :size="16"><DownloadOutline /></NIcon>
-      </template>
-      安装
-    </NButton>
   </div>
 </template>
 
@@ -38,16 +38,19 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-xl);
   padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
   transition: all var(--transition-base);
-  border-left: 3px solid transparent;
 }
 
 .result-card:hover {
-  border-left-color: var(--color-brand-coral);
+  border-color: var(--color-muted);
   box-shadow: var(--shadow-3);
+}
+
+.result-card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
 }
 
 .result-card-header {
@@ -95,19 +98,5 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 
 .result-link:hover {
   text-decoration: underline;
-}
-
-.install-btn {
-  align-self: flex-start;
-  background: var(--color-brand-coral);
-  border-color: var(--color-brand-coral);
-  color: var(--color-canvas);
-  font-weight: var(--weight-medium);
-  transition: all var(--transition-base);
-}
-
-.install-btn:hover {
-  background: var(--color-brand-coral-dark);
-  border-color: var(--color-brand-coral-dark);
 }
 </style>

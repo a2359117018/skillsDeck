@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NScrollbar, NSpin, NEmpty, NText } from 'naive-ui'
+import { NSpin, NEmpty, NText } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
@@ -30,7 +30,7 @@ function handleInstallComplete(): void {
 <template>
   <div class="search-page">
     <SkillSearchBar @search="handleSearch" />
-    <NScrollbar class="search-scroll">
+    <div class="search-scroll">
       <div v-if="skillsStore.searching" class="search-loading">
         <NSpin size="large" />
       </div>
@@ -58,7 +58,7 @@ function handleInstallComplete(): void {
         </div>
       </template>
       <NEmpty v-else description="输入关键词搜索技能" class="search-empty" />
-    </NScrollbar>
+    </div>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
       :package-ref="selectedPackage"
@@ -74,15 +74,13 @@ function handleInstallComplete(): void {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
 }
 
 .search-scroll {
   flex: 1;
   min-height: 0;
-}
-
-.search-scroll :deep(.n-scrollbar-rail) {
-  display: none !important;
+  overflow-y: auto;
 }
 
 .search-loading {
