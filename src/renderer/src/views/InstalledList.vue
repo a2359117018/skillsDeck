@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { NEmpty, NText, NInput, NIcon, NButton, useMessage } from 'naive-ui'
+import { NEmpty, NText, NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
 import { useConfirm } from '../composables/useConfirm'
@@ -144,7 +144,10 @@ function handleFilterAgent(agentFlag: string): void {
       <AgentTagBar />
 
       <!-- Skill List -->
-      <div v-if="skillsStore.filteredSkills.length > 0" class="skill-list">
+      <div v-if="skillsStore.fetching && skillsStore.filteredSkills.length === 0" class="page-loading">
+        <NSpin size="large" />
+      </div>
+      <div v-else-if="skillsStore.filteredSkills.length > 0" class="skill-list">
         <TransitionGroup name="list" tag="div">
           <SkillRow
             v-for="skill in skillsStore.filteredSkills"
@@ -215,6 +218,13 @@ function handleFilterAgent(agentFlag: string): void {
 .toolbar-actions {
   display: flex;
   gap: var(--space-sm);
+}
+
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
 }
 
 /* Skill List */
