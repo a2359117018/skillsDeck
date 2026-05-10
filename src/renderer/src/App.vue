@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import {
   NConfigProvider,
   NMessageProvider,
@@ -7,13 +6,8 @@ import {
   type GlobalThemeOverrides
 } from 'naive-ui'
 import AppSidebar from './components/layout/AppSidebar.vue'
-import AppLoading from './components/common/AppLoading.vue'
-import { useSkillsStore } from './stores/skills'
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
-
-const skillsStore = useSkillsStore()
-const showGlobalLoading = computed(() => skillsStore.fetching)
 
 const themeOverrides: GlobalThemeOverrides = {
   common: {
@@ -65,7 +59,6 @@ const themeOverrides: GlobalThemeOverrides = {
               <router-view />
             </Transition>
           </main>
-          <AppLoading :show="showGlobalLoading" />
         </div>
         <div v-else-if="windowType === 'env'">
           <router-view />
