@@ -59,10 +59,6 @@ function openAgentFolder(agent: AgentScanResult, e?: Event): void {
   skillsStore.openLocation(agent.globalPath)
 }
 
-async function handleOpenLocation(path: string): Promise<void> {
-  await skillsStore.openLocation(path)
-}
-
 async function handleUpdate(name: string): Promise<void> {
   const confirmed = await confirmUpdate(name)
   if (!confirmed) return

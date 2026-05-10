@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
-  Skill,
+  InstalledSkill,
   CommandResult,
   SkillSearchResult,
   AgentScanResult
@@ -23,8 +23,8 @@ function unwrapResult<T>(
 }
 
 export const useSkillsStore = defineStore('skills', () => {
-  const installedCache = useCachedResource<Skill[]>(
-    async () => unwrapResult(await window.api.skills.list({ global: true })),
+  const installedCache = useCachedResource<InstalledSkill[]>(
+    async () => unwrapResult(await window.api.skills.list()),
     []
   )
 
@@ -47,46 +47,17 @@ export const useSkillsStore = defineStore('skills', () => {
 
   const loading = computed(() => fetching.value || searching.value)
 
-  function resolveAgentsByPath(skillPath: string, pathToAgents: Map<string, string[]>): string[] {
-    const normalized = skillPath.replace(/\\/g, '/').toLowerCase()
-    const matched: string[] = []
-    for (const [dir, flags] of pathToAgents) {
-      if (normalized.startsWith(dir)) {
-        matched.push(...flags)
-      }
-    }
-    return matched
-  }
-
   const agentScanCache = useCachedResource<AgentScanResult[]>(
     async () => unwrapResult(await window.api.agents.scanAll()),
     []
   )
 
-  const enrichedSkills = computed(() => {
-    const scanData = agentScanCache.data.value
-    if (!scanData || scanData.length === 0) return installedCache.data.value
-
-    const pathToAgents = new Map<string, string[]>()
-    for (const result of scanData) {
-      const normalized = result.globalPath.replace(/\\/g, '/').toLowerCase()
-      const existing = pathToAgents.get(normalized) || []
-      existing.push(result.agentFlag)
-      pathToAgents.set(normalized, existing)
-    }
-
-    return installedCache.data.value.map((skill) => ({
-      ...skill,
-      agents: resolveAgentsByPath(skill.path, pathToAgents)
-    }))
-  })
-
   const filteredSkills = computed(() => {
-    let skills = enrichedSkills.value
+    let skills = installedCache.data.value
 
     if (selectedAgents.value.length > 0) {
       const lowered = selectedAgents.value.map((a) => a.toLowerCase())
-      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.toLowerCase())))
+      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.name.toLowerCase())))
     }
 
     if (searchKeyword.value) {
@@ -264,7 +235,6 @@ export const useSkillsStore = defineStore('skills', () => {
     installedSkills,
     selectedAgents,
     filteredSkills,
-    enrichedSkills,
     sortedAgentResults,
     fetching,
     searching,

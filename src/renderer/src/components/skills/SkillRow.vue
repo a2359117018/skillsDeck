@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { NIcon, NButton, NTag, NText } from 'naive-ui'
 import { FolderOpenOutline, RefreshOutline, TrashOutline } from '@vicons/ionicons5'
-import type { Skill } from '../../../../shared/types'
+import type { InstalledSkill } from '../../../../shared/types'
 
-const props = defineProps<{ skill: Skill }>()
+const props = defineProps<{ skill: InstalledSkill }>()
 
 const emit = defineEmits<{
   update: [name: string]
@@ -24,7 +24,7 @@ const emit = defineEmits<{
           size="tiny"
           class="action-btn"
           title="打开位置"
-          @click="emit('openLocation', props.skill.path)"
+          @click="emit('openLocation', props.skill.agents[0]?.path || '')"
         >
           <template #icon>
             <NIcon :size="16"><FolderOpenOutline /></NIcon>
@@ -60,14 +60,14 @@ const emit = defineEmits<{
     <div v-if="props.skill.agents.length > 0" class="skill-agents">
       <NTag
         v-for="agent in props.skill.agents"
-        :key="agent"
+        :key="agent.name"
         size="small"
         :bordered="false"
         round
         class="agent-tag agent-tag--clickable"
-        @click="emit('filterAgent', agent)"
+        @click="emit('filterAgent', agent.name)"
       >
-        {{ agent }}
+        {{ agent.name }}
       </NTag>
     </div>
   </div>

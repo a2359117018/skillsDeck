@@ -6,6 +6,7 @@ import type {
   CommandResult,
   SkillSearchResponse,
   CommandErrorInfo,
+  InstalledSkill,
   AgentScanResult
 } from '../shared/types'
 
@@ -14,7 +15,7 @@ type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo
 export interface AppApi {
   skills: {
     search: (keyword: string) => Promise<IpcResult<SkillSearchResponse>>
-    list: (opts?: { global?: boolean }) => Promise<IpcResult<Skill[]>>
+    list: () => Promise<IpcResult<InstalledSkill[]>>
     install: (opts: {
       packageRef: string
       agents: string[]
