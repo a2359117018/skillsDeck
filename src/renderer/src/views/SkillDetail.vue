@@ -80,7 +80,7 @@ async function handleInstallClick(): Promise<void> {
         size="medium"
         round
         class="action-btn"
-        :loading="skillsStore.updating || operationLoading"
+        :loading="operationLoading"
         @click="handleUpdate"
       >
         更新
@@ -89,7 +89,7 @@ async function handleInstallClick(): Promise<void> {
         size="medium"
         round
         class="action-btn action-btn-danger"
-        :loading="skillsStore.removing || operationLoading"
+        :loading="operationLoading"
         @click="handleRemove"
       >
         删除
