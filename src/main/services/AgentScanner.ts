@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import type { AgentScanResult } from '../../shared/types'
+import type { AgentScanResult, InstalledSkill } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
 
 interface AgentDef {
@@ -57,6 +57,39 @@ class AgentScanner {
       skills,
       count: skills.length
     }
+  }
+
+  async scanInstalled(): Promise<InstalledSkill[]> {
+    const skillMap = new Map<string, InstalledSkill>()
+
+    for (const agent of this.agents) {
+      const absPath = this.expandPath(agent.globalPath)
+      const skillNames: string[] = []
+
+      try {
+        const entries = await fs.promises.readdir(absPath, { withFileTypes: true })
+        for (const entry of entries) {
+          if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== '.system') {
+            skillNames.push(entry.name)
+          }
+        }
+      } catch {
+        continue
+      }
+
+      for (const skillName of skillNames) {
+        const skillPath = path.join(absPath, skillName)
+        if (!skillMap.has(skillName)) {
+          skillMap.set(skillName, { name: skillName, agents: [] })
+        }
+        skillMap.get(skillName)!.agents.push({
+          name: agent.agentFlag,
+          path: skillPath
+        })
+      }
+    }
+
+    return Array.from(skillMap.values())
   }
 }
 
