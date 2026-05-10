@@ -55,9 +55,11 @@ const themeOverrides: GlobalThemeOverrides = {
         <div v-if="windowType === 'main'" class="app-shell">
           <AppSidebar />
           <main class="content-area">
-            <Transition name="fade" mode="out-in">
-              <router-view />
-            </Transition>
+            <router-view v-slot="{ Component }">
+              <Transition name="fade" mode="out-in">
+                <component :is="Component" />
+              </Transition>
+            </router-view>
           </main>
         </div>
         <div v-else-if="windowType === 'env'">

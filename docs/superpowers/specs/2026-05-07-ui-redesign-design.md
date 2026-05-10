@@ -18,13 +18,13 @@ All DESIGN.md tokens materialized as CSS custom properties on `:root`.
 
 **Units**: px for tokens, rem for typography sizes, flex/grid for layout.
 
-| Category | Examples |
-|----------|----------|
-| Colors | `--color-primary: #0a0a0a`, `--color-brand-coral: #ff5530`, `--color-brand-blue: #1456f0`, `--color-brand-magenta: #ea5ec1`, `--color-brand-purple: #a855f7`, `--color-canvas: #ffffff`, `--color-surface: #f7f8fa`, `--color-hairline: #e5e7eb` |
-| Spacing | `--space-xxs: 4px` through `--space-section-lg: 80px` (12 steps) |
-| Radius | `--radius-xs: 4px` through `--radius-hero: 32px`, `--radius-full: 9999px` (10 steps) |
-| Shadow | `--shadow-0: none` through `--shadow-4: rgba(36,36,36,0.08) 0 12px 16px -4px` (5 levels) |
-| Typography | `--font-heading-md: 2rem/600` through `--font-micro: 0.75rem/400` (12 levels) |
+| Category   | Examples                                                                                                                                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Colors     | `--color-primary: #0a0a0a`, `--color-brand-coral: #ff5530`, `--color-brand-blue: #1456f0`, `--color-brand-magenta: #ea5ec1`, `--color-brand-purple: #a855f7`, `--color-canvas: #ffffff`, `--color-surface: #f7f8fa`, `--color-hairline: #e5e7eb` |
+| Spacing    | `--space-xxs: 4px` through `--space-section-lg: 80px` (12 steps)                                                                                                                                                                                 |
+| Radius     | `--radius-xs: 4px` through `--radius-hero: 32px`, `--radius-full: 9999px` (10 steps)                                                                                                                                                             |
+| Shadow     | `--shadow-0: none` through `--shadow-4: rgba(36,36,36,0.08) 0 12px 16px -4px` (5 levels)                                                                                                                                                         |
+| Typography | `--font-heading-md: 2rem/600` through `--font-micro: 0.75rem/400` (12 levels)                                                                                                                                                                    |
 
 ### 1.2 Font
 
@@ -47,6 +47,7 @@ Set as default on `body`. Fallback: Inter, Helvetica Neue, Arial.
 ### 1.3 NaiveUI Theme Override
 
 Via `NConfigProvider.themeOverrides`:
+
 - `primaryColor: '#0a0a0a'`
 - `borderRadius: '9999px'` for buttons/tags
 - `fontFamily: "'DM Sans', sans-serif"`
@@ -85,21 +86,25 @@ Via `NConfigProvider.themeOverrides`:
 ### 3.1 Installed Skills (InstalledList.vue)
 
 **Hero Section** (top):
+
 - Auto height, padding `xl`-`xxl`
 - Background: `brand-coral` → `brand-purple` subtle gradient, `rounded-xl`(16px)
 - White text: title "我的技能" + count badge + action buttons (refresh, update all) as white outline pill buttons
 - Decorative: blurred geometric shapes or light spots in background for depth
 
 **Search Bar**:
+
 - Below hero, white pill input `rounded-full`, search icon prefix
 - Right side: filtered skill count in `stone` color
 
 **AgentTagBar**:
+
 - Collapsible pill filters, `rounded-full` pills
 - Inactive: `surface` bg + `hairline` border
 - Active: `primary` bg + white text
 
 **Skill List**:
+
 - Card-style list items replacing row style
 - Each item: `rounded-lg`(12px), `hairline` border, hover → shadow level 1 + translateY(-2px)
 - Left: skill name (body-md, weight 600) + agent tags (small pill badges)
@@ -108,10 +113,12 @@ Via `NConfigProvider.themeOverrides`:
 ### 3.2 Skills Search (SkillsSearch.vue)
 
 **Search Bar**:
+
 - Centered, large pill input, `rounded-full`, 48px height
 - Search button: `primary` black pill with search icon
 
 **Results**:
+
 - Grid layout: `repeat(auto-fill, minmax(280px, 1fr))`
 - Each card: white bg, `rounded-xl`(16px), `hairline` border
 - Hover: 3px `brand-coral` left border + shadow elevation
@@ -150,15 +157,15 @@ Via `NConfigProvider.themeOverrides`:
 
 ## 4. Component Library
 
-| Component | Style |
-|-----------|-------|
-| Buttons | All `rounded-full`(9999px). Primary: black bg, white text. Accent: `brand-coral` bg. Secondary: transparent + `ink` border. Tertiary: `canvas` bg + `hairline` border. |
-| Inputs | `rounded-md`(8px), 40px height. Focus: 2px `brand-blue-deep` border. Error: 1px `#d45656` border. |
-| Badges/Tags | `rounded-full`. Success: `success-bg`/`success-text`. NEW: `brand-coral` bg + white. Info: `brand-blue-200` bg + `brand-blue-deep` text. |
-| Cards (base) | `canvas` bg, `rounded-xl`(16px), `hairline` border, padding `xl`. |
-| Cards (brand) | Gradient bg, `rounded-hero`(32px), white text, padding `xxl`. |
-| Modal/Dialog | `rounded-xxl`(20px), optional top brand-color stripe. |
-| Loading | Brand-color spinner + fade transition. |
+| Component     | Style                                                                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Buttons       | All `rounded-full`(9999px). Primary: black bg, white text. Accent: `brand-coral` bg. Secondary: transparent + `ink` border. Tertiary: `canvas` bg + `hairline` border. |
+| Inputs        | `rounded-md`(8px), 40px height. Focus: 2px `brand-blue-deep` border. Error: 1px `#d45656` border.                                                                      |
+| Badges/Tags   | `rounded-full`. Success: `success-bg`/`success-text`. NEW: `brand-coral` bg + white. Info: `brand-blue-200` bg + `brand-blue-deep` text.                               |
+| Cards (base)  | `canvas` bg, `rounded-xl`(16px), `hairline` border, padding `xl`.                                                                                                      |
+| Cards (brand) | Gradient bg, `rounded-hero`(32px), white text, padding `xxl`.                                                                                                          |
+| Modal/Dialog  | `rounded-xxl`(20px), optional top brand-color stripe.                                                                                                                  |
+| Loading       | Brand-color spinner + fade transition.                                                                                                                                 |
 
 ---
 
@@ -166,11 +173,11 @@ Via `NConfigProvider.themeOverrides`:
 
 Keep minimal — only functional feedback, no decorative motion.
 
-| Context | Animation |
-|---------|-----------|
-| Route transition | Fade + translateY(8px → 0), 200ms ease |
-| Card hover | Shadow elevation, 150ms ease |
-| Sidebar active bar | Slide transition, 150ms ease |
+| Context            | Animation                              |
+| ------------------ | -------------------------------------- |
+| Route transition   | Fade + translateY(8px → 0), 200ms ease |
+| Card hover         | Shadow elevation, 150ms ease           |
+| Sidebar active bar | Slide transition, 150ms ease           |
 
 ---
 
@@ -187,10 +194,12 @@ Keep minimal — only functional feedback, no decorative motion.
 ## 7. File Changes Overview
 
 ### New files:
+
 - `src/renderer/src/assets/tokens.css` — CSS custom properties
 - `src/renderer/src/components/layout/AppSidebar.vue` — self-built sidebar
 
 ### Major rewrites:
+
 - `src/renderer/src/App.vue` — new shell layout, NaiveUI theme config
 - `src/renderer/src/assets/main.css` — DM Sans import, global base
 - `src/renderer/src/assets/card.css` — token-based card utilities
@@ -204,9 +213,11 @@ Keep minimal — only functional feedback, no decorative motion.
 - `src/renderer/src/components/common/*.vue` — common components restyled
 
 ### Removed:
+
 - NaiveUI `NLayout`, `NLayoutSider`, `NMenu` usage (replaced by custom sidebar)
 
 ### Dependencies:
+
 - `@fontsource/dm-sans` — local font files, replaces Google Fonts CDN
 - Ionicons5 already installed
 
@@ -215,6 +226,7 @@ Keep minimal — only functional feedback, no decorative motion.
 ## 8. Implementation Phases
 
 ### P0 — Design Foundation
+
 - Install `@fontsource/dm-sans`
 - Create `tokens.css` with all CSS custom properties
 - Create `AppSidebar.vue` custom sidebar
@@ -223,16 +235,19 @@ Keep minimal — only functional feedback, no decorative motion.
 - **Verify**: sidebar navigation works, tokens apply, font loads
 
 ### P1 — First Page (InstalledList)
+
 - Rewrite `InstalledList.vue` with hero section + card list
 - Restyle related skill components
 - **Verify**: full visual review of one complete page
 
 ### P2 — Remaining Pages
+
 - Rewrite `SkillsSearch.vue`, `SkillDetail.vue`, `AgentView.vue`, `SettingsView.vue`, `EnvDetection.vue`
 - Restyle common components
 - **Verify**: each page independently
 
 ### P3 — Polish
+
 - Animation tuning
 - Edge cases and responsive checks
 - Final visual QA

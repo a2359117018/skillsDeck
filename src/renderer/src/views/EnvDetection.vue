@@ -34,36 +34,108 @@ async function handleInstallNode(): Promise<void> {
       <NSpin :show="envStore.checking">
         <NSpace vertical :size="20" class="env-checks">
           <div class="env-check-item">
-            <div class="env-check-icon" :class="{ success: envStore.status?.nodeInstalled, error: !envStore.status?.nodeInstalled }">
-              <svg v-if="envStore.status?.nodeInstalled" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M16.6666 5.00001L7.49998 14.1667L3.33331 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div
+              class="env-check-icon"
+              :class="{
+                success: envStore.status?.nodeInstalled,
+                error: !envStore.status?.nodeInstalled
+              }"
+            >
+              <svg
+                v-if="envStore.status?.nodeInstalled"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M16.6666 5.00001L7.49998 14.1667L3.33331 10"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
               <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M15 5L5 15M5 5L15 15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <NText class="env-check-text">Node.js {{ envStore.status?.nodeVersion || '' }}</NText>
           </div>
 
           <div class="env-check-item">
-            <div class="env-check-icon" :class="{ success: envStore.status?.npxInstalled, error: !envStore.status?.npxInstalled }">
-              <svg v-if="envStore.status?.npxInstalled" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M16.6666 5.00001L7.49998 14.1667L3.33331 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div
+              class="env-check-icon"
+              :class="{
+                success: envStore.status?.npxInstalled,
+                error: !envStore.status?.npxInstalled
+              }"
+            >
+              <svg
+                v-if="envStore.status?.npxInstalled"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M16.6666 5.00001L7.49998 14.1667L3.33331 10"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
               <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M15 5L5 15M5 5L15 15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <NText class="env-check-text">npx</NText>
           </div>
 
           <div class="env-check-item">
-            <div class="env-check-icon" :class="{ success: envStore.status?.skillsInstalled, error: !envStore.status?.skillsInstalled }">
-              <svg v-if="envStore.status?.skillsInstalled" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M16.6666 5.00001L7.49998 14.1667L3.33331 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div
+              class="env-check-icon"
+              :class="{
+                success: envStore.status?.skillsInstalled,
+                error: !envStore.status?.skillsInstalled
+              }"
+            >
+              <svg
+                v-if="envStore.status?.skillsInstalled"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M16.6666 5.00001L7.49998 14.1667L3.33331 10"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
               <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M15 5L5 15M5 5L15 15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <NText class="env-check-text">npx skills</NText>
@@ -110,7 +182,13 @@ async function handleInstallNode(): Promise<void> {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--color-brand-coral), var(--color-brand-blue), var(--color-brand-purple), var(--color-brand-magenta));
+  background: linear-gradient(
+    90deg,
+    var(--color-brand-coral),
+    var(--color-brand-blue),
+    var(--color-brand-purple),
+    var(--color-brand-magenta)
+  );
 }
 
 .env-checks {

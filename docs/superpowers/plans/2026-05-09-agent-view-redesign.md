@@ -13,9 +13,11 @@
 ## File Structure
 
 ### Modified files:
+
 - `src/renderer/src/views/AgentView.vue` — 全部改动集中在此文件，包括 template、script、style
 
 ### No new files needed.
+
 ### No test files (项目无组件测试体系).
 
 ---
@@ -23,11 +25,13 @@
 ## Task 1: 重写 Script 部分
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue:1-105` (script setup)
 
 - [ ] **Step 1: 替换整个 `<script setup>` 块**
 
 替换现有 script 为以下内容。主要变化：
+
 - 移除 `NTag` 导入（卡片不再使用 NTag）
 - 添加 `SearchOutline` 图标导入
 - 新增 `getAgentInitials` 函数
@@ -49,12 +53,7 @@ import {
   NInput,
   useMessage
 } from 'naive-ui'
-import {
-  FolderOpenOutline,
-  RefreshOutline,
-  TrashOutline,
-  SearchOutline
-} from '@vicons/ionicons5'
+import { FolderOpenOutline, RefreshOutline, TrashOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useConfirm } from '@renderer/composables/useConfirm'
 import type { AgentScanResult } from '../../../shared/types'
@@ -173,11 +172,13 @@ git commit -m "refactor(agent-view): update script section with new helpers and 
 ## Task 2: 重写 Template — Hero 区域 + 搜索栏 + 卡片网格
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue` (template 部分)
 
 - [ ] **Step 1: 替换 `<template>` 块**
 
 替换整个 template 为以下内容。关键变化：
+
 - 新增 hero 区域（渐变背景 + blob 装饰 + "Agent 管理" 标题）
 - 搜索栏改为药丸形 + 搜索图标前缀 + Agent 计数文字
 - 卡片改为浅色背景 + 2字符头像 + 信息行 + 始终可见的文件夹按钮
@@ -288,66 +289,71 @@ git commit -m "refactor(agent-view): update script section with new helpers and 
         <template #header>
           <span></span>
         </template>
-      <div v-if="selectedAgent" class="drawer-wrapper">
-        <div class="drawer-header" :class="['drawer-color-' + getAgentColorIndex(visibleAgentResults.findIndex(a => a.agentFlag === selectedAgent!.agentFlag))]">
-          <div class="drawer-header-content">
-            <div>
-              <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
-              <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
-            </div>
-            <NButton
-              size="small"
-              class="drawer-folder-btn"
-              @click="openAgentFolder(selectedAgent!)"
-            >
-              <template #icon>
-                <NIcon :size="16"><FolderOpenOutline /></NIcon>
-              </template>
-              打开文件夹
-            </NButton>
-          </div>
-        </div>
-        <NScrollbar class="drawer-scroll">
-          <div class="drawer-body">
-            <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-row">
-              <div class="skill-row-info">
-                <NText strong class="skill-row-name">{{ skillName }}</NText>
-                <NText depth="3" class="skill-row-path">
-                  {{ selectedAgent.globalPath.split(/[/\\]/).slice(-2).join('/') }}/{{ skillName }}
-                </NText>
+        <div v-if="selectedAgent" class="drawer-wrapper">
+          <div
+            class="drawer-header"
+            :class="['drawer-color-' + getAgentColorIndex(visibleAgentResults.findIndex(a => a.agentFlag === selectedAgent!.agentFlag))]"
+          >
+            <div class="drawer-header-content">
+              <div>
+                <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
+                <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
               </div>
-              <NSpace :size="8" align="center">
-                <NButton
-                  text
-                  size="small"
-                  type="primary"
-                  title="更新"
-                  :loading="updatingSkill === skillName"
-                  @click="handleUpdate(skillName)"
-                >
-                  <template #icon>
-                    <NIcon :size="16"><RefreshOutline /></NIcon>
-                  </template>
-                  更新
-                </NButton>
-                <NButton
-                  text
-                  size="small"
-                  type="error"
-                  title="删除"
-                  :loading="removingSkill === skillName"
-                  @click="handleRemove(skillName)"
-                >
-                  <template #icon>
-                    <NIcon :size="16"><TrashOutline /></NIcon>
-                  </template>
-                  删除
-                </NButton>
-              </NSpace>
+              <NButton
+                size="small"
+                class="drawer-folder-btn"
+                @click="openAgentFolder(selectedAgent!)"
+              >
+                <template #icon>
+                  <NIcon :size="16"><FolderOpenOutline /></NIcon>
+                </template>
+                打开文件夹
+              </NButton>
             </div>
           </div>
-        </NScrollbar>
-      </div>
+          <NScrollbar class="drawer-scroll">
+            <div class="drawer-body">
+              <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-row">
+                <div class="skill-row-info">
+                  <NText strong class="skill-row-name">{{ skillName }}</NText>
+                  <NText depth="3" class="skill-row-path">
+                    {{ selectedAgent.globalPath.split(/[/\\]/).slice(-2).join('/') }}/{{
+                      skillName
+                    }}
+                  </NText>
+                </div>
+                <NSpace :size="8" align="center">
+                  <NButton
+                    text
+                    size="small"
+                    type="primary"
+                    title="更新"
+                    :loading="updatingSkill === skillName"
+                    @click="handleUpdate(skillName)"
+                  >
+                    <template #icon>
+                      <NIcon :size="16"><RefreshOutline /></NIcon>
+                    </template>
+                    更新
+                  </NButton>
+                  <NButton
+                    text
+                    size="small"
+                    type="error"
+                    title="删除"
+                    :loading="removingSkill === skillName"
+                    @click="handleRemove(skillName)"
+                  >
+                    <template #icon>
+                      <NIcon :size="16"><TrashOutline /></NIcon>
+                    </template>
+                    删除
+                  </NButton>
+                </NSpace>
+              </div>
+            </div>
+          </NScrollbar>
+        </div>
       </NDrawerContent>
     </NDrawer>
   </div>
@@ -366,6 +372,7 @@ git commit -m "feat(agent-view): rewrite template with hero, search bar, cards, 
 ## Task 3: 重写 Style 部分
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue` (style 部分)
 
 - [ ] **Step 1: 替换 `<style scoped>` 块**
@@ -754,6 +761,7 @@ Expected: 无 AgentView 相关错误
 Run: `cd /e/ElectronProjects/npx-skills-ui && npm run dev`
 
 验证清单：
+
 - [ ] Hero 区域显示 "Agent 管理" + Agent 总数 + 刷新按钮
 - [ ] 搜索框为药丸形，带搜索图标前缀
 - [ ] 卡片显示浅色背景 + 2字符头像 + Agent 名称 + 技能数 + 文件夹按钮（始终可见）

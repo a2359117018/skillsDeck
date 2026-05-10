@@ -13,22 +13,26 @@
 ## File Structure
 
 ### New files:
+
 - `src/renderer/src/assets/tokens.css` — All CSS custom properties (colors, spacing, radius, shadow, typography)
 - `src/renderer/src/components/layout/AppSidebar.vue` — Self-built sidebar replacing NLayoutSider + NMenu
 
 ### Modified files (P0):
+
 - `src/renderer/src/App.vue` — Remove NLayout/NLayoutSider/NMenu, add AppSidebar, add theme overrides
 - `src/renderer/src/assets/main.css` — Font imports, tokens import, updated base styles
 - `src/renderer/src/assets/base.css` — Updated transition classes
 - `src/renderer/src/assets/card.css` — Replace hardcoded values with token references
 
 ### Modified files (P1):
+
 - `src/renderer/src/views/InstalledList.vue` — Hero section + card list redesign
 - `src/renderer/src/components/skills/SkillRow.vue` — Card-style list item
 - `src/renderer/src/components/skills/AgentTagBar.vue` — Pill filter restyle
 - `src/renderer/src/components/skills/SkillSearchBar.vue` — Pill input restyle
 
 ### Modified files (P2):
+
 - `src/renderer/src/views/SkillsSearch.vue` — Grid search results
 - `src/renderer/src/views/SkillDetail.vue` — Styled detail page
 - `src/renderer/src/views/AgentView.vue` — Gradient agent cards
@@ -40,6 +44,7 @@
 - `src/renderer/src/components/common/AppLoading.vue` — Brand spinner
 
 ### Removed (P0):
+
 - NaiveUI `NLayout`, `NLayoutSider`, `NMenu` imports in App.vue
 
 ---
@@ -49,11 +54,13 @@
 ### Task 1: Install Font Dependency
 
 **Files:**
+
 - Modify: `package.json` (via npm)
 
 - [ ] **Step 1: Install @fontsource/dm-sans**
 
 Run:
+
 ```bash
 cd /e/ElectronProjects/npx-skills-ui && npm install @fontsource/dm-sans
 ```
@@ -63,6 +70,7 @@ Expected: package.json updated, node_modules/@fontsource/dm-sans created.
 - [ ] **Step 2: Verify font files exist**
 
 Run:
+
 ```bash
 ls node_modules/@fontsource/dm-sans/ | head -20
 ```
@@ -81,6 +89,7 @@ git commit -m "chore: add @fontsource/dm-sans for offline font support"
 ### Task 2: Create Design Token System
 
 **Files:**
+
 - Create: `src/renderer/src/assets/tokens.css`
 
 - [ ] **Step 1: Create tokens.css**
@@ -188,6 +197,7 @@ git commit -m "chore: add @fontsource/dm-sans for offline font support"
 - [ ] **Step 2: Verify file syntax**
 
 Run:
+
 ```bash
 head -5 src/renderer/src/assets/tokens.css && echo "---" && grep -c "^\-\-color-" src/renderer/src/assets/tokens.css
 ```
@@ -206,6 +216,7 @@ git commit -m "feat: add design token system (CSS custom properties)"
 ### Task 3: Update Base Styles
 
 **Files:**
+
 - Modify: `src/renderer/src/assets/main.css`
 - Modify: `src/renderer/src/assets/base.css`
 
@@ -255,7 +266,9 @@ Replace the entire content of `src/renderer/src/assets/base.css`:
 /* Route transition */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity var(--transition-slow), transform var(--transition-slow);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
 }
 
 .fade-enter-from,
@@ -276,6 +289,7 @@ Replace the entire content of `src/renderer/src/assets/base.css`:
 The old `main.css` had no `@import './base.css'` — base transitions were in `base.css` loaded separately. Now all imports are consolidated in `main.css`. Check `main.ts` to see how CSS is loaded:
 
 Run:
+
 ```bash
 grep -n "import.*\.css" src/renderer/src/main.ts
 ```
@@ -285,6 +299,7 @@ If `main.ts` imports `base.css` separately, remove that import since transitions
 - [ ] **Step 4: Verify app starts**
 
 Run:
+
 ```bash
 npm run dev
 ```
@@ -303,11 +318,13 @@ git commit -m "feat: update base styles with DM Sans font and design tokens"
 ### Task 4: Create AppSidebar Component
 
 **Files:**
+
 - Create: `src/renderer/src/components/layout/AppSidebar.vue`
 
 - [ ] **Step 1: Create directory**
 
 Run:
+
 ```bash
 mkdir -p src/renderer/src/components/layout
 ```
@@ -319,12 +336,7 @@ mkdir -p src/renderer/src/components/layout
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
-import {
-  CubeOutline,
-  SearchOutline,
-  GitMergeOutline,
-  SettingsOutline
-} from '@vicons/ionicons5'
+import { CubeOutline, SearchOutline, GitMergeOutline, SettingsOutline } from '@vicons/ionicons5'
 
 const router = useRouter()
 const route = useRoute()
@@ -398,7 +410,12 @@ function navigate(key: string): void {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 85, 48, 0.15) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 85, 48, 0.15) 0%,
+    rgba(168, 85, 247, 0.1) 50%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -481,6 +498,7 @@ function navigate(key: string): void {
 - [ ] **Step 3: Verify component file exists**
 
 Run:
+
 ```bash
 ls -la src/renderer/src/components/layout/AppSidebar.vue
 ```
@@ -499,6 +517,7 @@ git commit -m "feat: create custom AppSidebar with icon-only nav and brand styli
 ### Task 5: Rewrite App.vue Shell
 
 **Files:**
+
 - Modify: `src/renderer/src/App.vue`
 
 - [ ] **Step 1: Rewrite App.vue**
@@ -603,11 +622,13 @@ The rewrite already removes `NLayout`, `NLayoutSider`, `NMenu`, `useRouter`, `us
 - [ ] **Step 3: Verify app runs with new shell**
 
 Run:
+
 ```bash
 npm run dev
 ```
 
 Expected:
+
 - Dark sidebar on left (60px wide) with icons
 - White content area on right
 - Sidebar icons navigate between routes
@@ -626,6 +647,7 @@ git commit -m "feat: rewrite App.vue shell with custom sidebar and NaiveUI theme
 ### Task 6: Update Card Styles with Tokens
 
 **Files:**
+
 - Modify: `src/renderer/src/assets/card.css`
 
 - [ ] **Step 1: Rewrite card.css with token references**
@@ -665,6 +687,7 @@ Replace the entire content of `src/renderer/src/assets/card.css`:
 - [ ] **Step 2: Verify no hardcoded color values remain**
 
 Run:
+
 ```bash
 grep -n '#' src/renderer/src/assets/card.css
 ```
@@ -685,6 +708,7 @@ git commit -m "feat: update card.css to use design token references"
 - [ ] **Step 1: Start the app**
 
 Run:
+
 ```bash
 npm run dev
 ```
@@ -713,6 +737,7 @@ npm run dev
 - [ ] **Step 6: Commit any hotfixes**
 
 If any issues found, fix and commit:
+
 ```bash
 git add -A
 git commit -m "fix: P0 visual verification hotfix"
@@ -725,6 +750,7 @@ git commit -m "fix: P0 visual verification hotfix"
 ### Task 8: Rewrite InstalledList.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/InstalledList.vue`
 
 **Before:** Read the current `InstalledList.vue` to understand the data bindings, store usage, and child components. The rewrite preserves all logic — only template and styles change.
@@ -732,6 +758,7 @@ git commit -m "fix: P0 visual verification hotfix"
 - [ ] **Step 1: Rewrite InstalledList.vue template and styles**
 
 Key changes:
+
 - Add hero banner section with gradient background (`brand-coral` → `brand-purple`)
 - Hero contains: title "我的技能", skill count badge, refresh/update-all buttons as white outline pills
 - Search bar: pill input `rounded-full`, search icon prefix, filtered count on right
@@ -740,6 +767,7 @@ Key changes:
 - Wrap in container with `max-width: 960px`, centered
 
 Template structure:
+
 ```html
 <div class="installed-page">
   <!-- Hero Section -->
@@ -789,6 +817,7 @@ Styles: Use tokens for all values. Hero gradient, pill inputs, card items.
 - [ ] **Step 2: Verify page renders with hero section**
 
 Run `npm run dev`, navigate to InstalledList. Check:
+
 - Gradient hero banner at top
 - White pill search bar below
 - Skill list items as cards
@@ -805,11 +834,13 @@ git commit -m "feat: redesign InstalledList with hero section and card list"
 ### Task 9: Restyle SkillRow.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SkillRow.vue`
 
 - [ ] **Step 1: Update SkillRow template and styles**
 
 Key changes:
+
 - Wrap in card container: `border-radius: var(--radius-lg)`, `border: 1px solid var(--color-hairline)`
 - Hover: `box-shadow: var(--shadow-2)`
 - Skill name: `font-weight: var(--weight-semibold)`, `font-size: var(--text-body-md)`
@@ -830,11 +861,13 @@ git commit -m "feat: restyle SkillRow as card-style list item"
 ### Task 10: Restyle AgentTagBar.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/AgentTagBar.vue`
 
 - [ ] **Step 1: Update AgentTagBar styles**
 
 Key changes:
+
 - Pills: `border-radius: var(--radius-full)`
 - Inactive: `background: var(--color-surface)`, `border: 1px solid var(--color-hairline)`
 - Active: `background: var(--color-primary)`, `color: white`
@@ -854,11 +887,13 @@ git commit -m "feat: restyle AgentTagBar with pill buttons and tokens"
 ### Task 11: Restyle SkillSearchBar.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SkillSearchBar.vue`
 
 - [ ] **Step 1: Update SkillSearchBar styles**
 
 Key changes:
+
 - Input: `border-radius: var(--radius-full)`, 40px height
 - Search icon prefix
 - Search button: `background: var(--color-primary)`, white text, `border-radius: var(--radius-full)`
@@ -879,6 +914,7 @@ git commit -m "feat: restyle SkillSearchBar as pill input"
 - [ ] **Step 1: Full visual review of InstalledList page**
 
 Run `npm run dev`, navigate to `/` (InstalledList). Check:
+
 - Hero gradient banner renders
 - Search bar is pill-shaped
 - Agent filter pills work (toggle agents, see active state)
@@ -904,6 +940,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 13: Rewrite SkillsSearch.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SkillsSearch.vue`
 
 - Centered large pill search bar (48px height)
@@ -916,6 +953,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 14: Restyle SearchResultCard.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SearchResultCard.vue`
 
 - White card, `rounded-xl`, `hairline` border
@@ -928,6 +966,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 15: Rewrite SkillDetail.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SkillDetail.vue`
 
 - Breadcrumb back navigation (← icon + text)
@@ -940,6 +979,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 16: Rewrite AgentView.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue`
 
 - Top: search input + refresh button
@@ -954,6 +994,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 17: Rewrite SettingsView.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue`
 
 - Centered form, `max-width: 480px`
@@ -966,6 +1007,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 18: Rewrite EnvDetection.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/EnvDetection.vue`
 
 - Centered card `rounded-xxl`(20px)
@@ -978,6 +1020,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 19: Restyle SkillInstallDialog.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SkillInstallDialog.vue`
 
 - Modal: `rounded-xxl`(20px) via NaiveUI theme override
@@ -989,6 +1032,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 20: Restyle CommandOutput.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/common/CommandOutput.vue`
 
 - Dark theme: `#1e1e1e` bg, `rounded-md`, subtle shadow
@@ -1000,6 +1044,7 @@ git commit -m "fix: P1 visual verification fixes for InstalledList"
 ### Task 21: Restyle AppLoading.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/components/common/AppLoading.vue`
 
 - Brand-color spinner (coral/purple gradient)

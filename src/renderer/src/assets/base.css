@@ -1,7 +1,9 @@
 /* Route transition */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity var(--transition-slow), transform var(--transition-slow);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
 }
 
 .fade-enter-from,
