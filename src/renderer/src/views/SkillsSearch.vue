@@ -70,6 +70,7 @@ function handleInstallComplete(): void {
 <style scoped>
 .search-page {
   max-width: 960px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   height: 100%;

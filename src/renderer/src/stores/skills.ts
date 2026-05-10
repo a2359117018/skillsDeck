@@ -150,6 +150,8 @@ export const useSkillsStore = defineStore('skills', () => {
 
   async function fetchInstalled(_global?: boolean): Promise<void> {
     void _global
+    installedCache.invalidate()
+    agentScanCache.invalidate()
     await Promise.all([installedCache.ensure(), agentScanCache.ensure()])
   }
 

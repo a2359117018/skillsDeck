@@ -15,13 +15,14 @@ const route = useRoute()
 interface NavItem {
   key: string
   icon: typeof CubeOutline
+  label: string
 }
 
 const navItems: NavItem[] = [
-  { key: 'installed', icon: CubeOutline },
-  { key: 'search', icon: SearchOutline },
-  { key: 'agent-view', icon: GitMergeOutline },
-  { key: 'settings', icon: SettingsOutline }
+  { key: 'installed', icon: CubeOutline, label: '已安装' },
+  { key: 'search', icon: SearchOutline, label: '搜索技能' },
+  { key: 'agent-view', icon: GitMergeOutline, label: 'Agent 管理' },
+  { key: 'settings', icon: SettingsOutline, label: '设置' }
 ]
 
 const dividers = new Set(['search', 'agent-view'])
@@ -46,7 +47,7 @@ function navigate(key: string): void {
           class="sidebar-item"
           :class="{ active: activeKey === item.key }"
           @click="navigate(item.key)"
-          :title="item.key"
+          :title="item.label"
         >
           <div class="active-bar"></div>
           <NIcon :size="20">
@@ -81,7 +82,7 @@ function navigate(key: string): void {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 85, 48, 0.15) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(20, 86, 240, 0.15) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -98,7 +99,7 @@ function navigate(key: string): void {
   width: 10px;
   height: 10px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-brand-coral), var(--color-brand-purple));
+  background: var(--color-brand-blue);
 }
 
 .sidebar-nav {

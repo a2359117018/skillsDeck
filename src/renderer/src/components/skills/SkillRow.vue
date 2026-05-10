@@ -107,12 +107,6 @@ const emit = defineEmits<{
 .skill-actions {
   display: flex;
   gap: var(--space-xxs);
-  opacity: 0;
-  transition: opacity var(--transition-base);
-}
-
-.skill-card:hover .skill-actions {
-  opacity: 1;
 }
 
 .action-btn {

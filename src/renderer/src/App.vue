@@ -41,6 +41,9 @@ const themeOverrides: GlobalThemeOverrides = {
   Modal: {
     borderRadius: '20px'
   },
+  Dialog: {
+    borderRadius: '16px'
+  },
   Select: {
     peers: {
       InternalSelection: {

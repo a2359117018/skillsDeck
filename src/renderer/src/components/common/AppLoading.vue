@@ -32,7 +32,7 @@ defineProps<{ show: boolean }>()
 
 .spinner-wrapper {
   padding: var(--space-xxl);
-  background: linear-gradient(135deg, var(--color-brand-coral), var(--color-brand-purple));
+  background: var(--color-brand-blue);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-3);
   animation: scaleIn var(--transition-base);

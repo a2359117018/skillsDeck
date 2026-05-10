@@ -7,7 +7,6 @@ import {
   NSpace,
   NButton,
   NIcon,
-  NScrollbar,
   NInput,
   useMessage
 } from 'naive-ui'
@@ -121,87 +120,75 @@ onMounted(() => skillsStore.fetchInstalled(true))
 <template>
   <div class="agent-page">
     <div class="container">
-      <!-- Hero Section -->
-      <div class="hero-section">
-        <div class="hero-content">
-          <h1 class="hero-title">
-            Agent 管理
-            <span class="hero-badge">{{ agentCount }}</span>
-          </h1>
-          <div class="hero-actions">
-            <NButton
-              text
-              class="hero-action-btn"
-              :loading="skillsStore.fetching"
-              @click="handleRefresh"
-            >
-              <template #icon>
-                <NIcon :size="18"><RefreshOutline /></NIcon>
-              </template>
-              刷新
-            </NButton>
-          </div>
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <h1 class="toolbar-title">
+          Agent 管理
+          <span class="toolbar-badge">{{ agentCount }}</span>
+        </h1>
+        <div class="toolbar-search">
+          <NInput
+            v-model:value="agentSearchKeyword"
+            placeholder="搜索 Agent..."
+            clearable
+            size="large"
+            class="toolbar-search-input"
+          >
+            <template #prefix>
+              <NIcon :size="18" :color="'var(--color-muted)'">
+                <SearchOutline />
+              </NIcon>
+            </template>
+          </NInput>
         </div>
-        <div class="hero-bg">
-          <div class="hero-blob hero-blob-1"></div>
-          <div class="hero-blob hero-blob-2"></div>
-          <div class="hero-blob hero-blob-3"></div>
+        <div class="toolbar-actions">
+          <NButton
+            secondary
+            size="small"
+            :loading="skillsStore.fetching"
+            @click="handleRefresh"
+          >
+            <template #icon>
+              <NIcon :size="16"><RefreshOutline /></NIcon>
+            </template>
+            刷新
+          </NButton>
         </div>
-      </div>
-
-      <!-- Search Section -->
-      <div class="search-section">
-        <NInput
-          v-model:value="agentSearchKeyword"
-          placeholder="搜索 Agent..."
-          clearable
-          size="large"
-          class="search-input"
-        >
-          <template #prefix>
-            <NIcon :size="18" :color="'var(--color-muted)'">
-              <SearchOutline />
-            </NIcon>
-          </template>
-        </NInput>
-        <NText class="search-count">{{ agentCount }} 个 Agent</NText>
       </div>
 
       <!-- Agent Grid -->
-      <NScrollbar class="agent-scroll">
-        <div v-if="visibleAgentResults.length > 0" class="agent-grid">
-          <div
-            v-for="(agent, index) in visibleAgentResults"
-            :key="agent.agentFlag"
-            class="agent-card"
-            :class="['color-' + getAgentColorIndex(index)]"
-            @click="openAgentCard(agent)"
-          >
-            <div class="agent-card-avatar">
-              {{ getAgentInitials(agent.agentName) }}
-            </div>
-            <div class="agent-card-name">
-              <NText strong>{{ agent.agentName }}</NText>
-            </div>
-            <div class="agent-card-info">
-              <NText depth="3">{{ agent.count }} 个技能</NText>
-              <NButton
-                size="tiny"
-                quaternary
-                circle
-                title="打开技能文件夹"
-                class="agent-folder-btn"
-                @click="openAgentFolder(agent, $event)"
-              >
-                <template #icon>
-                  <NIcon :size="14"><FolderOpenOutline /></NIcon>
-                </template>
-              </NButton>
-            </div>
+      <div v-if="visibleAgentResults.length > 0" class="agent-grid">
+        <div
+          v-for="(agent, index) in visibleAgentResults"
+          :key="agent.agentFlag"
+          class="agent-card"
+          :class="['color-' + getAgentColorIndex(index)]"
+          @click="openAgentCard(agent)"
+        >
+          <div class="agent-card-avatar">
+            {{ getAgentInitials(agent.agentName) }}
+          </div>
+          <div class="agent-card-name">
+            <NText strong>{{ agent.agentName }}</NText>
+          </div>
+          <div class="agent-card-info">
+            <NText depth="3">{{ agent.count }} 个技能</NText>
+            <NButton
+              size="tiny"
+              quaternary
+              circle
+              title="打开技能文件夹"
+              class="agent-folder-btn"
+              @click="openAgentFolder(agent, $event)"
+            >
+              <template #icon>
+                <NIcon :size="14"><FolderOpenOutline /></NIcon>
+              </template>
+            </NButton>
           </div>
         </div>
-        <NEmpty v-else description="暂无已安装的 Agent" class="empty-state" />
-      </NScrollbar>
+      </div>
+      <NEmpty v-else description="暂无已安装的 Agent" class="empty-state" />
     </div>
 
     <!-- Drawer -->
@@ -209,7 +196,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
       :show="drawerVisible"
       :width="500"
       placement="right"
-      :native-scrollbar="false"
       @update:show="
         (val: boolean) => {
           if (!val) closeDrawer()
@@ -218,25 +204,15 @@ onMounted(() => skillsStore.fetchInstalled(true))
       @mask-click="closeDrawer"
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
-        <div
-          class="drawer-header"
-          :class="[
-            'drawer-color-' +
-              getAgentColorIndex(
-                visibleAgentResults.findIndex(
-                  (a) => a.agentFlag === selectedAgent!.agentFlag
-                )
-              )
-          ]"
-        >
+        <div class="drawer-header">
           <div class="drawer-header-content">
             <div>
               <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
               <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
             </div>
             <NButton
+              secondary
               size="small"
-              class="drawer-folder-btn"
               @click="openAgentFolder(selectedAgent!)"
             >
               <template #icon>
@@ -247,59 +223,49 @@ onMounted(() => skillsStore.fetchInstalled(true))
           </div>
           <NButton quaternary circle class="drawer-close-btn" @click="closeDrawer">
             <template #icon>
-              <NIcon :size="20" color="white"><CloseOutline /></NIcon>
+              <NIcon :size="20"><CloseOutline /></NIcon>
             </template>
           </NButton>
         </div>
-        <NScrollbar class="drawer-scroll">
-          <div class="drawer-body">
-            <div
-              v-for="skillName in selectedAgent.skills"
-              :key="skillName"
-              class="skill-row"
-            >
-              <div class="skill-row-info">
-                <NText strong class="skill-row-name">{{ skillName }}</NText>
-                <NText depth="3" class="skill-row-path">
-                  {{
-                    selectedAgent.globalPath
-                      .split(/[/\\]/)
-                      .slice(-2)
-                      .join('/')
-                  }}/{{ skillName }}
-                </NText>
-              </div>
-              <NSpace :size="8" align="center">
-                <NButton
-                  text
-                  size="small"
-                  type="primary"
-                  title="更新"
-                  :loading="updatingSkill === skillName"
-                  @click="handleUpdate(skillName)"
-                >
-                  <template #icon>
-                    <NIcon :size="16"><RefreshOutline /></NIcon>
-                  </template>
-                  更新
-                </NButton>
-                <NButton
-                  text
-                  size="small"
-                  type="error"
-                  title="删除"
-                  :loading="removingSkill === skillName"
-                  @click="handleRemove(skillName)"
-                >
-                  <template #icon>
-                    <NIcon :size="16"><TrashOutline /></NIcon>
-                  </template>
-                  删除
-                </NButton>
-              </NSpace>
+        <div class="drawer-body">
+          <div
+            v-for="skillName in selectedAgent.skills"
+            :key="skillName"
+            class="skill-row"
+          >
+            <div class="skill-row-info">
+              <NText strong class="skill-row-name">{{ skillName }}</NText>
             </div>
+            <NSpace :size="8" align="center">
+              <NButton
+                text
+                size="small"
+                type="primary"
+                title="更新"
+                :loading="updatingSkill === skillName"
+                @click="handleUpdate(skillName)"
+              >
+                <template #icon>
+                  <NIcon :size="16"><RefreshOutline /></NIcon>
+                </template>
+                更新
+              </NButton>
+              <NButton
+                text
+                size="small"
+                type="error"
+                title="删除"
+                :loading="removingSkill === skillName"
+                @click="handleRemove(skillName)"
+              >
+                <template #icon>
+                  <NIcon :size="16"><TrashOutline /></NIcon>
+                </template>
+                删除
+              </NButton>
+            </NSpace>
           </div>
-        </NScrollbar>
+        </div>
       </div>
     </NDrawer>
   </div>
@@ -316,138 +282,52 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .container {
   max-width: 960px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--space-xl) * 2);
 }
 
-/* Hero Section */
-.hero-section {
-  position: relative;
-  background: linear-gradient(135deg, var(--color-brand-coral), var(--color-brand-purple));
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl) var(--space-xxl);
-  margin-bottom: var(--space-xl);
-  overflow: hidden;
-  color: white;
-  flex-shrink: 0;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-lg);
-}
-
-.hero-title {
-  font-size: var(--text-heading-lg);
-  font-weight: var(--weight-bold);
-  margin: 0;
+/* Toolbar */
+.toolbar {
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
-.hero-badge {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  padding: var(--space-xxs) var(--space-sm);
+.toolbar-title {
+  font-size: var(--text-heading-lg);
+  font-weight: var(--weight-bold);
+  margin: 0;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  white-space: nowrap;
+}
+
+.toolbar-badge {
+  background: var(--color-brand-blue);
+  color: white;
+  padding: 2px 10px;
   border-radius: var(--radius-full);
   font-size: var(--text-body-sm);
   font-weight: var(--weight-semibold);
 }
 
-.hero-actions {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.hero-action-btn {
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: var(--radius-full);
-  padding: var(--space-xxs) var(--space-md);
-  font-size: var(--text-body-sm);
-  font-weight: var(--weight-medium);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all var(--transition-base);
-}
-
-.hero-action-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.hero-blob {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-  filter: blur(40px);
-}
-
-.hero-blob-1 {
-  width: 200px;
-  height: 200px;
-  top: -50px;
-  right: -50px;
-}
-
-.hero-blob-2 {
-  width: 150px;
-  height: 150px;
-  bottom: -30px;
-  left: 20%;
-}
-
-.hero-blob-3 {
-  width: 100px;
-  height: 100px;
-  top: 50%;
-  right: 30%;
-}
-
-/* Search Section */
-.search-section {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-  flex-shrink: 0;
-}
-
-.search-input {
+.toolbar-search {
   flex: 1;
 }
 
-.search-input :deep(.n-input) {
+.toolbar-search-input :deep(.n-input) {
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid var(--color-hairline);
 }
 
-.search-count {
-  color: var(--color-stone);
-  font-size: var(--text-body-sm);
-  white-space: nowrap;
+.toolbar-actions {
+  display: flex;
+  gap: var(--space-sm);
 }
 
 /* Agent Grid */
-.agent-scroll {
-  flex: 1;
-  min-height: 0;
-}
-
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -577,12 +457,14 @@ onMounted(() => skillsStore.fetchInstalled(true))
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: white;
 }
 
 /* Drawer Header */
 .drawer-header {
-  padding: var(--space-xl) var(--space-xxl);
-  color: white;
+  padding: var(--space-lg) var(--space-xxl);
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-hairline);
   position: relative;
   flex-shrink: 0;
 }
@@ -596,72 +478,25 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .drawer-header-name {
   font-size: var(--text-heading-lg);
   font-weight: var(--weight-bold);
+  color: var(--color-ink);
 }
 
 .drawer-header-count {
   font-size: var(--text-body-sm);
-  opacity: 0.9;
+  color: var(--color-stone);
   margin-top: var(--space-xxs);
-}
-
-.drawer-folder-btn {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  border-radius: var(--radius-full) !important;
-  color: white !important;
-  padding: var(--space-xxs) var(--space-md) !important;
-  font-size: var(--text-body-sm);
-  transition: all var(--transition-base);
-}
-
-.drawer-folder-btn:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .drawer-close-btn {
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
-  color: white;
 }
 
-/* Drawer Header Colors */
-.drawer-header.drawer-color-0 {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-coral),
-    var(--color-brand-coral-light)
-  );
-}
-.drawer-header.drawer-color-1 {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-blue),
-    var(--color-brand-blue-200)
-  );
-}
-.drawer-header.drawer-color-2 {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-magenta),
-    var(--color-brand-magenta-light)
-  );
-}
-.drawer-header.drawer-color-3 {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-purple),
-    var(--color-brand-magenta)
-  );
-}
-
-/* Drawer Scroll */
-.drawer-scroll {
-  flex: 1;
-  min-height: 0;
-}
-
+/* Drawer Body */
 .drawer-body {
+  flex: 1;
+  overflow-y: auto;
   padding: var(--space-lg);
 }
 
@@ -690,11 +525,12 @@ onMounted(() => skillsStore.fetchInstalled(true))
   color: var(--color-ink);
 }
 
-.skill-row-path {
-  font-size: var(--text-caption);
-  color: var(--color-stone);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+</style>
+
+<style>
+/* NDrawer teleports to body, so scoped styles can't reach it */
+.n-drawer {
+  background-color: transparent !important;
+  border-radius: 0 !important;
 }
 </style>
