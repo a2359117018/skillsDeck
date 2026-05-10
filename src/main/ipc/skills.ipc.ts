@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import type { CommandErrorInfo } from '../../shared/types'
 import { npxService } from '../services/NpxService'
+import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'
 import { searchSkillsApi } from '../api/skills'
 
@@ -26,9 +27,9 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     }
   })
 
-  ipcMain.handle('skills:list', async (_, opts?: { global?: boolean }) => {
+  ipcMain.handle('skills:list', async () => {
     try {
-      return { ok: true, data: await npxService.list(opts?.global) }
+      return { ok: true, data: await agentScanner.scanInstalled() }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
     }
