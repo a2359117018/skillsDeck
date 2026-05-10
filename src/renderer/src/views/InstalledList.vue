@@ -117,12 +117,7 @@ function handleFilterAgent(agentFlag: string): void {
           </NInput>
         </div>
         <div class="toolbar-actions">
-          <NButton
-            secondary
-            size="small"
-            :loading="skillsStore.fetching"
-            @click="handleRefresh"
-          >
+          <NButton secondary size="small" :loading="skillsStore.fetching" @click="handleRefresh">
             <template #icon>
               <NIcon :size="16"><RefreshOutline /></NIcon>
             </template>
@@ -144,7 +139,10 @@ function handleFilterAgent(agentFlag: string): void {
       <AgentTagBar />
 
       <!-- Skill List -->
-      <div v-if="skillsStore.fetching && skillsStore.filteredSkills.length === 0" class="page-loading">
+      <div
+        v-if="skillsStore.fetching && skillsStore.filteredSkills.length === 0"
+        class="page-loading"
+      >
         <NSpin size="large" />
       </div>
       <div v-else-if="skillsStore.filteredSkills.length > 0" class="skill-list">

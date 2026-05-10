@@ -73,7 +73,12 @@ async function handleInstallClick(): Promise<void> {
     </div>
 
     <div class="detail-actions">
-      <NButton size="medium" round class="action-btn action-btn-primary" @click="handleInstallClick">
+      <NButton
+        size="medium"
+        round
+        class="action-btn action-btn-primary"
+        @click="handleInstallClick"
+      >
         安装到...
       </NButton>
       <NButton

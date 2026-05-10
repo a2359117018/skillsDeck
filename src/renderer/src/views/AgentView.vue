@@ -1,16 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import {
-  NDrawer,
-  NEmpty,
-  NText,
-  NSpace,
-  NButton,
-  NIcon,
-  NInput,
-  NSpin,
-  useMessage
-} from 'naive-ui'
+import { NDrawer, NEmpty, NText, NSpace, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
 import {
   FolderOpenOutline,
   RefreshOutline,
@@ -143,12 +133,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
           </NInput>
         </div>
         <div class="toolbar-actions">
-          <NButton
-            secondary
-            size="small"
-            :loading="skillsStore.fetching"
-            @click="handleRefresh"
-          >
+          <NButton secondary size="small" :loading="skillsStore.fetching" @click="handleRefresh">
             <template #icon>
               <NIcon :size="16"><RefreshOutline /></NIcon>
             </template>
@@ -214,11 +199,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
               <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
               <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
             </div>
-            <NButton
-              secondary
-              size="small"
-              @click="openAgentFolder(selectedAgent!)"
-            >
+            <NButton secondary size="small" @click="openAgentFolder(selectedAgent!)">
               <template #icon>
                 <NIcon :size="16"><FolderOpenOutline /></NIcon>
               </template>
@@ -232,11 +213,7 @@ onMounted(() => skillsStore.fetchInstalled(true))
           </NButton>
         </div>
         <div class="drawer-body">
-          <div
-            v-for="skillName in selectedAgent.skills"
-            :key="skillName"
-            class="skill-row"
-          >
+          <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-row">
             <div class="skill-row-info">
               <NText strong class="skill-row-name">{{ skillName }}</NText>
             </div>
@@ -375,7 +352,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   border-color: #ffe0d6;
 }
 .agent-card.color-0:hover {
-  box-shadow: var(--shadow-3), 0 0 20px rgba(255, 85, 48, 0.12);
+  box-shadow:
+    var(--shadow-3),
+    0 0 20px rgba(255, 85, 48, 0.12);
 }
 .agent-card.color-0 .agent-card-avatar {
   background: var(--color-brand-coral);
@@ -389,7 +368,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   border-color: #dbeafe;
 }
 .agent-card.color-1:hover {
-  box-shadow: var(--shadow-3), 0 0 20px rgba(20, 86, 240, 0.12);
+  box-shadow:
+    var(--shadow-3),
+    0 0 20px rgba(20, 86, 240, 0.12);
 }
 .agent-card.color-1 .agent-card-avatar {
   background: var(--color-brand-blue);
@@ -403,7 +384,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   border-color: #fce7f3;
 }
 .agent-card.color-2:hover {
-  box-shadow: var(--shadow-3), 0 0 20px rgba(234, 94, 193, 0.12);
+  box-shadow:
+    var(--shadow-3),
+    0 0 20px rgba(234, 94, 193, 0.12);
 }
 .agent-card.color-2 .agent-card-avatar {
   background: var(--color-brand-magenta);
@@ -417,7 +400,9 @@ onMounted(() => skillsStore.fetchInstalled(true))
   border-color: #f3e8ff;
 }
 .agent-card.color-3:hover {
-  box-shadow: var(--shadow-3), 0 0 20px rgba(168, 85, 247, 0.12);
+  box-shadow:
+    var(--shadow-3),
+    0 0 20px rgba(168, 85, 247, 0.12);
 }
 .agent-card.color-3 .agent-card-avatar {
   background: var(--color-brand-purple);
@@ -535,7 +520,6 @@ onMounted(() => skillsStore.fetchInstalled(true))
 .skill-row-name {
   color: var(--color-ink);
 }
-
 </style>
 
 <style>
