@@ -61,7 +61,7 @@ function handleInstallComplete(): void {
     </div>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
-      :package-ref="selectedPackage"
+      :source="selectedPackage"
       @complete="handleInstallComplete"
     />
   </div>

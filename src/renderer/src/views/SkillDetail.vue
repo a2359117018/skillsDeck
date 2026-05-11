@@ -107,7 +107,7 @@ async function handleInstallClick(): Promise<void> {
 
     <SkillInstallDialog
       v-model:show="showInstallDialog"
-      :package-ref="packageRef"
+      :source="packageRef"
       @complete="operationOutput = ''"
     />
   </div>

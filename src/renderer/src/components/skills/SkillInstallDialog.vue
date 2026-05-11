@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import {
   NModal,
   NCard,
@@ -12,14 +12,15 @@ import {
   NText,
   NTag,
   NIcon,
+  NProgress,
   NScrollbar,
   useMessage
 } from 'naive-ui'
-import { DownloadOutline, CloseOutline } from '@vicons/ionicons5'
+import { DownloadOutline, CloseOutline, CheckmarkCircle, CloseCircle } from '@vicons/ionicons5'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import { useSkillsStore } from '../../stores/skills'
 
-const props = defineProps<{ show: boolean; packageRef: string }>()
+const props = defineProps<{ show: boolean; source: string }>()
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'complete'): void
@@ -32,9 +33,8 @@ const isGlobal = ref(false)
 const selectedAgents = ref<string[]>([])
 const filterText = ref('')
 const installing = ref(false)
+const installStatus = ref<'idle' | 'installing' | 'success' | 'failed'>('idle')
 const commandOutput = ref('')
-const commandDone = ref(false)
-const scrollbarRef = ref<InstanceType<typeof NScrollbar> | null>(null)
 
 const commonAgents = getCommonAgents()
 
@@ -96,26 +96,9 @@ function goBack(): void {
 
 let removeOutputListener: (() => void) | null = null
 
-watch(commandOutput, async () => {
-  await nextTick()
-  try {
-    if (scrollbarRef.value) {
-      const el = scrollbarRef.value.$el
-      const wrapEl = (el instanceof HTMLElement ? el : el?.$el)?.querySelector(
-        '.n-scrollbar-container'
-      ) as HTMLElement | null
-      if (wrapEl) {
-        wrapEl.scrollTop = wrapEl.scrollHeight
-      }
-    }
-  } catch {
-    // scroll error ignored
-  }
-})
-
 async function handleInstall(): Promise<void> {
   installing.value = true
-  commandDone.value = false
+  installStatus.value = 'installing'
   commandOutput.value = ''
 
   removeOutputListener = window.api.skills.onInstallOutput((text) => {
@@ -124,20 +107,23 @@ async function handleInstall(): Promise<void> {
 
   try {
     const result = await skillsStore.installStreaming(
-      props.packageRef,
+      props.source,
       selectedAgents.value,
       isGlobal.value
     )
-    commandDone.value = true
     if (result.success) {
-      message.success('安装成功')
+      installStatus.value = 'success'
+      setTimeout(() => {
+        emit('update:show', false)
+        emit('complete')
+      }, 1500)
     } else {
-      message.error('安装失败')
+      installStatus.value = 'failed'
     }
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
     commandOutput.value += errMsg
-    commandDone.value = true
+    installStatus.value = 'failed'
     message.error('安装失败: ' + errMsg)
   } finally {
     installing.value = false
@@ -151,7 +137,7 @@ async function handleInstall(): Promise<void> {
 async function handleCancelInstall(): Promise<void> {
   await window.api.skills.cancelInstall()
   commandOutput.value += '\n安装已取消'
-  commandDone.value = true
+  installStatus.value = 'failed'
   installing.value = false
   if (removeOutputListener) {
     removeOutputListener()
@@ -162,7 +148,12 @@ async function handleCancelInstall(): Promise<void> {
 function handleClose(): void {
   if (installing.value) return
   emit('update:show', false)
-  if (commandDone.value) emit('complete')
+  if (installStatus.value === 'success') emit('complete')
+}
+
+function handleRetry(): void {
+  installStatus.value = 'idle'
+  commandOutput.value = ''
 }
 
 function resetState(): void {
@@ -171,8 +162,8 @@ function resetState(): void {
   selectedAgents.value = []
   filterText.value = ''
   installing.value = false
+  installStatus.value = 'idle'
   commandOutput.value = ''
-  commandDone.value = false
 }
 
 onUnmounted(() => {
@@ -180,6 +171,11 @@ onUnmounted(() => {
     removeOutputListener()
     removeOutputListener = null
   }
+})
+
+const failedLogLines = computed(() => {
+  if (!commandOutput.value) return []
+  return commandOutput.value.split('\n').slice(-30)
 })
 </script>
 
@@ -192,7 +188,7 @@ onUnmounted(() => {
   >
     <NCard title="安装技能" style="width: 620px">
       <NText
-        >安装: <strong>{{ packageRef }}</strong></NText
+        >安装: <strong>{{ source }}</strong></NText
       >
 
       <NSteps :current="currentStep" style="margin-top: var(--space-md)" size="small">
@@ -200,6 +196,7 @@ onUnmounted(() => {
         <NStep title="确认安装" />
       </NSteps>
 
+      <!-- Step 1: Agent selection (unchanged) -->
       <div v-if="currentStep === 1" style="margin-top: var(--space-md)">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
           全局安装（不指定 agent）
@@ -259,6 +256,7 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- Step 2: Confirm and progress -->
       <div v-if="currentStep === 2" style="margin-top: var(--space-md)">
         <div class="confirm-row">
           <NText depth="3">安装模式: </NText>
@@ -273,25 +271,45 @@ onUnmounted(() => {
           </NSpace>
         </div>
 
-        <div v-if="commandOutput || installing" class="install-terminal">
-          <NScrollbar ref="scrollbarRef" style="max-height: 240px">
-            <pre
-              class="terminal-content">{{ commandOutput }}<span v-if="installing" class="cursor-blink">▌</span></pre>
-          </NScrollbar>
+        <!-- Installing state -->
+        <div v-if="installStatus === 'installing'" class="install-progress">
+          <NProgress type="line" :percentage="100" :show-indicator="false" status="default" processing />
+          <NText>正在安装中，请稍候...</NText>
+        </div>
+
+        <!-- Success state -->
+        <div v-else-if="installStatus === 'success'" class="install-result install-result--success">
+          <NIcon :size="48" color="#18a058"><CheckmarkCircle /></NIcon>
+          <NText type="success">安装成功</NText>
+        </div>
+
+        <!-- Failed state -->
+        <div v-else-if="installStatus === 'failed'" class="install-result install-result--failed">
+          <NIcon :size="48" color="#d03050"><CloseCircle /></NIcon>
+          <NText type="error">安装失败</NText>
+          <div v-if="commandOutput" class="failed-log">
+            <NScrollbar style="max-height: 200px">
+              <pre class="terminal-content">{{ failedLogLines.join('\n') }}</pre>
+            </NScrollbar>
+          </div>
         </div>
       </div>
 
       <template #footer>
         <NSpace justify="end">
           <NButton v-if="currentStep === 1" @click="handleClose">取消</NButton>
-          <NButton v-if="currentStep === 2 && !commandDone" :disabled="installing" @click="goBack">
+          <NButton
+            v-if="currentStep === 2 && installStatus === 'idle'"
+            :disabled="installing"
+            @click="goBack"
+          >
             上一步
           </NButton>
           <NButton v-if="currentStep === 1" type="primary" :disabled="!canGoNext" @click="goNext">
             下一步
           </NButton>
           <NButton
-            v-if="currentStep === 2 && !commandDone && !installing"
+            v-if="currentStep === 2 && installStatus === 'idle' && !installing"
             type="primary"
             @click="handleInstall"
           >
@@ -300,13 +318,21 @@ onUnmounted(() => {
             </template>
             确认安装
           </NButton>
-          <NButton v-if="installing" type="warning" @click="handleCancelInstall">
+          <NButton v-if="installStatus === 'installing'" type="warning" @click="handleCancelInstall">
             <template #icon>
               <NIcon :size="16"><CloseOutline /></NIcon>
             </template>
             取消安装
           </NButton>
-          <NButton v-if="commandDone" type="primary" @click="handleClose"> 完成 </NButton>
+          <NButton v-if="installStatus === 'failed'" type="primary" @click="handleRetry">
+            重试
+          </NButton>
+          <NButton
+            v-if="installStatus === 'failed' || installStatus === 'success'"
+            @click="handleClose"
+          >
+            关闭
+          </NButton>
         </NSpace>
       </template>
     </NCard>
@@ -357,11 +383,36 @@ onUnmounted(() => {
   margin-bottom: var(--space-md);
 }
 
-.install-terminal {
+.install-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) 0;
+}
+
+.install-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) 0;
+}
+
+.install-result--success {
+  color: #18a058;
+}
+
+.install-result--failed {
+  color: #d03050;
+}
+
+.failed-log {
+  width: 100%;
+  margin-top: var(--space-md);
   background: #1e1e1e;
   border-radius: var(--radius-md);
   padding: var(--space-xs);
-  box-shadow: var(--shadow-1);
 }
 
 .terminal-content {
@@ -373,15 +424,5 @@ onUnmounted(() => {
   word-break: break-all;
   margin: 0;
   padding: var(--space-sm) var(--space-md);
-}
-
-.cursor-blink {
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
 }
 </style>
