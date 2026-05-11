@@ -5,11 +5,13 @@ import { useCachedResource } from '../composables/useCachedResource'
 export const useSettingsStore = defineStore('settings', () => {
   const settingsCache = useCachedResource(() => window.api.store.getSettings(), {
     defaultAgent: 'claude-code',
-    autoCheckEnv: true
+    autoCheckEnv: true,
+    proxyUrl: ''
   })
 
   const defaultAgent = ref('claude-code')
   const autoCheckEnv = ref(true)
+  const proxyUrl = ref('')
   const error = ref<string | null>(null)
   const fetching = computed(() => settingsCache.loading.value)
   const loading = fetching
@@ -19,13 +21,14 @@ export const useSettingsStore = defineStore('settings', () => {
       const data = await settingsCache.ensure()
       defaultAgent.value = data.defaultAgent
       autoCheckEnv.value = data.autoCheckEnv
+      proxyUrl.value = data.proxyUrl || ''
       error.value = null
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load settings'
     }
   }
 
-  async function save(partial: { defaultAgent?: string; autoCheckEnv?: boolean }): Promise<void> {
+  async function save(partial: { defaultAgent?: string; autoCheckEnv?: boolean; proxyUrl?: string }): Promise<void> {
     try {
       await window.api.store.setSettings(partial)
       settingsCache.invalidate()
@@ -37,5 +40,5 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  return { defaultAgent, autoCheckEnv, loading, fetching, error, load, save }
+  return { defaultAgent, autoCheckEnv, proxyUrl, loading, fetching, error, load, save }
 })

@@ -126,7 +126,7 @@ export const useSkillsStore = defineStore('skills', () => {
   }
 
   async function doInstall(
-    packageRef: string,
+    source: string,
     agents: string[],
     isGlobal: boolean,
     streaming: boolean
@@ -134,7 +134,7 @@ export const useSkillsStore = defineStore('skills', () => {
     installing.value = true
     error.value = null
     try {
-      const opts = { source: packageRef, agents: [...agents], global: isGlobal }
+      const opts = { source, agents: [...agents], global: isGlobal }
       const result = streaming
         ? await window.api.skills.installStreaming(opts)
         : await window.api.skills.install(opts)
@@ -150,19 +150,19 @@ export const useSkillsStore = defineStore('skills', () => {
   }
 
   async function install(
-    packageRef: string,
+    source: string,
     agents: string[],
     isGlobal: boolean
   ): Promise<CommandResult> {
-    return doInstall(packageRef, agents, isGlobal, false)
+    return doInstall(source, agents, isGlobal, false)
   }
 
   async function installStreaming(
-    packageRef: string,
+    source: string,
     agents: string[],
     isGlobal: boolean
   ): Promise<CommandResult> {
-    return doInstall(packageRef, agents, isGlobal, true)
+    return doInstall(source, agents, isGlobal, true)
   }
 
   async function update(packageRef: string, global?: boolean): Promise<CommandResult> {
