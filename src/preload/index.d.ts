@@ -16,12 +16,12 @@ export interface AppApi {
     search: (keyword: string) => Promise<IpcResult<SkillSearchResponse>>
     list: () => Promise<IpcResult<InstalledSkill[]>>
     install: (opts: {
-      packageRef: string
+      source: string
       agents: string[]
       global?: boolean
     }) => Promise<IpcResult<CommandResult>>
     installStreaming: (opts: {
-      packageRef: string
+      source: string
       agents: string[]
       global?: boolean
     }) => Promise<IpcResult<CommandResult>>

@@ -5,10 +5,10 @@ const api = {
   skills: {
     search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
     list: (): Promise<unknown[]> => ipcRenderer.invoke('skills:list'),
-    install: (opts: { packageRef: string; agents: string[]; global?: boolean }): Promise<unknown> =>
+    install: (opts: { source: string; agents: string[]; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:install', opts),
     installStreaming: (opts: {
-      packageRef: string
+      source: string
       agents: string[]
       global?: boolean
     }): Promise<unknown> => ipcRenderer.invoke('skills:install-streaming', opts),

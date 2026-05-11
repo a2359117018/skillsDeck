@@ -134,7 +134,7 @@ export const useSkillsStore = defineStore('skills', () => {
     installing.value = true
     error.value = null
     try {
-      const opts = { packageRef, agents: [...agents], global: isGlobal }
+      const opts = { source: packageRef, agents: [...agents], global: isGlobal }
       const result = streaming
         ? await window.api.skills.installStreaming(opts)
         : await window.api.skills.install(opts)

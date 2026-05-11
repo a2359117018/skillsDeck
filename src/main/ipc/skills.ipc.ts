@@ -37,11 +37,11 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
   ipcMain.handle(
     'skills:install',
-    async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
+    async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
       try {
         return {
           ok: true,
-          data: await npxService.install(opts.packageRef, opts.agents, opts.global)
+          data: await npxService.install(opts.source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -51,7 +51,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
   ipcMain.handle(
     'skills:install-streaming',
-    async (_, opts: { packageRef: string; agents: string[]; global?: boolean }) => {
+    async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
       const mainWindow = getMainWindow()
       if (!mainWindow) {
         return {
@@ -74,7 +74,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
           ok: true,
           data: await npxService.installStreaming(
             onOutput,
-            opts.packageRef,
+            opts.source,
             opts.agents,
             opts.global
           )
