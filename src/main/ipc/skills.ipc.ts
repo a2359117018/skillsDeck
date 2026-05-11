@@ -72,12 +72,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         }
         return {
           ok: true,
-          data: await npxService.installStreaming(
-            onOutput,
-            opts.source,
-            opts.agents,
-            opts.global
-          )
+          data: await npxService.installStreaming(onOutput, opts.source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }

@@ -19,8 +19,8 @@ Replace `npxService.list()` (which calls `npx skills list --json`) with `AgentSc
 // src/shared/types.ts
 
 export interface InstalledSkillAgent {
-  name: string   // agentFlag, e.g. 'trae', 'claude-code'
-  path: string   // absolute path to this skill under the agent's skills dir
+  name: string // agentFlag, e.g. 'trae', 'claude-code'
+  path: string // absolute path to this skill under the agent's skills dir
 }
 
 export interface InstalledSkill {
@@ -115,9 +115,7 @@ list: () => Promise<IpcResult<InstalledSkill[]>>
 - Remove `enrichedSkills` computed — no longer needed since scanning is accurate
 - Update `filteredSkills` to use `agent.name` instead of raw agent string:
   ```typescript
-  skills = skills.filter((s) =>
-    s.agents.some((a) => lowered.includes(a.name.toLowerCase()))
-  )
+  skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.name.toLowerCase())))
   ```
 - `AgentTagBar` continues to use `sortedAgentResults` from `AgentScanResult[]` — unchanged
 

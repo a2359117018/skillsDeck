@@ -22,7 +22,7 @@
 export interface AppSettings {
   defaultAgent: string
   autoCheckEnv: boolean
-  proxyUrl?: string  // 空字符串或 undefined 表示不使用代理
+  proxyUrl?: string // 空字符串或 undefined 表示不使用代理
 }
 ```
 
@@ -40,16 +40,17 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 新增一行设置项"GitHub 代理"，使用 `NSelect`：
 
-| 选项 | 值 |
-|------|-----|
-| 不使用代理 | `''` |
-| gh-proxy.org | `https://gh-proxy.org` |
-| hk.gh-proxy.org | `https://hk.gh-proxy.org` |
-| cdn.gh-proxy.org | `https://cdn.gh-proxy.org` |
+| 选项                 | 值                             |
+| -------------------- | ------------------------------ |
+| 不使用代理           | `''`                           |
+| gh-proxy.org         | `https://gh-proxy.org`         |
+| hk.gh-proxy.org      | `https://hk.gh-proxy.org`      |
+| cdn.gh-proxy.org     | `https://cdn.gh-proxy.org`     |
 | edgeone.gh-proxy.org | `https://edgeone.gh-proxy.org` |
-| 自定义... | `'__custom__'` |
+| 自定义...            | `'__custom__'`                 |
 
 当选择"自定义..."时，下方展开 `NInput` 输入框：
+
 - placeholder: `https://your-proxy.com`
 - 需以 `https://` 开头
 - 输入内容实时更新 `proxyUrl` 值
@@ -60,11 +61,11 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 #### 状态流转
 
-| 状态 | UI 表现 |
-|------|---------|
-| 安装中 | `NProgress` indeterminate 模式 + "正在安装中，请稍候..." + 取消按钮可用 |
-| 成功 | 进度条消失，绿色对勾 + "安装成功"，2 秒后自动关闭对话框 |
-| 失败 | 进度条消失，红色错误图标 + "安装失败"，下方展开失败日志区域（原始输出的最后 30 行），带"重试"和"关闭"按钮 |
+| 状态   | UI 表现                                                                                                   |
+| ------ | --------------------------------------------------------------------------------------------------------- |
+| 安装中 | `NProgress` indeterminate 模式 + "正在安装中，请稍候..." + 取消按钮可用                                   |
+| 成功   | 进度条消失，绿色对勾 + "安装成功"，2 秒后自动关闭对话框                                                   |
+| 失败   | 进度条消失，红色错误图标 + "安装失败"，下方展开失败日志区域（原始输出的最后 30 行），带"重试"和"关闭"按钮 |
 
 #### 实现要点
 
@@ -117,18 +118,18 @@ await skillsStore.installStreaming(skill.source, selectedAgents)
 
 ## 文件变更清单
 
-| 文件 | 变更类型 | 说明 |
-|------|---------|------|
-| `src/shared/types.ts` | 修改 | `AppSettings` 新增 `proxyUrl` |
-| `src/main/services/StoreService.ts` | 修改 | `DEFAULT_SETTINGS` 新增 `proxyUrl` |
-| `src/main/services/NpxService.ts` | 修改 | `buildInstallArgs` 改为接收 `source` 并拼接 git URL；新增 `buildGitUrl` |
-| `src/main/ipc/skills.ipc.ts` | 修改 | `install-streaming` handler 参数名 `packageRef` → `source` |
-| `src/preload/index.ts` | 修改 | `installStreaming` 参数名同步更新 |
-| `src/preload/index.d.ts` | 修改 | `installStreaming` 类型签名同步更新 |
-| `src/renderer/src/stores/skills.ts` | 修改 | `installStreaming` action 参数名 `packageRef` → `source` |
-| `src/renderer/src/components/skills/SkillInstallDialog.vue` | 大幅修改 | 移除实时日志区域，改为进度指示器；传入参数改为 `skill.source` |
-| `src/renderer/src/views/SettingsView.vue` | 修改 | 新增代理选择器 |
-| `src/renderer/src/stores/settings.ts` | 修改 | `settingsCache` default value 新增 `proxyUrl: ''` |
+| 文件                                                        | 变更类型 | 说明                                                                    |
+| ----------------------------------------------------------- | -------- | ----------------------------------------------------------------------- |
+| `src/shared/types.ts`                                       | 修改     | `AppSettings` 新增 `proxyUrl`                                           |
+| `src/main/services/StoreService.ts`                         | 修改     | `DEFAULT_SETTINGS` 新增 `proxyUrl`                                      |
+| `src/main/services/NpxService.ts`                           | 修改     | `buildInstallArgs` 改为接收 `source` 并拼接 git URL；新增 `buildGitUrl` |
+| `src/main/ipc/skills.ipc.ts`                                | 修改     | `install-streaming` handler 参数名 `packageRef` → `source`              |
+| `src/preload/index.ts`                                      | 修改     | `installStreaming` 参数名同步更新                                       |
+| `src/preload/index.d.ts`                                    | 修改     | `installStreaming` 类型签名同步更新                                     |
+| `src/renderer/src/stores/skills.ts`                         | 修改     | `installStreaming` action 参数名 `packageRef` → `source`                |
+| `src/renderer/src/components/skills/SkillInstallDialog.vue` | 大幅修改 | 移除实时日志区域，改为进度指示器；传入参数改为 `skill.source`           |
+| `src/renderer/src/views/SettingsView.vue`                   | 修改     | 新增代理选择器                                                          |
+| `src/renderer/src/stores/settings.ts`                       | 修改     | `settingsCache` default value 新增 `proxyUrl: ''`                       |
 
 ## 边界情况
 

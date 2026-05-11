@@ -28,7 +28,11 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  async function save(partial: { defaultAgent?: string; autoCheckEnv?: boolean; proxyUrl?: string }): Promise<void> {
+  async function save(partial: {
+    defaultAgent?: string
+    autoCheckEnv?: boolean
+    proxyUrl?: string
+  }): Promise<void> {
     try {
       await window.api.store.setSettings(partial)
       settingsCache.invalidate()

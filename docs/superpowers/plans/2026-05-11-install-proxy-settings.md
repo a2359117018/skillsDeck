@@ -12,27 +12,28 @@
 
 ## File Structure
 
-| File | Responsibility |
-|------|---------------|
-| `src/shared/types.ts` | `AppSettings` 接口新增 `proxyUrl` 字段 |
-| `src/main/services/StoreService.ts` | 默认设置值新增 `proxyUrl: ''` |
-| `src/main/services/NpxService.ts` | 新增 `buildGitUrl`，改造 `buildInstallArgs` 接收 `source` 而非 `packageRef` |
-| `src/main/ipc/skills.ipc.ts` | `install` 和 `install-streaming` handler 参数名 `packageRef` → `source` |
-| `src/preload/index.ts` | `install` / `installStreaming` 的 opts 字段名同步更新 |
-| `src/preload/index.d.ts` | `AppApi` 类型签名同步更新 |
-| `src/renderer/src/stores/skills.ts` | `doInstall` / `install` / `installStreaming` 参数名和 opts 字段名更新 |
-| `src/renderer/src/stores/settings.ts` | `settingsCache` 默认值和 `save` 参数类型扩展 |
-| `src/renderer/src/views/SettingsView.vue` | 新增代理选择器 UI（预设 + 自定义输入） |
-| `src/renderer/src/components/skills/SkillInstallDialog.vue` | 移除终端输出区域，改为进度指示器；prop `packageRef` → `source` |
-| `src/renderer/src/components/skills/SearchResultCard.vue` | `install` emit 传 `result.source` 而非 `packageRef` |
-| `src/renderer/src/views/SkillsSearch.vue` | `handleInstall` 和 dialog prop 改为传 `source` |
-| `src/renderer/src/views/SkillDetail.vue` | 计算 `source` 并传给 dialog |
+| File                                                        | Responsibility                                                              |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/shared/types.ts`                                       | `AppSettings` 接口新增 `proxyUrl` 字段                                      |
+| `src/main/services/StoreService.ts`                         | 默认设置值新增 `proxyUrl: ''`                                               |
+| `src/main/services/NpxService.ts`                           | 新增 `buildGitUrl`，改造 `buildInstallArgs` 接收 `source` 而非 `packageRef` |
+| `src/main/ipc/skills.ipc.ts`                                | `install` 和 `install-streaming` handler 参数名 `packageRef` → `source`     |
+| `src/preload/index.ts`                                      | `install` / `installStreaming` 的 opts 字段名同步更新                       |
+| `src/preload/index.d.ts`                                    | `AppApi` 类型签名同步更新                                                   |
+| `src/renderer/src/stores/skills.ts`                         | `doInstall` / `install` / `installStreaming` 参数名和 opts 字段名更新       |
+| `src/renderer/src/stores/settings.ts`                       | `settingsCache` 默认值和 `save` 参数类型扩展                                |
+| `src/renderer/src/views/SettingsView.vue`                   | 新增代理选择器 UI（预设 + 自定义输入）                                      |
+| `src/renderer/src/components/skills/SkillInstallDialog.vue` | 移除终端输出区域，改为进度指示器；prop `packageRef` → `source`              |
+| `src/renderer/src/components/skills/SearchResultCard.vue`   | `install` emit 传 `result.source` 而非 `packageRef`                         |
+| `src/renderer/src/views/SkillsSearch.vue`                   | `handleInstall` 和 dialog prop 改为传 `source`                              |
+| `src/renderer/src/views/SkillDetail.vue`                    | 计算 `source` 并传给 dialog                                                 |
 
 ---
 
 ### Task 1: Shared Types and StoreService Defaults
 
 **Files:**
+
 - Modify: `src/shared/types.ts:50-53`
 - Modify: `src/main/services/StoreService.ts:9-12`
 
@@ -72,6 +73,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 2: NpxService URL Construction
 
 **Files:**
+
 - Modify: `src/main/services/NpxService.ts`
 
 - [ ] **Step 1: Import `getSettings` and add `buildGitUrl`**
@@ -194,6 +196,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 3: IPC and Preload Layer Parameter Rename
 
 **Files:**
+
 - Modify: `src/main/ipc/skills.ipc.ts:39-86`
 - Modify: `src/preload/index.ts:8-14`
 - Modify: `src/preload/index.d.ts:18-27`
@@ -203,55 +206,50 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 In `src/main/ipc/skills.ipc.ts`, replace the `skills:install` and `skills:install-streaming` handlers:
 
 ```typescript
-  ipcMain.handle(
-    'skills:install',
-    async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
-      try {
-        return {
-          ok: true,
-          data: await npxService.install(opts.source, opts.agents, opts.global)
-        }
-      } catch (e) {
-        return { ok: false, error: serializeError(e) }
+ipcMain.handle(
+  'skills:install',
+  async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
+    try {
+      return {
+        ok: true,
+        data: await npxService.install(opts.source, opts.agents, opts.global)
       }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
     }
-  )
+  }
+)
 
-  ipcMain.handle(
-    'skills:install-streaming',
-    async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
-      const mainWindow = getMainWindow()
-      if (!mainWindow) {
-        return {
-          ok: false,
-          error: {
-            code: 'UNKNOWN',
-            command: '',
-            stderr: '',
-            exitCode: null,
-            message: 'Main window not available'
-          }
+ipcMain.handle(
+  'skills:install-streaming',
+  async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
+    const mainWindow = getMainWindow()
+    if (!mainWindow) {
+      return {
+        ok: false,
+        error: {
+          code: 'UNKNOWN',
+          command: '',
+          stderr: '',
+          exitCode: null,
+          message: 'Main window not available'
         }
-      }
-      try {
-        const onOutput = (text: string): void => {
-          if (mainWindow.isDestroyed()) return
-          mainWindow.webContents.send('skills:install-output', text)
-        }
-        return {
-          ok: true,
-          data: await npxService.installStreaming(
-            onOutput,
-            opts.source,
-            opts.agents,
-            opts.global
-          )
-        }
-      } catch (e) {
-        return { ok: false, error: serializeError(e) }
       }
     }
-  )
+    try {
+      const onOutput = (text: string): void => {
+        if (mainWindow.isDestroyed()) return
+        mainWindow.webContents.send('skills:install-output', text)
+      }
+      return {
+        ok: true,
+        data: await npxService.installStreaming(onOutput, opts.source, opts.agents, opts.global)
+      }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
+  }
+)
 ```
 
 - [ ] **Step 2: Update preload script**
@@ -273,16 +271,10 @@ In `src/preload/index.ts`, replace the `install` and `installStreaming` entries:
 In `src/preload/index.d.ts`, replace the `install` and `installStreaming` types:
 
 ```typescript
-    install: (opts: {
-      source: string
-      agents: string[]
-      global?: boolean
-    }) => Promise<IpcResult<CommandResult>>
-    installStreaming: (opts: {
-      source: string
-      agents: string[]
-      global?: boolean
-    }) => Promise<IpcResult<CommandResult>>
+install: (opts: { source: string; agents: string[]; global?: boolean }) =>
+  Promise<IpcResult<CommandResult>>
+installStreaming: (opts: { source: string; agents: string[]; global?: boolean }) =>
+  Promise<IpcResult<CommandResult>>
 ```
 
 - [ ] **Step 4: Commit**
@@ -299,6 +291,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 4: Renderer Stores Update
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/skills.ts:128-166`
 - Modify: `src/renderer/src/stores/settings.ts:6-38`
 
@@ -307,45 +300,45 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 In `src/renderer/src/stores/skills.ts`, replace `doInstall`, `install`, and `installStreaming`:
 
 ```typescript
-  async function doInstall(
-    source: string,
-    agents: string[],
-    isGlobal: boolean,
-    streaming: boolean
-  ): Promise<CommandResult> {
-    installing.value = true
-    error.value = null
-    try {
-      const opts = { source, agents: [...agents], global: isGlobal }
-      const result = streaming
-        ? await window.api.skills.installStreaming(opts)
-        : await window.api.skills.install(opts)
-      const data = unwrapResult(result)
-      installedCache.invalidate()
-      return data
-    } catch (e) {
-      error.value = extractError(e)
-      throw e
-    } finally {
-      installing.value = false
-    }
+async function doInstall(
+  source: string,
+  agents: string[],
+  isGlobal: boolean,
+  streaming: boolean
+): Promise<CommandResult> {
+  installing.value = true
+  error.value = null
+  try {
+    const opts = { source, agents: [...agents], global: isGlobal }
+    const result = streaming
+      ? await window.api.skills.installStreaming(opts)
+      : await window.api.skills.install(opts)
+    const data = unwrapResult(result)
+    installedCache.invalidate()
+    return data
+  } catch (e) {
+    error.value = extractError(e)
+    throw e
+  } finally {
+    installing.value = false
   }
+}
 
-  async function install(
-    source: string,
-    agents: string[],
-    isGlobal: boolean
-  ): Promise<CommandResult> {
-    return doInstall(source, agents, isGlobal, false)
-  }
+async function install(
+  source: string,
+  agents: string[],
+  isGlobal: boolean
+): Promise<CommandResult> {
+  return doInstall(source, agents, isGlobal, false)
+}
 
-  async function installStreaming(
-    source: string,
-    agents: string[],
-    isGlobal: boolean
-  ): Promise<CommandResult> {
-    return doInstall(source, agents, isGlobal, true)
-  }
+async function installStreaming(
+  source: string,
+  agents: string[],
+  isGlobal: boolean
+): Promise<CommandResult> {
+  return doInstall(source, agents, isGlobal, true)
+}
 ```
 
 - [ ] **Step 2: Update settings store**
@@ -383,7 +376,11 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  async function save(partial: { defaultAgent?: string; autoCheckEnv?: boolean; proxyUrl?: string }): Promise<void> {
+  async function save(partial: {
+    defaultAgent?: string
+    autoCheckEnv?: boolean
+    proxyUrl?: string
+  }): Promise<void> {
     try {
       await window.api.store.setSettings(partial)
       settingsCache.invalidate()
@@ -413,6 +410,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 5: SettingsView Proxy Selector
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue`
 
 - [ ] **Step 1: Add imports and proxy options**
@@ -581,6 +579,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 6: SkillInstallDialog Progress Indicator
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SkillInstallDialog.vue`
 
 - [ ] **Step 1: Replace entire file**
@@ -904,7 +903,11 @@ const failedLogLines = computed(() => {
             </template>
             确认安装
           </NButton>
-          <NButton v-if="installStatus === 'installing'" type="warning" @click="handleCancelInstall">
+          <NButton
+            v-if="installStatus === 'installing'"
+            type="warning"
+            @click="handleCancelInstall"
+          >
             <template #icon>
               <NIcon :size="16"><CloseOutline /></NIcon>
             </template>
@@ -1033,6 +1036,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 7: Update Caller Sites
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SearchResultCard.vue:8-10`
 - Modify: `src/renderer/src/views/SkillsSearch.vue:11-22,62-66`
 - Modify: `src/renderer/src/views/SkillDetail.vue:17,56-60,108-112`
@@ -1071,11 +1075,11 @@ function handleInstallComplete(): void {
 ```
 
 ```vue
-    <SkillInstallDialog
-      v-model:show="showInstallDialog"
-      :source="selectedSource"
-      @complete="handleInstallComplete"
-    />
+<SkillInstallDialog
+  v-model:show="showInstallDialog"
+  :source="selectedSource"
+  @complete="handleInstallComplete"
+/>
 ```
 
 - [ ] **Step 3: Update SkillDetail**
@@ -1092,11 +1096,11 @@ const source = computed(() => packageRef.replace('@', '/'))
 Update the dialog prop:
 
 ```vue
-    <SkillInstallDialog
-      v-model:show="showInstallDialog"
-      :source="source"
-      @complete="operationOutput = ''"
-    />
+<SkillInstallDialog
+  v-model:show="showInstallDialog"
+  :source="source"
+  @complete="operationOutput = ''"
+/>
 ```
 
 - [ ] **Step 4: Commit**
@@ -1117,6 +1121,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ## Self-Review
 
 **1. Spec coverage:**
+
 - [x] 代理设置数据模型 (`AppSettings.proxyUrl`) → Task 1
 - [x] 代理设置 UI (SettingsView.vue 选择器) → Task 5
 - [x] 安装进度指示器 (indeterminate progress + states) → Task 6
@@ -1125,11 +1130,13 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 - [x] 边界情况处理 (自定义代理输入、失败日志展示) → Tasks 5, 6
 
 **2. Placeholder scan:**
+
 - [x] 无 TBD/TODO
 - [x] 无 "add appropriate error handling" 类模糊描述
 - [x] 每个代码步骤包含完整代码
 
 **3. Type consistency:**
+
 - [x] `source: string` 在 NpxService、IPC、preload、skills store、SkillInstallDialog 中一致
 - [x] `proxyUrl?: string` 在 types、StoreService、settings store、SettingsView 中一致
 - [x] `AppSettings` 扩展在所有引用处一致

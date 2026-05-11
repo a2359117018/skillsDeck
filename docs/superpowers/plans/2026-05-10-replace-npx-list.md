@@ -12,20 +12,21 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|------|--------|----------------|
-| `src/shared/types.ts` | Modify | Add `InstalledSkill` and `InstalledSkillAgent` interfaces |
-| `src/main/services/AgentScanner.ts` | Modify | Add `scanInstalled()` method |
-| `src/main/ipc/skills.ipc.ts` | Modify | Replace `skills:list` handler to call `agentScanner.scanInstalled()` |
-| `src/preload/index.d.ts` | Modify | Update `skills.list` return type to `InstalledSkill[]` |
-| `src/renderer/src/stores/skills.ts` | Modify | Remove `enrichedSkills`, adapt `filteredSkills` to new `agents` shape |
-| `src/renderer/src/components/skills/SkillRow.vue` | Modify | Use `agents[0]?.path`, render `agent.name` |
+| File                                              | Action | Responsibility                                                        |
+| ------------------------------------------------- | ------ | --------------------------------------------------------------------- |
+| `src/shared/types.ts`                             | Modify | Add `InstalledSkill` and `InstalledSkillAgent` interfaces             |
+| `src/main/services/AgentScanner.ts`               | Modify | Add `scanInstalled()` method                                          |
+| `src/main/ipc/skills.ipc.ts`                      | Modify | Replace `skills:list` handler to call `agentScanner.scanInstalled()`  |
+| `src/preload/index.d.ts`                          | Modify | Update `skills.list` return type to `InstalledSkill[]`                |
+| `src/renderer/src/stores/skills.ts`               | Modify | Remove `enrichedSkills`, adapt `filteredSkills` to new `agents` shape |
+| `src/renderer/src/components/skills/SkillRow.vue` | Modify | Use `agents[0]?.path`, render `agent.name`                            |
 
 ---
 
 ### Task 1: Add InstalledSkill types
 
 **Files:**
+
 - Modify: `src/shared/types.ts`
 
 - [ ] **Step 1: Add `InstalledSkillAgent` and `InstalledSkill` interfaces**
@@ -61,15 +62,19 @@ git commit -m "feat: add InstalledSkill and InstalledSkillAgent types"
 ### Task 2: Add scanInstalled() to AgentScanner
 
 **Files:**
+
 - Modify: `src/main/services/AgentScanner.ts`
 
 - [ ] **Step 1: Import new types and add scanInstalled method**
 
 Replace the import line:
+
 ```typescript
 import type { AgentScanResult } from '../../shared/types'
 ```
+
 with:
+
 ```typescript
 import type { AgentScanResult, InstalledSkill } from '../../shared/types'
 ```
@@ -128,28 +133,33 @@ git commit -m "feat(AgentScanner): add scanInstalled method"
 ### Task 3: Update skills:list IPC handler
 
 **Files:**
+
 - Modify: `src/main/ipc/skills.ipc.ts`
 
 - [ ] **Step 1: Replace npxService.list with agentScanner.scanInstalled**
 
 Replace the import:
+
 ```typescript
 import { npxService } from '../services/NpxService'
 ```
+
 with:
+
 ```typescript
 import { agentScanner } from '../services/AgentScanner'
 ```
 
 Replace the `skills:list` handler:
+
 ```typescript
-  ipcMain.handle('skills:list', async () => {
-    try {
-      return { ok: true, data: await agentScanner.scanInstalled() }
-    } catch (e) {
-      return { ok: false, error: serializeError(e) }
-    }
-  })
+ipcMain.handle('skills:list', async () => {
+  try {
+    return { ok: true, data: await agentScanner.scanInstalled() }
+  } catch (e) {
+    return { ok: false, error: serializeError(e) }
+  }
+})
 ```
 
 - [ ] **Step 2: Run typecheck**
@@ -169,11 +179,13 @@ git commit -m "refactor(skills.ipc): use AgentScanner.scanInstalled for skills:l
 ### Task 4: Update preload types
 
 **Files:**
+
 - Modify: `src/preload/index.d.ts`
 
 - [ ] **Step 1: Add import and update list signature**
 
 Replace:
+
 ```typescript
 import type {
   EnvStatus,
@@ -184,7 +196,9 @@ import type {
   CommandErrorInfo
 } from '../shared/types'
 ```
+
 with:
+
 ```typescript
 import type {
   EnvStatus,
@@ -198,12 +212,15 @@ import type {
 ```
 
 Replace:
+
 ```typescript
-    list: (opts?: { global?: boolean }) => Promise<IpcResult<Skill[]>>
+list: (opts?: { global?: boolean }) => Promise<IpcResult<Skill[]>>
 ```
+
 with:
+
 ```typescript
-    list: () => Promise<IpcResult<InstalledSkill[]>>
+list: () => Promise<IpcResult<InstalledSkill[]>>
 ```
 
 - [ ] **Step 2: Run typecheck**
@@ -223,11 +240,13 @@ git commit -m "refactor(preload): update skills.list return type to InstalledSki
 ### Task 5: Update renderer skills store
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/skills.ts`
 
 - [ ] **Step 1: Update imports and type references**
 
 Replace:
+
 ```typescript
 import type {
   Skill,
@@ -236,7 +255,9 @@ import type {
   AgentScanResult
 } from '../../../shared/types'
 ```
+
 with:
+
 ```typescript
 import type {
   InstalledSkill,
@@ -249,39 +270,47 @@ import type {
 - [ ] **Step 2: Update installedCache type and remove enrichedSkills**
 
 Replace:
+
 ```typescript
-  const installedCache = useCachedResource<Skill[]>(
-    async () => unwrapResult(await window.api.skills.list({ global: true })),
-    []
-  )
+const installedCache = useCachedResource<Skill[]>(
+  async () => unwrapResult(await window.api.skills.list({ global: true })),
+  []
+)
 ```
+
 with:
+
 ```typescript
-  const installedCache = useCachedResource<InstalledSkill[]>(
-    async () => unwrapResult(await window.api.skills.list()),
-    []
-  )
+const installedCache = useCachedResource<InstalledSkill[]>(
+  async () => unwrapResult(await window.api.skills.list()),
+  []
+)
 ```
 
 Replace the `resolveAgentsByPath` function and `enrichedSkills` computed with a direct alias:
+
 ```typescript
-  const enrichedSkills = installedSkills
+const enrichedSkills = installedSkills
 ```
 
 Or simply replace all code from `resolveAgentsByPath` through the end of `enrichedSkills` (lines 50-82 approximately) with:
+
 ```typescript
-  const enrichedSkills = installedSkills
+const enrichedSkills = installedSkills
 ```
 
 - [ ] **Step 3: Update filteredSkills to use agent.name**
 
 Replace:
+
 ```typescript
-      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.toLowerCase())))
+skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.toLowerCase())))
 ```
+
 with:
+
 ```typescript
-      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.name.toLowerCase())))
+skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.name.toLowerCase())))
 ```
 
 - [ ] **Step 4: Run typecheck**
@@ -301,24 +330,31 @@ git commit -m "refactor(skills-store): adapt to InstalledSkill structure"
 ### Task 6: Update SkillRow component
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/SkillRow.vue`
 
 - [ ] **Step 1: Update import and type reference**
 
 Replace:
+
 ```typescript
 import type { Skill } from '../../../../shared/types'
 ```
+
 with:
+
 ```typescript
 import type { InstalledSkill } from '../../../../shared/types'
 ```
 
 Replace:
+
 ```typescript
 const props = defineProps<{ skill: Skill }>()
 ```
+
 with:
+
 ```typescript
 const props = defineProps<{ skill: InstalledSkill }>()
 ```
@@ -326,6 +362,7 @@ const props = defineProps<{ skill: InstalledSkill }>()
 - [ ] **Step 2: Update template for agents object array**
 
 Replace the open-location button:
+
 ```vue
         <NButton
           quaternary
@@ -336,7 +373,9 @@ Replace the open-location button:
           @click="emit('openLocation', props.skill.path)"
         >
 ```
+
 with:
+
 ```vue
         <NButton
           quaternary
@@ -349,8 +388,9 @@ with:
 ```
 
 Replace the agents tag loop:
+
 ```vue
-    <div v-if="props.skill.agents.length > 0" class="skill-agents">
+<div v-if="props.skill.agents.length > 0" class="skill-agents">
       <NTag
         v-for="agent in props.skill.agents"
         :key="agent"
@@ -364,9 +404,11 @@ Replace the agents tag loop:
       </NTag>
     </div>
 ```
+
 with:
+
 ```vue
-    <div v-if="props.skill.agents.length > 0" class="skill-agents">
+<div v-if="props.skill.agents.length > 0" class="skill-agents">
       <NTag
         v-for="agent in props.skill.agents"
         :key="agent.name"
@@ -398,6 +440,7 @@ git commit -m "refactor(SkillRow): adapt to InstalledSkill with agents as object
 ### Task 7: Final verification
 
 **Files:**
+
 - No changes
 
 - [ ] **Step 1: Run full typecheck**
@@ -424,6 +467,7 @@ If lint/typecheck found issues, fix and commit. Otherwise nothing to commit.
 ## Self-Review
 
 **Spec coverage:**
+
 - ✅ New `InstalledSkill` / `InstalledSkillAgent` types → Task 1
 - ✅ `AgentScanner.scanInstalled()` → Task 2
 - ✅ IPC handler replacement → Task 3
