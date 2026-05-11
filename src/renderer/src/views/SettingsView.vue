@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   NCard,
   NForm,
@@ -9,6 +9,7 @@ import {
   NButton,
   NSpace,
   NIcon,
+  NInput,
   useMessage
 } from 'naive-ui'
 import { RefreshOutline } from '@vicons/ionicons5'
@@ -24,12 +25,51 @@ const { confirmUpdateAll } = useConfirm()
 
 const agentOptions = AGENTS.map((a) => ({ label: a.name, value: a.agentFlag }))
 
-onMounted(() => settingsStore.load())
+const CUSTOM_PROXY_VALUE = '__custom__'
+
+const proxyOptions = [
+  { label: '不使用代理', value: '' },
+  { label: 'gh-proxy.org', value: 'https://gh-proxy.org' },
+  { label: 'hk.gh-proxy.org', value: 'https://hk.gh-proxy.org' },
+  { label: 'cdn.gh-proxy.org', value: 'https://cdn.gh-proxy.org' },
+  { label: 'edgeone.gh-proxy.org', value: 'https://edgeone.gh-proxy.org' },
+  { label: '自定义...', value: CUSTOM_PROXY_VALUE }
+]
+
+const selectedProxy = ref('')
+const customProxyUrl = ref('')
+
+onMounted(() => {
+  settingsStore.load().then(() => {
+    const stored = settingsStore.proxyUrl
+    const preset = proxyOptions.find((o) => o.value === stored)
+    if (preset && stored !== CUSTOM_PROXY_VALUE) {
+      selectedProxy.value = stored
+      customProxyUrl.value = ''
+    } else if (stored && stored.startsWith('https://')) {
+      selectedProxy.value = CUSTOM_PROXY_VALUE
+      customProxyUrl.value = stored
+    } else {
+      selectedProxy.value = ''
+      customProxyUrl.value = ''
+    }
+  })
+})
+
+const showCustomInput = computed(() => selectedProxy.value === CUSTOM_PROXY_VALUE)
+
+const effectiveProxyUrl = computed(() => {
+  if (selectedProxy.value === CUSTOM_PROXY_VALUE) {
+    return customProxyUrl.value.trim()
+  }
+  return selectedProxy.value
+})
 
 async function handleSave(): Promise<void> {
   await settingsStore.save({
     defaultAgent: settingsStore.defaultAgent,
-    autoCheckEnv: settingsStore.autoCheckEnv
+    autoCheckEnv: settingsStore.autoCheckEnv,
+    proxyUrl: effectiveProxyUrl.value
   })
   message.success('设置已保存')
 }
@@ -64,6 +104,15 @@ async function handleUpdateAll(): Promise<void> {
         </NFormItem>
         <NFormItem label="启动时检查环境">
           <NSwitch v-model:value="settingsStore.autoCheckEnv" />
+        </NFormItem>
+        <NFormItem label="GitHub 代理">
+          <NSelect v-model:value="selectedProxy" :options="proxyOptions" />
+          <NInput
+            v-if="showCustomInput"
+            v-model:value="customProxyUrl"
+            placeholder="https://your-proxy.com"
+            style="margin-top: var(--space-sm)"
+          />
         </NFormItem>
         <NFormItem label="技能管理">
           <NButton
