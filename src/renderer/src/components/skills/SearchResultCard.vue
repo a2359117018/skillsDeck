@@ -5,7 +5,7 @@ import type { SkillSearchResult } from '../../../../shared/types'
 import { toPackageRef, formatInstalls } from '../../../../shared/types'
 
 const props = defineProps<{ result: SkillSearchResult }>()
-const emit = defineEmits<{ install: [packageRef: string] }>()
+const emit = defineEmits<{ install: [source: string] }>()
 
 const packageRef = toPackageRef(props.result.id)
 const detailUrl = `https://skills.sh/${props.result.id}`
@@ -17,7 +17,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
       <NText strong class="result-name">{{ result.name }}</NText>
       <div class="result-card-actions">
         <div class="install-badge">{{ formatInstalls(result.installs) }} 次下载</div>
-        <NButton size="small" round @click="emit('install', packageRef)">
+        <NButton size="small" round @click="emit('install', result.source)">
           <template #icon>
             <NIcon :size="16"><DownloadOutline /></NIcon>
           </template>

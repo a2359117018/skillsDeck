@@ -8,7 +8,7 @@ import SkillInstallDialog from '@renderer/components/skills/SkillInstallDialog.v
 
 const skillsStore = useSkillsStore()
 const showInstallDialog = ref(false)
-const selectedPackage = ref('')
+const selectedSource = ref('')
 const hasSearched = ref(false)
 
 function handleSearch(keyword: string): void {
@@ -16,14 +16,14 @@ function handleSearch(keyword: string): void {
   skillsStore.search(keyword)
 }
 
-function handleInstall(packageRef: string): void {
-  selectedPackage.value = packageRef
+function handleInstall(source: string): void {
+  selectedSource.value = source
   showInstallDialog.value = true
 }
 
 function handleInstallComplete(): void {
   showInstallDialog.value = false
-  selectedPackage.value = ''
+  selectedSource.value = ''
 }
 </script>
 
@@ -61,7 +61,7 @@ function handleInstallComplete(): void {
     </div>
     <SkillInstallDialog
       v-model:show="showInstallDialog"
-      :source="selectedPackage"
+      :source="selectedSource"
       @complete="handleInstallComplete"
     />
   </div>

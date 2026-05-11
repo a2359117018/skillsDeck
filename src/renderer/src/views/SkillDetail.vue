@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NButton, NText, NIcon, useMessage } from 'naive-ui'
 import { ArrowBack } from '@vicons/ionicons5'
@@ -15,6 +15,7 @@ const message = useMessage()
 const { confirmUpdate, confirmRemove, confirmInstall } = useConfirm()
 
 const packageRef = decodeURIComponent(route.params.packageRef as string)
+const source = computed(() => packageRef.replace('@', '/'))
 const showInstallDialog = ref(false)
 const operationOutput = ref('')
 const operationLoading = ref(false)
@@ -107,7 +108,7 @@ async function handleInstallClick(): Promise<void> {
 
     <SkillInstallDialog
       v-model:show="showInstallDialog"
-      :source="packageRef"
+      :source="source"
       @complete="operationOutput = ''"
     />
   </div>
