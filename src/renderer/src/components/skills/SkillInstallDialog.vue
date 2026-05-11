@@ -116,7 +116,7 @@ async function handleInstall(): Promise<void> {
       setTimeout(() => {
         emit('update:show', false)
         emit('complete')
-      }, 1500)
+      }, 2000)
     } else {
       installStatus.value = 'failed'
     }
@@ -273,7 +273,13 @@ const failedLogLines = computed(() => {
 
         <!-- Installing state -->
         <div v-if="installStatus === 'installing'" class="install-progress">
-          <NProgress type="line" :percentage="100" :show-indicator="false" status="default" processing />
+          <NProgress
+            type="line"
+            :percentage="100"
+            :show-indicator="false"
+            status="default"
+            processing
+          />
           <NText>正在安装中，请稍候...</NText>
         </div>
 
@@ -318,7 +324,11 @@ const failedLogLines = computed(() => {
             </template>
             确认安装
           </NButton>
-          <NButton v-if="installStatus === 'installing'" type="warning" @click="handleCancelInstall">
+          <NButton
+            v-if="installStatus === 'installing'"
+            type="warning"
+            @click="handleCancelInstall"
+          >
             <template #icon>
               <NIcon :size="16"><CloseOutline /></NIcon>
             </template>

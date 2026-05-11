@@ -66,6 +66,14 @@ const effectiveProxyUrl = computed(() => {
 })
 
 async function handleSave(): Promise<void> {
+  if (
+    showCustomInput.value &&
+    customProxyUrl.value &&
+    !customProxyUrl.value.trim().startsWith('https://')
+  ) {
+    message.warning('自定义代理地址必须以 https:// 开头')
+    return
+  }
   await settingsStore.save({
     defaultAgent: settingsStore.defaultAgent,
     autoCheckEnv: settingsStore.autoCheckEnv,
