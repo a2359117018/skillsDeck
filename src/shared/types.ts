@@ -50,6 +50,7 @@ export interface CommandErrorInfo {
 export interface AppSettings {
   defaultAgent: string
   autoCheckEnv: boolean
+  proxyUrl?: string
 }
 
 export interface SkillSearchResult {

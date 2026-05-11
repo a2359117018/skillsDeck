@@ -8,7 +8,8 @@ interface StoreSchema {
 
 const DEFAULT_SETTINGS: AppSettings = {
   defaultAgent: 'claude-code',
-  autoCheckEnv: true
+  autoCheckEnv: true,
+  proxyUrl: ''
 }
 
 let store: Store<StoreSchema> | null = null
