@@ -1,5 +1,6 @@
 import type { CommandResult } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
+import { getSettings } from './StoreService'
 
 class NpxService {
   async checkNpxVersion(): Promise<{ ok: boolean; version: string | null }> {
@@ -28,18 +29,18 @@ class NpxService {
     }
   }
 
-  async install(packageRef: string, agents: string[], global?: boolean): Promise<CommandResult> {
-    const args = this.buildInstallArgs(packageRef, agents, global)
+  async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
+    const args = this.buildInstallArgs(source, agents, global)
     return commandRunner.run('npx', args)
   }
 
   async installStreaming(
     onOutput: (text: string) => void,
-    packageRef: string,
+    source: string,
     agents: string[],
     global?: boolean
   ): Promise<CommandResult> {
-    const args = this.buildInstallArgs(packageRef, agents, global)
+    const args = this.buildInstallArgs(source, agents, global)
     return commandRunner.run('npx', args, { onOutput })
   }
 
@@ -70,8 +71,17 @@ class NpxService {
     return ['skills', subcommand, ...parts]
   }
 
-  private buildInstallArgs(packageRef: string, agents: string[], global?: boolean): string[] {
-    const args = this.buildArgs('add', packageRef)
+  private buildGitUrl(source: string): string {
+    const proxyUrl = getSettings().proxyUrl
+    if (proxyUrl) {
+      return `${proxyUrl}/https://github.com/${source}.git`
+    }
+    return `https://github.com/${source}.git`
+  }
+
+  private buildInstallArgs(source: string, agents: string[], global?: boolean): string[] {
+    const gitUrl = this.buildGitUrl(source)
+    const args = this.buildArgs('add', gitUrl)
     args.push('-g', '-y')
     if (global) {
       args.push('--agent', '*')
