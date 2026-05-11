@@ -14,13 +14,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { key: 'installed', icon: CubeOutline, label: '已安装' },
   { key: 'search', icon: SearchOutline, label: '搜索技能' },
+  { key: 'installed', icon: CubeOutline, label: '已安装' },
   { key: 'agent-view', icon: GitMergeOutline, label: 'Agent 管理' },
   { key: 'settings', icon: SettingsOutline, label: '设置' }
 ]
 
-const dividers = new Set(['search', 'agent-view'])
+const dividers = new Set(['installed', 'agent-view'])
 
 const activeKey = computed(() => route.name as string)
 
@@ -31,10 +31,6 @@ function navigate(key: string): void {
 
 <template>
   <aside class="sidebar">
-    <div class="sidebar-brand">
-      <span class="brand-dot"></span>
-    </div>
-
     <nav class="sidebar-nav">
       <template v-for="item in navItems" :key="item.key">
         <div v-if="dividers.has(item.key)" class="sidebar-divider"></div>
@@ -45,7 +41,7 @@ function navigate(key: string): void {
           @click="navigate(item.key)"
         >
           <div class="active-bar"></div>
-          <NIcon :size="20">
+          <NIcon :size="24">
             <component :is="item.icon" />
           </NIcon>
         </button>
@@ -79,22 +75,6 @@ function navigate(key: string): void {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(20, 86, 240, 0.15) 0%, transparent 70%);
   pointer-events: none;
-}
-
-.sidebar-brand {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--space-lg);
-}
-
-.brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background: var(--color-brand-blue);
 }
 
 .sidebar-nav {
