@@ -3,11 +3,13 @@ import { onMounted } from 'vue'
 import { NEmpty, NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
+import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
 
 const skillsStore = useSkillsStore()
+const taskStore = useTaskStore()
 const message = useMessage()
 const { confirmUpdate, confirmRemove, confirmUpdateAll } = useConfirm()
 
@@ -28,17 +30,21 @@ async function handleRefresh(): Promise<void> {
 async function handleUpdate(name: string): Promise<void> {
   const confirmed = await confirmUpdate(name)
   if (!confirmed) return
-  try {
-    const result = await skillsStore.update(name, true)
-    if (result.success) {
-      message.success(`${name} 更新成功`)
-      await loadSkills()
-    } else {
-      message.error(`${name} 更新失败`)
-    }
-  } catch {
-    message.error(`${name} 更新失败`)
-  }
+  taskStore
+    .start('skill-update', {
+      packageRef: name,
+      global: true,
+      onSuccess: () => {
+        message.success(`${name} 更新成功`)
+        loadSkills()
+      },
+      onError: (err) => {
+        message.error(`${name} 更新失败: ${err}`)
+      }
+    })
+    .catch((e) => {
+      message.info(e instanceof Error ? e.message : '启动更新失败')
+    })
 }
 
 async function handleRemove(name: string): Promise<void> {
@@ -69,17 +75,20 @@ async function handleUpdateAll(): Promise<void> {
   }
   const confirmed = await confirmUpdateAll(names)
   if (!confirmed) return
-  try {
-    const result = await skillsStore.updateAll(true)
-    if (result.success) {
-      message.success('全部更新成功')
-      await loadSkills()
-    } else {
-      message.error('更新失败: ' + (result.stderr || '未知错误'))
-    }
-  } catch {
-    message.error('更新失败')
-  }
+  taskStore
+    .start('skill-update-all', {
+      global: true,
+      onSuccess: () => {
+        message.success('全部更新成功')
+        loadSkills()
+      },
+      onError: (err) => {
+        message.error(`更新失败: ${err}`)
+      }
+    })
+    .catch((e) => {
+      message.info(e instanceof Error ? e.message : '启动更新失败')
+    })
 }
 
 function handleSearchInput(val: string): void {
@@ -126,7 +135,6 @@ function handleFilterAgent(agentFlag: string): void {
           <NButton
             secondary
             size="small"
-            :loading="skillsStore.updatingAll"
             :disabled="skillsStore.installedSkills.length === 0"
             @click="handleUpdateAll"
           >
