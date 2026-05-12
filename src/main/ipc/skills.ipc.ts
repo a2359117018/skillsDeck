@@ -4,6 +4,7 @@ import { npxService } from '../services/NpxService'
 import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'
 import { searchSkillsApi } from '../api/skills'
+import { backgroundTaskService } from '../services/BackgroundTaskService'
 
 function serializeError(e: unknown): CommandErrorInfo {
   if (e instanceof CommandError) {
@@ -113,4 +114,53 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       }
     }
   )
+
+  ipcMain.handle(
+    'skills:update-background',
+    async (_, opts: { packageRef: string; global?: boolean }) => {
+      const taskId = backgroundTaskService.register('skill-update')
+      backgroundTaskService.markRunning(taskId)
+
+      npxService
+        .update(opts.packageRef, opts.global)
+        .then((result) => {
+          if (result.success) {
+            backgroundTaskService.markSuccess(taskId)
+          } else {
+            backgroundTaskService.markError(taskId, result.stderr || '更新失败')
+          }
+        })
+        .catch((error) => {
+          backgroundTaskService.markError(
+            taskId,
+            error instanceof Error ? error.message : String(error)
+          )
+        })
+
+      return { taskId }
+    }
+  )
+
+  ipcMain.handle('skills:update-all-background', async (_, opts?: { global?: boolean }) => {
+    const taskId = backgroundTaskService.register('skill-update-all')
+    backgroundTaskService.markRunning(taskId)
+
+    npxService
+      .updateAll(opts?.global)
+      .then((result) => {
+        if (result.success) {
+          backgroundTaskService.markSuccess(taskId)
+        } else {
+          backgroundTaskService.markError(taskId, result.stderr || '更新失败')
+        }
+      })
+      .catch((error) => {
+        backgroundTaskService.markError(
+          taskId,
+          error instanceof Error ? error.message : String(error)
+        )
+      })
+
+    return { taskId }
+  })
 }
