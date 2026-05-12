@@ -6,7 +6,8 @@ import type {
   SkillSearchResponse,
   CommandErrorInfo,
   InstalledSkill,
-  AgentScanResult
+  AgentScanResult,
+  BackgroundTask
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -34,6 +35,8 @@ export interface AppApi {
       agent?: string
       global?: boolean
     }) => Promise<IpcResult<CommandResult>>
+    updateBackground: (opts: { packageRef: string; global?: boolean }) => Promise<{ taskId: string; error?: string }>
+    updateAllBackground: (opts?: { global?: boolean }) => Promise<{ taskId: string; error?: string }>
   }
   agents: {
     scanAll: () => Promise<IpcResult<AgentScanResult[]>>
@@ -45,11 +48,19 @@ export interface AppApi {
   env: {
     check: () => Promise<EnvStatus>
     installNode: () => Promise<{ success: boolean; error?: string }>
+    installSkills: () => Promise<{ success: boolean; error?: string; stdout?: string }>
+    cancelInstallNode: () => Promise<void>
     onDownloadProgress: (callback: (percent: number) => void) => () => void
   }
   store: {
     getSettings: () => Promise<AppSettings>
     setSettings: (partial: Record<string, unknown>) => Promise<void>
+  }
+  tasks: {
+    start: (opts: { type: BackgroundTask['type'] }) => Promise<{ taskId: string; error?: string }>
+    cancel: (taskId: string) => Promise<void>
+    getAll: () => Promise<BackgroundTask[]>
+    onUpdate: (callback: (task: BackgroundTask) => void) => () => void
   }
   window: {
     openSettings: () => Promise<void>
