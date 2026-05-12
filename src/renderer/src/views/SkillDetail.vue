@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { NButton, NText, NIcon, useMessage } from 'naive-ui'
 import { ArrowBack } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
+import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
 import SkillInstallDialog from '../components/skills/SkillInstallDialog.vue'
 import CommandOutput from '../components/common/CommandOutput.vue'
@@ -11,6 +12,7 @@ import CommandOutput from '../components/common/CommandOutput.vue'
 const route = useRoute()
 const router = useRouter()
 const skillsStore = useSkillsStore()
+const taskStore = useTaskStore()
 const message = useMessage()
 const { confirmUpdate, confirmRemove, confirmInstall } = useConfirm()
 
@@ -23,16 +25,21 @@ const operationLoading = ref(false)
 async function handleUpdate(): Promise<void> {
   const confirmed = await confirmUpdate(packageRef)
   if (!confirmed) return
-  operationLoading.value = true
-  operationOutput.value = ''
-  try {
-    const result = await skillsStore.update(packageRef, true)
-    operationOutput.value = result.stdout || result.stderr || ''
-    if (result.success) message.success('更新成功')
-    else message.error('更新失败')
-  } finally {
-    operationLoading.value = false
-  }
+  taskStore
+    .start('skill-update', {
+      packageRef,
+      global: true,
+      onSuccess: () => {
+        message.success('更新成功')
+        operationOutput.value = ''
+      },
+      onError: (err) => {
+        message.error(`更新失败: ${err}`)
+      }
+    })
+    .catch((e) => {
+      message.info(e instanceof Error ? e.message : '启动更新失败')
+    })
 }
 
 async function handleRemove(): Promise<void> {
@@ -82,15 +89,7 @@ async function handleInstallClick(): Promise<void> {
       >
         安装到...
       </NButton>
-      <NButton
-        size="medium"
-        round
-        class="action-btn"
-        :loading="operationLoading"
-        @click="handleUpdate"
-      >
-        更新
-      </NButton>
+      <NButton size="medium" round class="action-btn" @click="handleUpdate"> 更新 </NButton>
       <NButton
         size="medium"
         round
