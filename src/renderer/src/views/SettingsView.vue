@@ -48,7 +48,12 @@ const { confirmUpdateAll, confirmUpdateEnv } = useConfirm()
 const envDownloading = ref(false)
 const envDownloadProgress = ref(0)
 
-const originalSettings = ref({ defaultAgent: '', autoCheckEnv: true, proxyUrl: '' })
+const originalSettings = ref({
+  defaultAgent: '',
+  autoCheckEnv: true,
+  proxyUrl: '',
+  npmRegistry: ''
+})
 let unsubscribeTasks: (() => void) | null = null
 
 const agentOptions = AGENTS.map((a) => ({ label: a.name, value: a.agentFlag }))
@@ -66,6 +71,22 @@ const proxyOptions = [
 
 const selectedProxy = ref('')
 const customProxyUrl = ref('')
+
+const CUSTOM_REGISTRY_VALUE = '__custom_registry__'
+
+const registryOptions = [
+  { label: '不使用镜像', value: '', icon: UnlinkOutline },
+  { label: '淘宝 (npmmirror.com)', value: 'https://npmmirror.com/mirrors/npm/', icon: LinkOutline },
+  {
+    label: '清华大学 (tuna.tsinghua.edu.cn)',
+    value: 'https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/npm/',
+    icon: LinkOutline
+  },
+  { label: '自定义...', value: CUSTOM_REGISTRY_VALUE, icon: PencilOutline }
+]
+
+const selectedRegistry = ref('')
+const customRegistryUrl = ref('')
 
 onMounted(() => {
   envStore.check()
@@ -87,7 +108,21 @@ onMounted(() => {
     originalSettings.value = {
       defaultAgent: settingsStore.defaultAgent,
       autoCheckEnv: settingsStore.autoCheckEnv,
-      proxyUrl: effectiveProxyUrl.value
+      proxyUrl: effectiveProxyUrl.value,
+      npmRegistry: effectiveRegistryUrl.value
+    }
+
+    const storedRegistry = settingsStore.npmRegistry
+    const registryPreset = registryOptions.find((o) => o.value === storedRegistry)
+    if (registryPreset && storedRegistry !== CUSTOM_REGISTRY_VALUE) {
+      selectedRegistry.value = storedRegistry
+      customRegistryUrl.value = ''
+    } else if (storedRegistry && storedRegistry.startsWith('https://')) {
+      selectedRegistry.value = CUSTOM_REGISTRY_VALUE
+      customRegistryUrl.value = storedRegistry
+    } else {
+      selectedRegistry.value = ''
+      customRegistryUrl.value = ''
     }
   })
 })
@@ -97,6 +132,26 @@ onUnmounted(() => {
 })
 
 const showCustomInput = computed(() => selectedProxy.value === CUSTOM_PROXY_VALUE)
+
+const showCustomRegistryInput = computed(() => selectedRegistry.value === CUSTOM_REGISTRY_VALUE)
+
+const effectiveRegistryUrl = computed(() => {
+  if (selectedRegistry.value === CUSTOM_REGISTRY_VALUE) {
+    return customRegistryUrl.value.trim()
+  }
+  return selectedRegistry.value
+})
+
+const activeRegistryDisplay = computed(() => {
+  if (selectedRegistry.value === CUSTOM_REGISTRY_VALUE) {
+    return customRegistryUrl.value.trim() || '未填写'
+  }
+  if (selectedRegistry.value === '') {
+    return '默认源'
+  }
+  const preset = registryOptions.find((o) => o.value === selectedRegistry.value)
+  return preset?.label || selectedRegistry.value
+})
 
 const effectiveProxyUrl = computed(() => {
   if (selectedProxy.value === CUSTOM_PROXY_VALUE) {
@@ -141,7 +196,8 @@ const hasUnsavedChanges = computed(() => {
   return (
     settingsStore.defaultAgent !== originalSettings.value.defaultAgent ||
     settingsStore.autoCheckEnv !== originalSettings.value.autoCheckEnv ||
-    effectiveProxyUrl.value !== originalSettings.value.proxyUrl
+    effectiveProxyUrl.value !== originalSettings.value.proxyUrl ||
+    effectiveRegistryUrl.value !== originalSettings.value.npmRegistry
   )
 })
 
@@ -154,15 +210,25 @@ async function handleSave(): Promise<void> {
     message.warning('自定义代理地址必须以 https:// 开头')
     return
   }
+  if (
+    showCustomRegistryInput.value &&
+    customRegistryUrl.value &&
+    !customRegistryUrl.value.trim().startsWith('https://')
+  ) {
+    message.warning('自定义镜像地址必须以 https:// 开头')
+    return
+  }
   await settingsStore.save({
     defaultAgent: settingsStore.defaultAgent,
     autoCheckEnv: settingsStore.autoCheckEnv,
-    proxyUrl: effectiveProxyUrl.value
+    proxyUrl: effectiveProxyUrl.value,
+    npmRegistry: effectiveRegistryUrl.value
   })
   originalSettings.value = {
     defaultAgent: settingsStore.defaultAgent,
     autoCheckEnv: settingsStore.autoCheckEnv,
-    proxyUrl: effectiveProxyUrl.value
+    proxyUrl: effectiveProxyUrl.value,
+    npmRegistry: effectiveRegistryUrl.value
   }
   message.success('设置已保存')
 }
@@ -346,6 +412,40 @@ async function handleUpdateAll(): Promise<void> {
                 </NIcon>
                 <NText depth="3" class="proxy-active-text">
                   当前生效：{{ activeProxyDisplay }}
+                </NText>
+              </div>
+            </div>
+          </NFormItem>
+          <NFormItem label="npm 镜像">
+            <div class="proxy-field">
+              <NSelect
+                v-model:value="selectedRegistry"
+                :options="registryOptions"
+                :render-label="renderProxyLabel"
+                :render-tag="renderProxyTag"
+                class="settings-select"
+              />
+              <Transition name="expand">
+                <div v-if="showCustomRegistryInput" class="custom-input-wrapper">
+                  <NInput
+                    v-model:value="customRegistryUrl"
+                    placeholder="https://your-mirror.com/npm/"
+                    class="custom-proxy-input"
+                  >
+                    <template #prefix>
+                      <NIcon :size="16" color="var(--color-muted)">
+                        <PencilOutline />
+                      </NIcon>
+                    </template>
+                  </NInput>
+                </div>
+              </Transition>
+              <div class="proxy-active">
+                <NIcon :size="14" color="var(--color-muted)">
+                  <CheckmarkCircleOutline />
+                </NIcon>
+                <NText depth="3" class="proxy-active-text">
+                  当前生效：{{ activeRegistryDisplay }}
                 </NText>
               </div>
             </div>

@@ -5,6 +5,7 @@ import decompress from 'decompress'
 import type { EnvStatus } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
 import { npxService } from './NpxService'
+import { getSettings } from './StoreService'
 
 let downloadAbortController: AbortController | null = null
 
@@ -150,7 +151,12 @@ export function registerNodeInPath(nodeDir: string): void {
  */
 export async function installSkillsCli(): Promise<{ success: boolean; stdout: string }> {
   try {
-    const result = await commandRunner.run('npm', ['install', '-g', 'npx', 'skills'], {
+    const args = ['install', '-g', 'npx', 'skills']
+    const registry = getSettings().npmRegistry
+    if (registry) {
+      args.push('--registry', registry)
+    }
+    const result = await commandRunner.run('npm', args, {
       timeout: 120000
     })
     return { success: result.success, stdout: result.stdout }

@@ -9,7 +9,8 @@ interface StoreSchema {
 const DEFAULT_SETTINGS: AppSettings = {
   defaultAgent: 'claude-code',
   autoCheckEnv: true,
-  proxyUrl: ''
+  proxyUrl: '',
+  npmRegistry: 'https://npmmirror.com/mirrors/npm/'
 }
 
 let store: Store<StoreSchema> | null = null

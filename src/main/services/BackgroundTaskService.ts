@@ -3,6 +3,7 @@ import { execa } from 'execa'
 import type { BackgroundTask } from '../../shared/types'
 import type { Subprocess } from 'execa'
 import { getMainWindow } from './WindowManager'
+import { getSettings } from './StoreService'
 
 type TaskType = BackgroundTask['type']
 
@@ -11,17 +12,32 @@ class BackgroundTaskService {
   private processes = new Map<string, Subprocess>()
 
   private resolveCommand(type: TaskType): { command: string; args: string[] } {
+    let command: string
+    let args: string[]
+
     switch (type) {
       case 'update-npx':
-        return { command: 'npm', args: ['update', '-g', 'npx'] }
+        command = 'npm'
+        args = ['update', '-g', 'npx']
+        break
       case 'update-skills':
-        return { command: 'npm', args: ['update', '-g', 'skills'] }
+        command = 'npm'
+        args = ['update', '-g', 'skills']
+        break
       case 'install-node':
-        // TODO: implement install-node via BackgroundTaskService (currently uses direct download)
         throw new Error('install-node not yet supported in BackgroundTaskService')
       case 'install-skills':
-        return { command: 'npm', args: ['install', '-g', 'npx', 'skills'] }
+        command = 'npm'
+        args = ['install', '-g', 'npx', 'skills']
+        break
     }
+
+    const registry = getSettings().npmRegistry
+    if (registry) {
+      args.push('--registry', registry)
+    }
+
+    return { command, args }
   }
 
   register(type: string): string {

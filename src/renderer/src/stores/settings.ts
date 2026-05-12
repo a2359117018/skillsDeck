@@ -6,12 +6,14 @@ export const useSettingsStore = defineStore('settings', () => {
   const settingsCache = useCachedResource(() => window.api.store.getSettings(), {
     defaultAgent: 'claude-code',
     autoCheckEnv: true,
-    proxyUrl: ''
+    proxyUrl: '',
+    npmRegistry: 'https://npmmirror.com/mirrors/npm/'
   })
 
   const defaultAgent = ref('claude-code')
   const autoCheckEnv = ref(true)
   const proxyUrl = ref('')
+  const npmRegistry = ref('')
   const error = ref<string | null>(null)
   const fetching = computed(() => settingsCache.loading.value)
   const loading = fetching
@@ -22,6 +24,7 @@ export const useSettingsStore = defineStore('settings', () => {
       defaultAgent.value = data.defaultAgent
       autoCheckEnv.value = data.autoCheckEnv
       proxyUrl.value = data.proxyUrl || ''
+      npmRegistry.value = data.npmRegistry || ''
       error.value = null
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load settings'
@@ -32,6 +35,7 @@ export const useSettingsStore = defineStore('settings', () => {
     defaultAgent?: string
     autoCheckEnv?: boolean
     proxyUrl?: string
+    npmRegistry?: string
   }): Promise<void> {
     try {
       await window.api.store.setSettings(partial)
@@ -44,5 +48,5 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  return { defaultAgent, autoCheckEnv, proxyUrl, loading, fetching, error, load, save }
+  return { defaultAgent, autoCheckEnv, proxyUrl, npmRegistry, loading, fetching, error, load, save }
 })

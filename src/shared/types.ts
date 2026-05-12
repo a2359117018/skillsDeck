@@ -66,6 +66,7 @@ export interface AppSettings {
   defaultAgent: string
   autoCheckEnv: boolean
   proxyUrl?: string
+  npmRegistry?: string
 }
 
 export interface SkillSearchResult {
