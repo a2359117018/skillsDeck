@@ -7,8 +7,12 @@ export const useEnvStore = defineStore('env', () => {
   const statusCache = useCachedResource<EnvStatus>(() => window.api.env.check(), {
     nodeInstalled: false,
     nodeVersion: null,
+    npmInstalled: false,
+    npmVersion: null,
     npxInstalled: false,
-    skillsInstalled: false
+    npxVersion: null,
+    skillsInstalled: false,
+    skillsVersion: null
   })
 
   const downloading = ref(false)

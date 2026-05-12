@@ -33,8 +33,6 @@ export const useSkillsStore = defineStore('skills', () => {
   const _searchResults = ref<SkillSearchResult[]>([])
   const _searchDuration = ref(0)
   const installing = ref(false)
-  const updating = ref(false)
-  const updatingAll = ref(false)
   const removing = ref(false)
   const searching = ref(false)
   const error = ref<string | null>(null)
@@ -165,38 +163,6 @@ export const useSkillsStore = defineStore('skills', () => {
     return doInstall(source, agents, isGlobal, true)
   }
 
-  async function update(packageRef: string, global?: boolean): Promise<CommandResult> {
-    updating.value = true
-    error.value = null
-    try {
-      const result = await window.api.skills.update({ packageRef, global })
-      const data = unwrapResult(result)
-      installedCache.invalidate()
-      return data
-    } catch (e) {
-      error.value = extractError(e)
-      throw e
-    } finally {
-      updating.value = false
-    }
-  }
-
-  async function updateAll(global?: boolean): Promise<CommandResult> {
-    updatingAll.value = true
-    error.value = null
-    try {
-      const result = await window.api.skills.updateAll({ global })
-      const data = unwrapResult(result)
-      installedCache.invalidate()
-      return data
-    } catch (e) {
-      error.value = extractError(e)
-      throw e
-    } finally {
-      updatingAll.value = false
-    }
-  }
-
   async function remove(
     packageRef: string,
     global?: boolean,
@@ -238,8 +204,6 @@ export const useSkillsStore = defineStore('skills', () => {
     fetching,
     searching,
     installing,
-    updating,
-    updatingAll,
     removing,
     loading,
     error,
@@ -253,8 +217,6 @@ export const useSkillsStore = defineStore('skills', () => {
     fetchInstalled,
     install,
     installStreaming,
-    update,
-    updateAll,
     remove,
     openLocation
   }

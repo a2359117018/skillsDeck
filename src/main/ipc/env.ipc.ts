@@ -1,7 +1,13 @@
 import { ipcMain, BrowserWindow } from 'electron'
-import { checkAll, downloadNode, extractAndRegisterNode } from '../services/EnvService'
+import {
+  checkAll,
+  downloadNode,
+  extractAndRegisterNode,
+  installSkillsCli,
+  cancelNodeDownload
+} from '../services/EnvService'
 import { setEnvStatus } from '../services/StoreService'
-import { closeEnvWindow, createSettingsWindow } from '../services/WindowManager'
+import { createSettingsWindow } from '../services/WindowManager'
 
 export function registerEnvIpc(): void {
   ipcMain.handle('env:check', async () => {
@@ -19,14 +25,27 @@ export function registerEnvIpc(): void {
       await extractAndRegisterNode(archivePath)
       const status = await checkAll()
       setEnvStatus(status)
-      if (status.nodeInstalled && status.npxInstalled && status.skillsInstalled) {
-        closeEnvWindow()
-      }
       return { success: true }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       return { success: false, error: message }
     }
+  })
+
+  ipcMain.handle('env:install-skills', async () => {
+    try {
+      const result = await installSkillsCli()
+      const status = await checkAll()
+      setEnvStatus(status)
+      return result
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      return { success: false, error: message }
+    }
+  })
+
+  ipcMain.handle('env:cancel-install-node', () => {
+    cancelNodeDownload()
   })
 
   ipcMain.handle('window:open-settings', () => {

@@ -1,0 +1,23 @@
+{
+  "skill_name": "visual-options",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我设计一个博客首页的布局，要有文章列表、侧边栏和搜索功能",
+      "expected_output": "生成包含2-4个不同布局方案的HTML文件，每个方案是可交互的原型，使用真实模拟数据",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "这个React项目的状态管理怎么组织比较好？有用户信息、购物车、商品列表这些数据",
+      "expected_output": "生成包含2-3个架构图的HTML文件，用SVG/CSS展示组件关系和数据流",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我要做一个电商后台dashboard，数据多但要清晰好看，有销售额图表、订单列表、库存预警这些模块",
+      "expected_output": "混合模式：先生成架构布局方案，再提供UI样式选项",
+      "files": []
+    }
+  ]
+}

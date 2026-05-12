@@ -35,8 +35,13 @@ export interface AppApi {
       agent?: string
       global?: boolean
     }) => Promise<IpcResult<CommandResult>>
-    updateBackground: (opts: { packageRef: string; global?: boolean }) => Promise<{ taskId: string; error?: string }>
-    updateAllBackground: (opts?: { global?: boolean }) => Promise<{ taskId: string; error?: string }>
+    updateBackground: (opts: {
+      packageRef: string
+      global?: boolean
+    }) => Promise<{ taskId: string; error?: string }>
+    updateAllBackground: (opts?: {
+      global?: boolean
+    }) => Promise<{ taskId: string; error?: string }>
   }
   agents: {
     scanAll: () => Promise<IpcResult<AgentScanResult[]>>

@@ -254,16 +254,19 @@ async function handleUpdateAll(): Promise<void> {
   }
   const confirmed = await confirmUpdateAll(names)
   if (!confirmed) return
-  try {
-    const result = await skillsStore.updateAll(true)
-    if (result.success) {
-      message.success('更新成功')
-    } else {
-      message.error('更新失败: ' + (result.stderr || '未知错误'))
-    }
-  } catch {
-    message.error('更新失败')
-  }
+  taskStore
+    .start('skill-update-all', {
+      global: true,
+      onSuccess: () => {
+        message.success('全部更新成功')
+      },
+      onError: (err) => {
+        message.error(`更新失败: ${err}`)
+      }
+    })
+    .catch((e) => {
+      message.info(e instanceof Error ? e.message : '启动更新失败')
+    })
 }
 </script>
 
@@ -360,7 +363,6 @@ async function handleUpdateAll(): Promise<void> {
           <NFormItem label="技能管理">
             <NButton
               round
-              :loading="skillsStore.updatingAll"
               :disabled="skillsStore.installedSkills.length === 0"
               @click="handleUpdateAll"
             >

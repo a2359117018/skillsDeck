@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { createMainWindow, createEnvWindow } from './services/WindowManager'
+import { createMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
 import { getSettings, setEnvStatus } from './services/StoreService'
@@ -19,9 +19,6 @@ app.whenReady().then(() => {
   if (settings.autoCheckEnv) {
     checkAll().then((status) => {
       setEnvStatus(status)
-      if (!status.nodeInstalled || !status.npxInstalled || !status.skillsInstalled) {
-        createEnvWindow()
-      }
     })
   }
 

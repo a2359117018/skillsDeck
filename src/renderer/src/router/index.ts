@@ -13,7 +13,7 @@ const routes = [
     props: true
   },
   { path: '/agent-view', name: 'agent-view', component: () => import('../views/AgentView.vue') },
-  { path: '/env', name: 'env', component: () => import('../views/EnvDetection.vue') },
+  { path: '/env', name: 'env', component: () => import('../views/SettingsView.vue') },
   { path: '/settings', name: 'settings', component: () => import('../views/SettingsView.vue') }
 ]
 

@@ -4,7 +4,6 @@ import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
 
 let mainWindow: BrowserWindow | null = null
-let envWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
 
 function createWindowOptions(opts: {
@@ -52,23 +51,6 @@ export function createMainWindow(): BrowserWindow {
   return mainWindow
 }
 
-export function createEnvWindow(): BrowserWindow {
-  if (envWindow && !envWindow.isDestroyed()) {
-    envWindow.focus()
-    return envWindow
-  }
-  envWindow = new BrowserWindow({
-    ...createWindowOptions({ width: 500, height: 400, title: 'Environment Detection' }),
-    parent: mainWindow || undefined,
-    modal: true
-  })
-  loadWindow(envWindow, { window: 'env' })
-  envWindow.on('closed', () => {
-    envWindow = null
-  })
-  return envWindow
-}
-
 export function createSettingsWindow(): BrowserWindow {
   if (settingsWindow && !settingsWindow.isDestroyed()) {
     settingsWindow.focus()
@@ -84,12 +66,6 @@ export function createSettingsWindow(): BrowserWindow {
     settingsWindow = null
   })
   return settingsWindow
-}
-
-export function closeEnvWindow(): void {
-  if (envWindow && !envWindow.isDestroyed()) {
-    envWindow.close()
-  }
 }
 
 export function getMainWindow(): BrowserWindow | null {

@@ -9,10 +9,12 @@ import {
   CloseOutline
 } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
+import { useTaskStore } from '@renderer/stores/tasks'
 import { useConfirm } from '@renderer/composables/useConfirm'
 import type { AgentScanResult } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
+const taskStore = useTaskStore()
 const message = useMessage()
 const { confirmUpdate, confirmRemove } = useConfirm()
 
@@ -23,7 +25,6 @@ skillsStore.setMessageHandler((msg, type) => {
 const agentSearchKeyword = ref('')
 const selectedAgent = ref<AgentScanResult | null>(null)
 const drawerVisible = ref(false)
-const updatingSkill = ref<string | null>(null)
 const removingSkill = ref<string | null>(null)
 
 const visibleAgentResults = computed(() =>
@@ -62,20 +63,21 @@ function openAgentFolder(agent: AgentScanResult, e?: Event): void {
 async function handleUpdate(name: string): Promise<void> {
   const confirmed = await confirmUpdate(name)
   if (!confirmed) return
-  updatingSkill.value = name
-  try {
-    const result = await skillsStore.update(name, true)
-    if (result.success) {
-      message.success(`${name} 更新成功`)
-      await skillsStore.fetchInstalled()
-    } else {
-      message.error(`${name} 更新失败`)
-    }
-  } catch {
-    message.error(`${name} 更新失败`)
-  } finally {
-    updatingSkill.value = null
-  }
+  taskStore
+    .start('skill-update', {
+      packageRef: name,
+      global: true,
+      onSuccess: () => {
+        message.success(`${name} 更新成功`)
+        skillsStore.fetchInstalled()
+      },
+      onError: (err) => {
+        message.error(`${name} 更新失败: ${err}`)
+      }
+    })
+    .catch((e) => {
+      message.info(e instanceof Error ? e.message : '启动更新失败')
+    })
 }
 
 async function handleRemove(name: string): Promise<void> {
@@ -219,7 +221,6 @@ onMounted(() => skillsStore.fetchInstalled())
                 size="small"
                 type="primary"
                 title="更新"
-                :loading="updatingSkill === skillName"
                 @click="handleUpdate(skillName)"
               >
                 <template #icon>

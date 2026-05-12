@@ -6,6 +6,7 @@ export function useConfirm(): {
   confirmUpdate: (name: string) => Promise<boolean>
   confirmRemove: (name: string) => Promise<boolean>
   confirmUpdateAll: (names: string[]) => Promise<boolean>
+  confirmUpdateEnv: (name: string, version: string) => Promise<boolean>
 } {
   const dialog = useDialog()
 
@@ -80,5 +81,34 @@ export function useConfirm(): {
     })
   }
 
-  return { confirmInstall, confirmUpdate, confirmRemove, confirmUpdateAll }
+  function confirmUpdateEnv(name: string, version: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      dialog.info({
+        title: `更新 ${name}`,
+        content: () =>
+          h('div', null, [
+            h('p', null, `确定更新 ${name} 吗？`),
+            h(
+              'p',
+              {
+                style: {
+                  color: 'var(--color-stone)',
+                  fontSize: '13px',
+                  marginTop: '8px'
+                }
+              },
+              `当前版本 ${version || 'unknown'}，更新期间相关功能可能暂时不可用。`
+            )
+          ]),
+        positiveText: '确定更新',
+        negativeText: '取消',
+        onPositiveClick: () => resolve(true),
+        onNegativeClick: () => resolve(false),
+        onClose: () => resolve(false),
+        onMaskClick: () => resolve(false)
+      })
+    })
+  }
+
+  return { confirmInstall, confirmUpdate, confirmRemove, confirmUpdateAll, confirmUpdateEnv }
 }

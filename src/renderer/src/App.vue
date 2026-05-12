@@ -1,13 +1,41 @@
 <script setup lang="ts">
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   NConfigProvider,
   NMessageProvider,
   NDialogProvider,
+  NAlert,
+  NButton,
   type GlobalThemeOverrides
 } from 'naive-ui'
 import AppSidebar from './components/layout/AppSidebar.vue'
+import { useEnvStore } from './stores/env'
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
+const envStore = useEnvStore()
+const router = useRouter()
+
+const isMainWindow = windowType === 'main'
+
+const envOk = computed(() => {
+  const s = envStore.status
+  return s?.nodeInstalled && s?.npmInstalled && s?.npxInstalled && s?.skillsInstalled
+})
+
+const envBannerVisible = computed(
+  () => isMainWindow && !envStore.fetching && envStore.status !== null && !envOk.value
+)
+
+onMounted(() => {
+  if (isMainWindow) {
+    envStore.check()
+  }
+})
+
+function goToSettings(): void {
+  router.push({ name: 'settings' })
+}
 
 const themeOverrides: GlobalThemeOverrides = {
   common: {
@@ -15,7 +43,7 @@ const themeOverrides: GlobalThemeOverrides = {
     primaryColorHover: '#2a2a2a',
     primaryColorPressed: '#000000',
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif",
-    borderRadius: '9999px',
+    borderRadius: '8px',
     borderRadiusSmall: '8px'
   },
   Button: {
@@ -38,12 +66,8 @@ const themeOverrides: GlobalThemeOverrides = {
   Dialog: {
     borderRadius: '16px'
   },
-  Select: {
-    peers: {
-      InternalSelection: {
-        borderRadius: '8px'
-      }
-    }
+  InternalSelectMenu: {
+    borderRadius: '8px'
   }
 }
 </script>
@@ -55,6 +79,12 @@ const themeOverrides: GlobalThemeOverrides = {
         <div v-if="windowType === 'main'" class="app-shell">
           <AppSidebar />
           <main class="content-area">
+            <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
+              <div class="env-banner-inner">
+                <span>运行环境不完整，部分功能可能无法使用</span>
+                <NButton size="small" round type="warning" @click="goToSettings"> 去安装 </NButton>
+              </div>
+            </NAlert>
             <router-view v-slot="{ Component }">
               <Transition name="fade" mode="out-in">
                 <component :is="Component" />
@@ -62,9 +92,7 @@ const themeOverrides: GlobalThemeOverrides = {
             </router-view>
           </main>
         </div>
-        <div v-else-if="windowType === 'env'">
-          <router-view />
-        </div>
+        <router-view v-else />
       </NMessageProvider>
     </NDialogProvider>
   </NConfigProvider>
@@ -82,5 +110,16 @@ const themeOverrides: GlobalThemeOverrides = {
   height: 100vh;
   overflow: auto;
   background-color: var(--color-canvas);
+}
+
+.env-banner :deep(.n-alert-body) {
+  padding: 10px 16px;
+}
+
+.env-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 </style>

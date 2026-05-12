@@ -24,9 +24,14 @@ const api = {
       ipcRenderer.invoke('skills:update-all', opts),
     remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
       ipcRenderer.invoke('skills:remove', opts),
-    updateBackground: (opts: { packageRef: string; global?: boolean }): Promise<{ taskId: string; error?: string }> =>
+    updateBackground: (opts: {
+      packageRef: string
+      global?: boolean
+    }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('skills:update-background', opts),
-    updateAllBackground: (opts?: { global?: boolean }): Promise<{ taskId: string; error?: string }> =>
+    updateAllBackground: (opts?: {
+      global?: boolean
+    }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('skills:update-all-background', opts)
   },
   agents: {

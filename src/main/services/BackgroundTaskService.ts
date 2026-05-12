@@ -100,7 +100,8 @@ class BackgroundTaskService {
       if (code === 0) {
         this.markSuccess(id)
       } else {
-        this.markError(id, `Exit code: ${code}`)
+        const detail = task.stdout.trim() ? `\n${task.stdout.trim()}` : ''
+        this.markError(id, `Exit code: ${code}${detail}`)
       }
       this.cleanup(id)
     })

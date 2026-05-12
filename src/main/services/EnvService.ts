@@ -6,6 +6,15 @@ import type { EnvStatus } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
 import { npxService } from './NpxService'
 
+let downloadAbortController: AbortController | null = null
+
+export function cancelNodeDownload(): void {
+  if (downloadAbortController) {
+    downloadAbortController.abort()
+    downloadAbortController = null
+  }
+}
+
 async function safeRun(
   command: string,
   args: string[],
@@ -20,13 +29,18 @@ async function safeRun(
 
 export async function checkAll(): Promise<EnvStatus> {
   const node = await safeRun('node', ['--version'], 10000)
+  const npm = await safeRun('npm', ['--version'], 10000)
   const npx = await npxService.checkNpxVersion()
   const skills = await npxService.checkSkillsVersion()
   return {
     nodeInstalled: node.success,
     nodeVersion: node.success ? node.stdout.trim() : null,
+    npmInstalled: npm.success,
+    npmVersion: npm.success ? npm.stdout.trim() : null,
     npxInstalled: npx.ok,
-    skillsInstalled: skills.ok
+    npxVersion: npx.ok ? npx.version : null,
+    skillsInstalled: skills.ok,
+    skillsVersion: skills.ok ? skills.version : null
   }
 }
 
@@ -62,6 +76,7 @@ export function getNodeInstallDir(): string {
  * @throws Error if download fails or response body is missing
  */
 export async function downloadNode(onProgress: (percent: number) => void): Promise<string> {
+  downloadAbortController = new AbortController()
   const url = getNodeDownloadUrl()
   const installDir = getNodeInstallDir()
   if (!existsSync(installDir)) {
@@ -71,7 +86,7 @@ export async function downloadNode(onProgress: (percent: number) => void): Promi
   const archivePath = join(installDir, fileName)
 
   try {
-    const response = await fetch(url)
+    const response = await fetch(url, { signal: downloadAbortController.signal })
     if (!response.ok) throw new Error(`Download failed: ${response.statusText}`)
     const contentLength = Number(response.headers.get('content-length') || 0)
     let downloaded = 0
@@ -95,15 +110,20 @@ export async function downloadNode(onProgress: (percent: number) => void): Promi
       }
     }
     stream.end()
+    downloadAbortController = null
 
     return archivePath
   } catch (error) {
+    downloadAbortController = null
     if (existsSync(archivePath)) {
       try {
         unlinkSync(archivePath)
       } catch {
         // Ignore cleanup errors
       }
+    }
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('下载已取消')
     }
     throw error
   }
@@ -128,6 +148,17 @@ export function registerNodeInPath(nodeDir: string): void {
  * @returns Path to the extracted Node.js directory
  * @throws Error if extraction fails or no node directory is found
  */
+export async function installSkillsCli(): Promise<{ success: boolean; stdout: string }> {
+  try {
+    const result = await commandRunner.run('npm', ['install', '-g', 'npx', 'skills'], {
+      timeout: 120000
+    })
+    return { success: result.success, stdout: result.stdout }
+  } catch {
+    return { success: false, stdout: '' }
+  }
+}
+
 export async function extractAndRegisterNode(archivePath: string): Promise<string> {
   const installDir = getNodeInstallDir()
   await decompress(archivePath, installDir)

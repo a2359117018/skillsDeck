@@ -115,9 +115,18 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     }
   )
 
+  function hasPendingTask(type: string): boolean {
+    return Array.from(backgroundTaskService.getAll()).some(
+      (t) => t.type === type && (t.status === 'pending' || t.status === 'running')
+    )
+  }
+
   ipcMain.handle(
     'skills:update-background',
     async (_, opts: { packageRef: string; global?: boolean }) => {
+      if (hasPendingTask('skill-update')) {
+        return { taskId: '', error: '更新任务正在进行中' }
+      }
       const taskId = backgroundTaskService.register('skill-update')
       backgroundTaskService.markRunning(taskId)
 
@@ -142,6 +151,9 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
   )
 
   ipcMain.handle('skills:update-all-background', async (_, opts?: { global?: boolean }) => {
+    if (hasPendingTask('skill-update-all')) {
+      return { taskId: '', error: '全部更新任务正在进行中' }
+    }
     const taskId = backgroundTaskService.register('skill-update-all')
     backgroundTaskService.markRunning(taskId)
 
