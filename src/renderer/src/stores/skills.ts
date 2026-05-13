@@ -45,6 +45,10 @@ export const useSkillsStore = defineStore('skills', () => {
 
   const loading = computed(() => fetching.value || searching.value)
 
+  const refreshing = computed(
+    () => installedCache.refreshing.value || agentScanCache.refreshing.value
+  )
+
   const agentScanCache = useCachedResource<AgentScanResult[]>(
     async () => unwrapResult(await window.api.agents.scanAll()),
     []
@@ -206,6 +210,7 @@ export const useSkillsStore = defineStore('skills', () => {
     installing,
     removing,
     loading,
+    refreshing,
     error,
     searchKeyword,
     clearError,

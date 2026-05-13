@@ -21,6 +21,8 @@ export const useEnvStore = defineStore('env', () => {
   const fetching = computed(() => statusCache.loading.value)
   const checking = fetching
 
+  const refreshing = computed(() => statusCache.refreshing.value)
+
   async function check(): Promise<void> {
     try {
       await statusCache.ensure()
@@ -50,6 +52,7 @@ export const useEnvStore = defineStore('env', () => {
     status,
     fetching,
     checking,
+    refreshing,
     downloading,
     downloadProgress,
     error,

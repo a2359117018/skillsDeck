@@ -18,6 +18,8 @@ export const useSettingsStore = defineStore('settings', () => {
   const fetching = computed(() => settingsCache.loading.value)
   const loading = fetching
 
+  const refreshing = computed(() => settingsCache.refreshing.value)
+
   async function load(): Promise<void> {
     try {
       const data = await settingsCache.ensure()
@@ -48,5 +50,5 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  return { defaultAgent, autoCheckEnv, proxyUrl, npmRegistry, loading, fetching, error, load, save }
+  return { defaultAgent, autoCheckEnv, proxyUrl, npmRegistry, loading, fetching, refreshing, error, load, save }
 })
