@@ -23,7 +23,10 @@ skillsStore.setMessageHandler((msg, type) => {
 })
 
 const agentSearchKeyword = ref('')
-const selectedAgent = ref<AgentScanResult | null>(null)
+const selectedAgentFlag = ref<string | null>(null)
+const selectedAgent = computed(
+  () => skillsStore.sortedAgentResults.find((a) => a.agentFlag === selectedAgentFlag.value) || null
+)
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
 
@@ -46,13 +49,13 @@ function getAgentColorIndex(index: number): number {
 }
 
 function openAgentCard(agent: AgentScanResult): void {
-  selectedAgent.value = agent
+  selectedAgentFlag.value = agent.agentFlag
   drawerVisible.value = true
 }
 
 function closeDrawer(): void {
   drawerVisible.value = false
-  selectedAgent.value = null
+  selectedAgentFlag.value = null
 }
 
 function openAgentFolder(agent: AgentScanResult, e?: Event): void {
@@ -100,7 +103,12 @@ async function handleRemove(name: string): Promise<void> {
 }
 
 async function handleRefresh(): Promise<void> {
-  await skillsStore.fetchInstalled()
+  try {
+    await skillsStore.fetchInstalled()
+    message.success('刷新完成')
+  } catch {
+    message.error('刷新失败，请重试')
+  }
 }
 
 onMounted(() => skillsStore.fetchInstalled())
@@ -131,7 +139,7 @@ onMounted(() => skillsStore.fetchInstalled())
           </NInput>
         </div>
         <div class="toolbar-actions">
-          <NButton secondary size="small" :loading="skillsStore.fetching" @click="handleRefresh">
+          <NButton secondary size="small" :disabled="skillsStore.refreshing" @click="handleRefresh">
             <template #icon>
               <NIcon :size="16"><RefreshOutline /></NIcon>
             </template>

@@ -32,7 +32,12 @@ async function loadSkills(): Promise<void> {
 onMounted(() => loadSkills())
 
 async function handleRefresh(): Promise<void> {
-  await loadSkills()
+  try {
+    await loadSkills()
+    message.success('刷新完成')
+  } catch {
+    message.error('刷新失败，请重试')
+  }
 }
 
 async function handleUpdate(name: string): Promise<void> {
@@ -165,7 +170,7 @@ function handleFilterAgent(agentFlag: string): void {
           </NInput>
         </div>
         <div class="toolbar-actions">
-          <NButton secondary size="small" :loading="skillsStore.fetching" @click="handleRefresh">
+          <NButton secondary size="small" :disabled="skillsStore.refreshing" @click="handleRefresh">
             <template #icon>
               <NIcon :size="16"><RefreshOutline /></NIcon>
             </template>

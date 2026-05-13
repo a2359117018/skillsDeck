@@ -48,6 +48,7 @@ const { confirmUpdateAll, confirmUpdateEnv } = useConfirm()
 const envDownloading = ref(false)
 const envDownloadProgress = ref(0)
 
+const isLoaded = ref(false)
 const originalSettings = ref({
   defaultAgent: '',
   autoCheckEnv: true,
@@ -105,12 +106,6 @@ onMounted(() => {
       selectedProxy.value = ''
       customProxyUrl.value = ''
     }
-    originalSettings.value = {
-      defaultAgent: settingsStore.defaultAgent,
-      autoCheckEnv: settingsStore.autoCheckEnv,
-      proxyUrl: effectiveProxyUrl.value,
-      npmRegistry: effectiveRegistryUrl.value
-    }
 
     const storedRegistry = settingsStore.npmRegistry
     const registryPreset = registryOptions.find((o) => o.value === storedRegistry)
@@ -124,6 +119,14 @@ onMounted(() => {
       selectedRegistry.value = ''
       customRegistryUrl.value = ''
     }
+
+    originalSettings.value = {
+      defaultAgent: settingsStore.defaultAgent,
+      autoCheckEnv: settingsStore.autoCheckEnv,
+      proxyUrl: effectiveProxyUrl.value,
+      npmRegistry: effectiveRegistryUrl.value
+    }
+    isLoaded.value = true
   })
 })
 
@@ -193,6 +196,7 @@ function renderProxyTag(props: { option: SelectOption; handleClose: () => void }
 }
 
 const hasUnsavedChanges = computed(() => {
+  if (!isLoaded.value) return false
   return (
     settingsStore.defaultAgent !== originalSettings.value.defaultAgent ||
     settingsStore.autoCheckEnv !== originalSettings.value.autoCheckEnv ||
@@ -273,6 +277,15 @@ async function handleInstallSkills(): Promise<void> {
     message.error(e instanceof Error ? e.message : '安装失败')
   } finally {
     skillsInstalling.value = false
+  }
+}
+
+async function handleEnvRecheck(): Promise<void> {
+  try {
+    await envStore.check()
+    message.success('环境检测完成')
+  } catch {
+    message.error('环境检测失败，请重试')
   }
 }
 
@@ -572,7 +585,7 @@ async function handleUpdateAll(): Promise<void> {
         </div>
 
         <div class="env-actions">
-          <NButton size="small" round :loading="envStore.checking" @click="envStore.check()">
+          <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
             <template #icon>
               <NIcon :size="14"><RefreshOutline /></NIcon>
             </template>
