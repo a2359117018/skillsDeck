@@ -28,6 +28,9 @@ export function useCachedResource<T>(
     if (cache.value && !cache.value.stale) {
       return cache.value.data
     }
+    if (refreshing.value) {
+      return data.value
+    }
     return refresh()
   }
 
