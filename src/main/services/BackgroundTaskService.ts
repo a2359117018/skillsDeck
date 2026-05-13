@@ -16,10 +16,6 @@ class BackgroundTaskService {
     let args: string[]
 
     switch (type) {
-      case 'update-npx':
-        command = 'npm'
-        args = ['update', '-g', 'npx']
-        break
       case 'update-skills':
         command = 'npm'
         args = ['update', '-g', 'skills']
@@ -28,7 +24,7 @@ class BackgroundTaskService {
         throw new Error('install-node not yet supported in BackgroundTaskService')
       case 'install-skills':
         command = 'npm'
-        args = ['install', '-g', 'npx', 'skills']
+        args = ['install', '-g', 'skills']
         break
     }
 
