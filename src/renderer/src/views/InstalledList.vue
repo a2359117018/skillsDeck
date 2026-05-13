@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { NEmpty, NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
@@ -7,11 +7,19 @@ import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
+import SkillRemoveDialog from '../components/skills/SkillRemoveDialog.vue'
+import type { InstalledSkillAgent } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
 const message = useMessage()
 const { confirmUpdate, confirmRemove, confirmUpdateAll } = useConfirm()
+
+const removeDialogState = ref<{
+  visible: boolean
+  skillName: string
+  agents: InstalledSkillAgent[]
+}>({ visible: false, skillName: '', agents: [] })
 
 skillsStore.setMessageHandler((msg, type) => {
   message[type](msg)
@@ -48,18 +56,49 @@ async function handleUpdate(name: string): Promise<void> {
 }
 
 async function handleRemove(name: string): Promise<void> {
-  const confirmed = await confirmRemove(name)
-  if (!confirmed) return
-  try {
-    const result = await skillsStore.remove(name, true)
-    if (result.success) {
-      message.success(`${name} 已删除`)
-      await loadSkills()
-    } else {
+  const skill = skillsStore.installedSkills.find((s) => s.name === name)
+  const agents = skill?.agents || []
+
+  if (agents.length <= 1) {
+    const confirmed = await confirmRemove(name)
+    if (!confirmed) return
+    try {
+      const result = await skillsStore.remove(name, true)
+      if (result.success) {
+        message.success(`${name} 已删除`)
+        await loadSkills()
+      } else {
+        message.error(`${name} 删除失败`)
+      }
+    } catch {
       message.error(`${name} 删除失败`)
     }
+    return
+  }
+
+  removeDialogState.value = { visible: true, skillName: name, agents }
+}
+
+async function handleRemoveDialogDone(result: {
+  confirmed: boolean
+  agent?: string
+}): Promise<void> {
+  if (!result.confirmed) {
+    removeDialogState.value.visible = false
+    return
+  }
+  const { skillName } = removeDialogState.value
+  removeDialogState.value.visible = false
+  try {
+    const removeResult = await skillsStore.remove(skillName, true, result.agent)
+    if (removeResult.success) {
+      message.success(`${skillName} 已删除`)
+      await loadSkills()
+    } else {
+      message.error(`${skillName} 删除失败`)
+    }
   } catch {
-    message.error(`${name} 删除失败`)
+    message.error(`${skillName} 删除失败`)
   }
 }
 
@@ -167,6 +206,14 @@ function handleFilterAgent(agentFlag: string): void {
         </TransitionGroup>
       </div>
       <NEmpty v-else description="暂无已安装的技能" class="empty-state" />
+
+      <!-- Remove Dialog -->
+      <SkillRemoveDialog
+        v-if="removeDialogState.visible"
+        :skill-name="removeDialogState.skillName"
+        :agents="removeDialogState.agents"
+        @done="handleRemoveDialogDone"
+      />
     </div>
   </div>
 </template>
