@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import {
   NModal,
   NCard,
@@ -16,9 +16,10 @@ import {
   NScrollbar,
   useMessage
 } from 'naive-ui'
-import { DownloadOutline, CloseOutline, CheckmarkCircle, CloseCircle } from '@vicons/ionicons5'
+import { DownloadOutline, CheckmarkCircle, CloseCircle } from '@vicons/ionicons5'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import { useSkillsStore } from '../../stores/skills'
+import { useSettingsStore } from '../../stores/settings'
 
 const props = defineProps<{ show: boolean; source: string }>()
 const emit = defineEmits<{
@@ -26,6 +27,7 @@ const emit = defineEmits<{
   (e: 'complete'): void
 }>()
 const skillsStore = useSkillsStore()
+const settingsStore = useSettingsStore()
 const message = useMessage()
 
 const currentStep = ref(1)
@@ -33,10 +35,49 @@ const isGlobal = ref(false)
 const selectedAgents = ref<string[]>([])
 const filterText = ref('')
 const installing = ref(false)
-const installStatus = ref<'idle' | 'installing' | 'success' | 'failed'>('idle')
+const installStatus = ref<'idle' | 'installing' | 'success' | 'failed' | 'cancelled'>('idle')
 const commandOutput = ref('')
+const simulatedProgress = ref(0)
+let progressTimer: ReturnType<typeof setTimeout> | null = null
+
+function startProgressSimulation(): void {
+  simulatedProgress.value = 0
+  const startTime = Date.now()
+
+  function tick(): void {
+    const elapsed = (Date.now() - startTime) / 1000
+    if (elapsed < 3) {
+      simulatedProgress.value = Math.min(85, simulatedProgress.value + 3 + Math.random() * 2)
+      progressTimer = setTimeout(tick, 200)
+    } else if (elapsed < 6) {
+      simulatedProgress.value = Math.min(92, simulatedProgress.value + 1 + Math.random() * 2)
+      progressTimer = setTimeout(tick, 300)
+    } else {
+      simulatedProgress.value = Math.min(92, simulatedProgress.value + Math.random())
+      progressTimer = setTimeout(tick, 500)
+    }
+  }
+
+  progressTimer = setTimeout(tick, 200)
+}
+
+function stopProgressSimulation(): void {
+  if (progressTimer) {
+    clearTimeout(progressTimer)
+    progressTimer = null
+  }
+}
 
 const commonAgents = getCommonAgents()
+
+watch(
+  () => props.show,
+  (visible) => {
+    if (visible) {
+      selectedAgents.value = [settingsStore.defaultAgent]
+    }
+  }
+)
 
 const filteredAgents = computed(() => {
   const text = filterText.value.toLowerCase()
@@ -100,6 +141,7 @@ async function handleInstall(): Promise<void> {
   installing.value = true
   installStatus.value = 'installing'
   commandOutput.value = ''
+  startProgressSimulation()
 
   removeOutputListener = window.api.skills.onInstallOutput((text) => {
     commandOutput.value += text
@@ -111,7 +153,9 @@ async function handleInstall(): Promise<void> {
       selectedAgents.value,
       isGlobal.value
     )
+    stopProgressSimulation()
     if (result.success) {
+      simulatedProgress.value = 100
       installStatus.value = 'success'
       setTimeout(() => {
         emit('update:show', false)
@@ -121,6 +165,7 @@ async function handleInstall(): Promise<void> {
       installStatus.value = 'failed'
     }
   } catch (error) {
+    stopProgressSimulation()
     const errMsg = error instanceof Error ? error.message : String(error)
     commandOutput.value += errMsg
     installStatus.value = 'failed'
@@ -135,9 +180,10 @@ async function handleInstall(): Promise<void> {
 }
 
 async function handleCancelInstall(): Promise<void> {
+  stopProgressSimulation()
   await window.api.skills.cancelInstall()
   commandOutput.value += '\n安装已取消'
-  installStatus.value = 'failed'
+  installStatus.value = 'cancelled'
   installing.value = false
   if (removeOutputListener) {
     removeOutputListener()
@@ -159,14 +205,16 @@ function handleRetry(): void {
 function resetState(): void {
   currentStep.value = 1
   isGlobal.value = false
-  selectedAgents.value = []
+  selectedAgents.value = [settingsStore.defaultAgent]
   filterText.value = ''
   installing.value = false
   installStatus.value = 'idle'
   commandOutput.value = ''
+  simulatedProgress.value = 0
 }
 
 onUnmounted(() => {
+  stopProgressSimulation()
   if (removeOutputListener) {
     removeOutputListener()
     removeOutputListener = null
@@ -273,14 +321,22 @@ const failedLogLines = computed(() => {
 
         <!-- Installing state -->
         <div v-if="installStatus === 'installing'" class="install-progress">
+          <div class="progress-header">
+            <NText depth="3" class="progress-label">正在安装中...</NText>
+            <NText strong class="progress-percent">{{ Math.round(simulatedProgress) }}%</NText>
+          </div>
           <NProgress
             type="line"
-            :percentage="100"
+            :percentage="simulatedProgress"
             :show-indicator="false"
+            :height="8"
+            :border-radius="4"
+            :fill-border-radius="4"
             status="default"
-            processing
           />
-          <NText>正在安装中，请稍候...</NText>
+          <NButton size="small" round class="progress-cancel-btn" @click="handleCancelInstall">
+            取消安装
+          </NButton>
         </div>
 
         <!-- Success state -->
@@ -298,6 +354,12 @@ const failedLogLines = computed(() => {
               <pre class="terminal-content">{{ failedLogLines.join('\n') }}</pre>
             </NScrollbar>
           </div>
+        </div>
+
+        <!-- Cancelled state -->
+        <div v-else-if="installStatus === 'cancelled'" class="install-result install-result--cancelled">
+          <NIcon :size="48" color="#f0a020"><CloseCircle /></NIcon>
+          <NText type="warning">安装已取消</NText>
         </div>
       </div>
 
@@ -324,21 +386,11 @@ const failedLogLines = computed(() => {
             </template>
             确认安装
           </NButton>
-          <NButton
-            v-if="installStatus === 'installing'"
-            type="warning"
-            @click="handleCancelInstall"
-          >
-            <template #icon>
-              <NIcon :size="16"><CloseOutline /></NIcon>
-            </template>
-            取消安装
-          </NButton>
           <NButton v-if="installStatus === 'failed'" type="primary" @click="handleRetry">
             重试
           </NButton>
           <NButton
-            v-if="installStatus === 'failed' || installStatus === 'success'"
+            v-if="installStatus === 'failed' || installStatus === 'success' || installStatus === 'cancelled'"
             @click="handleClose"
           >
             关闭
@@ -396,9 +448,30 @@ const failedLogLines = computed(() => {
 .install-progress {
   display: flex;
   flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg) 0;
+}
+
+.progress-header {
+  display: flex;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-xl) 0;
+  justify-content: space-between;
+}
+
+.progress-label {
+  font-size: var(--text-body-sm);
+}
+
+.progress-percent {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-cancel-btn {
+  align-self: flex-end;
+  margin-top: var(--space-xs);
 }
 
 .install-result {
@@ -415,6 +488,10 @@ const failedLogLines = computed(() => {
 
 .install-result--failed {
   color: #d03050;
+}
+
+.install-result--cancelled {
+  color: #f0a020;
 }
 
 .failed-log {

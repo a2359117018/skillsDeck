@@ -77,10 +77,15 @@ const CUSTOM_REGISTRY_VALUE = '__custom_registry__'
 
 const registryOptions = [
   { label: '不使用镜像', value: '', icon: UnlinkOutline },
-  { label: '淘宝 (npmmirror.com)', value: 'https://npmmirror.com/mirrors/npm/', icon: LinkOutline },
+  { label: '淘宝 (npmmirror.com)', value: 'https://registry.npmmirror.com/', icon: LinkOutline },
   {
     label: '清华大学 (tuna.tsinghua.edu.cn)',
-    value: 'https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/npm/',
+    value: 'https://mirrors.tuna.tsinghua.edu.cn/npm/',
+    icon: LinkOutline
+  },
+  {
+    label: '腾讯云 (tencent.com)',
+    value: 'https://mirrors.cloud.tencent.com/npm/',
     icon: LinkOutline
   },
   { label: '自定义...', value: CUSTOM_REGISTRY_VALUE, icon: PencilOutline }

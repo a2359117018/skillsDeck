@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { NEmpty, NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
@@ -21,6 +21,8 @@ const removeDialogState = ref<{
   agents: InstalledSkillAgent[]
 }>({ visible: false, skillName: '', agents: [] })
 
+let unsubscribeTasks: (() => void) | null = null
+
 skillsStore.setMessageHandler((msg, type) => {
   message[type](msg)
 })
@@ -29,7 +31,14 @@ async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled()
 }
 
-onMounted(() => loadSkills())
+onMounted(() => {
+  loadSkills()
+  unsubscribeTasks = taskStore.subscribe()
+})
+
+onUnmounted(() => {
+  unsubscribeTasks?.()
+})
 
 async function handleRefresh(): Promise<void> {
   try {

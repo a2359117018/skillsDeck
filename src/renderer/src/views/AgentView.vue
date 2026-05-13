@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { NDrawer, NEmpty, NText, NSpace, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
 import {
   FolderOpenOutline,
@@ -29,6 +29,8 @@ const selectedAgent = computed(
 )
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
+
+let unsubscribeTasks: (() => void) | null = null
 
 const visibleAgentResults = computed(() =>
   skillsStore.sortedAgentResults.filter((a) => {
@@ -111,7 +113,14 @@ async function handleRefresh(): Promise<void> {
   }
 }
 
-onMounted(() => skillsStore.fetchInstalled())
+onMounted(() => {
+  skillsStore.fetchInstalled()
+  unsubscribeTasks = taskStore.subscribe()
+})
+
+onUnmounted(() => {
+  unsubscribeTasks?.()
+})
 </script>
 
 <template>

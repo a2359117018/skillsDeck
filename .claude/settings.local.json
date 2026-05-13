@@ -27,7 +27,15 @@
       "mcp__chrome-devtools__fill",
       "mcp__chrome-devtools__list_console_messages",
       "mcp__chrome-devtools__close_page",
-      "mcp__filesystem__create_directory"
+      "mcp__filesystem__create_directory",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__read_text_file",
+      "Bash(typescript-language-server *)",
+      "Bash(where typescript-language-server *)",
+      "Bash(openspec new *)",
+      "Bash(openspec status *)",
+      "Bash(openspec instructions *)",
+      "Bash(grep -E \"\\\\.\\(md|txt\\)$\")"
     ]
   }
 }
