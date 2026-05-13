@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { NDrawer, NEmpty, NText, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
+import {
+  NDrawer,
+  NTooltip,
+  NEmpty,
+  NText,
+  NButton,
+  NIcon,
+  NInput,
+  NSpin,
+  useMessage
+} from 'naive-ui'
 import {
   FolderOpenOutline,
   RefreshOutline,
@@ -217,22 +227,38 @@ onUnmounted(() => {
             </div>
           </div>
           <div class="header-actions">
-            <NButton
-              quaternary
-              circle
-              size="small"
-              class="header-icon-btn"
-              @click="openAgentFolder(selectedAgent!)"
-            >
-              <template #icon>
-                <NIcon :size="18"><FolderOpenOutline /></NIcon>
+            <NTooltip>
+              <template #trigger>
+                <NButton
+                  quaternary
+                  circle
+                  size="small"
+                  class="header-icon-btn"
+                  @click="openAgentFolder(selectedAgent!)"
+                >
+                  <template #icon>
+                    <NIcon :size="18"><FolderOpenOutline /></NIcon>
+                  </template>
+                </NButton>
               </template>
-            </NButton>
-            <NButton quaternary circle size="small" class="header-icon-btn" @click="closeDrawer">
-              <template #icon>
-                <NIcon :size="18"><CloseOutline /></NIcon>
+              打开文件夹
+            </NTooltip>
+            <NTooltip>
+              <template #trigger>
+                <NButton
+                  quaternary
+                  circle
+                  size="small"
+                  class="header-icon-btn"
+                  @click="closeDrawer"
+                >
+                  <template #icon>
+                    <NIcon :size="18"><CloseOutline /></NIcon>
+                  </template>
+                </NButton>
               </template>
-            </NButton>
+              关闭
+            </NTooltip>
           </div>
         </div>
         <div class="drawer-body">
@@ -242,29 +268,39 @@ onUnmounted(() => {
               <div class="skill-name">{{ skillName }}</div>
             </div>
             <div class="skill-actions">
-              <NButton
-                quaternary
-                circle
-                size="small"
-                class="action-btn update"
-                @click="handleUpdate(skillName)"
-              >
-                <template #icon>
-                  <NIcon :size="16"><RefreshOutline /></NIcon>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    quaternary
+                    circle
+                    size="small"
+                    class="action-btn update"
+                    @click="handleUpdate(skillName)"
+                  >
+                    <template #icon>
+                      <NIcon :size="16"><RefreshOutline /></NIcon>
+                    </template>
+                  </NButton>
                 </template>
-              </NButton>
-              <NButton
-                quaternary
-                circle
-                size="small"
-                class="action-btn delete"
-                :loading="removingSkill === skillName"
-                @click="handleRemove(skillName)"
-              >
-                <template #icon>
-                  <NIcon :size="16"><TrashOutline /></NIcon>
+                更新
+              </NTooltip>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    quaternary
+                    circle
+                    size="small"
+                    class="action-btn delete"
+                    :loading="removingSkill === skillName"
+                    @click="handleRemove(skillName)"
+                  >
+                    <template #icon>
+                      <NIcon :size="16"><TrashOutline /></NIcon>
+                    </template>
+                  </NButton>
                 </template>
-              </NButton>
+                删除
+              </NTooltip>
             </div>
           </div>
         </div>
