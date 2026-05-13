@@ -12,6 +12,7 @@ export function useCachedResource<T>(
 ): {
   data: Ref<T>
   loading: Ref<boolean>
+  refreshing: Ref<boolean>
   isStale: Ref<boolean>
   ensure: () => Promise<T>
   invalidate: () => void
@@ -20,6 +21,7 @@ export function useCachedResource<T>(
   const cache = ref<CacheState<T> | null>(null) as Ref<CacheState<T> | null>
   const data = ref<T>(initialValue) as Ref<T>
   const loading = ref(false)
+  const refreshing = ref(false)
   const isStale = ref(true)
 
   async function ensure(): Promise<T> {
@@ -30,7 +32,14 @@ export function useCachedResource<T>(
   }
 
   async function refresh(): Promise<T> {
-    loading.value = true
+    if (refreshing.value) {
+      return data.value
+    }
+    const hasData = cache.value !== null
+    refreshing.value = true
+    if (!hasData) {
+      loading.value = true
+    }
     try {
       const result = await fetcher()
       data.value = result
@@ -41,6 +50,7 @@ export function useCachedResource<T>(
       console.error('Failed to refresh cached resource:', error)
       throw error
     } finally {
+      refreshing.value = false
       loading.value = false
     }
   }
@@ -52,5 +62,5 @@ export function useCachedResource<T>(
     isStale.value = true
   }
 
-  return { data, loading, isStale, ensure, invalidate, refresh }
+  return { data, loading, refreshing, isStale, ensure, invalidate, refresh }
 }
