@@ -35,7 +35,8 @@
       "Bash(openspec new *)",
       "Bash(openspec status *)",
       "Bash(openspec instructions *)",
-      "Bash(grep -E \"\\\\.\\(md|txt\\)$\")"
+      "Bash(grep -E \"\\\\.\\(md|txt\\)$\")",
+      "Bash(start *)"
     ]
   }
 }

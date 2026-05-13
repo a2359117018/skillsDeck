@@ -12,22 +12,23 @@
 
 ## File Map
 
-| File | Action | Responsibility |
-|------|--------|----------------|
-| `src/shared/types.ts` | Modify | Remove `npxInstalled`/`npxVersion` from `EnvStatus`, remove `'update-npx'` from `BackgroundTask` type |
-| `src/main/services/NpxService.ts` | Rename + Modify → `SkillsService.ts` | Rename class, remove `checkNpxVersion()`, change command from `npx` to `skills`, flatten args |
-| `src/main/services/EnvService.ts` | Modify | Remove npx check import/call, use `commandRunner.run('skills', ...)` directly, simplify `installSkillsCli()` |
-| `src/main/services/BackgroundTaskService.ts` | Modify | Remove `'update-npx'` case, change `install-skills` to not include `npx` |
-| `src/main/ipc/skills.ipc.ts` | Modify | Update import from `NpxService` to `SkillsService` |
-| `src/renderer/src/stores/env.ts` | Modify | Remove npx defaults from status cache |
-| `src/renderer/src/App.vue` | Modify | Remove `npxInstalled` from `envOk` check |
-| `src/renderer/src/views/SettingsView.vue` | Modify | Remove npx status block, `handleUpdateNpx` function |
+| File                                         | Action                               | Responsibility                                                                                               |
+| -------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `src/shared/types.ts`                        | Modify                               | Remove `npxInstalled`/`npxVersion` from `EnvStatus`, remove `'update-npx'` from `BackgroundTask` type        |
+| `src/main/services/NpxService.ts`            | Rename + Modify → `SkillsService.ts` | Rename class, remove `checkNpxVersion()`, change command from `npx` to `skills`, flatten args                |
+| `src/main/services/EnvService.ts`            | Modify                               | Remove npx check import/call, use `commandRunner.run('skills', ...)` directly, simplify `installSkillsCli()` |
+| `src/main/services/BackgroundTaskService.ts` | Modify                               | Remove `'update-npx'` case, change `install-skills` to not include `npx`                                     |
+| `src/main/ipc/skills.ipc.ts`                 | Modify                               | Update import from `NpxService` to `SkillsService`                                                           |
+| `src/renderer/src/stores/env.ts`             | Modify                               | Remove npx defaults from status cache                                                                        |
+| `src/renderer/src/App.vue`                   | Modify                               | Remove `npxInstalled` from `envOk` check                                                                     |
+| `src/renderer/src/views/SettingsView.vue`    | Modify                               | Remove npx status block, `handleUpdateNpx` function                                                          |
 
 ---
 
 ### Task 1: Update shared types
 
 **Files:**
+
 - Modify: `src/shared/types.ts`
 
 - [ ] **Step 1: Remove npx fields from EnvStatus and update-npx from BackgroundTask type**
@@ -68,11 +69,13 @@ git commit -m "refactor: remove npx fields from shared types"
 ### Task 2: Rename and refactor NpxService → SkillsService
 
 **Files:**
+
 - Rename: `src/main/services/NpxService.ts` → `src/main/services/SkillsService.ts`
 
 - [ ] **Step 1: Create SkillsService.ts with refactored code**
 
 Create `src/main/services/SkillsService.ts` with the following content. Key changes:
+
 - Class renamed to `SkillsService`, export renamed to `skillsService`
 - `checkNpxVersion()` deleted entirely
 - `checkSkillsVersion()` uses `commandRunner.run('skills', ['--version'])` directly
@@ -184,6 +187,7 @@ git commit -m "refactor: rename NpxService to SkillsService, invoke skills CLI d
 ### Task 3: Update EnvService
 
 **Files:**
+
 - Modify: `src/main/services/EnvService.ts`
 
 - [ ] **Step 1: Remove npx import and calls, simplify installSkillsCli**
@@ -194,6 +198,7 @@ Edit `src/main/services/EnvService.ts`:
    - Delete: `import { npxService } from './NpxService'`
 
 2. Replace the `checkAll()` function to remove npx checks and use `commandRunner` directly for skills:
+
    ```typescript
    export async function checkAll(): Promise<EnvStatus> {
      const node = await safeRun('node', ['--version'], 10000)
@@ -241,6 +246,7 @@ git commit -m "refactor: remove npx checks from EnvService, simplify skills inst
 ### Task 4: Update BackgroundTaskService
 
 **Files:**
+
 - Modify: `src/main/services/BackgroundTaskService.ts`
 
 - [ ] **Step 1: Remove update-npx case and fix install-skills args**
@@ -286,20 +292,25 @@ git commit -m "refactor: remove update-npx task type, fix install-skills command
 ### Task 5: Update IPC handlers
 
 **Files:**
+
 - Modify: `src/main/ipc/skills.ipc.ts`
 
 - [ ] **Step 1: Update import and all references from npxService to skillsService**
 
 Change the import line from:
+
 ```typescript
 import { npxService } from '../services/NpxService'
 ```
+
 to:
+
 ```typescript
 import { skillsService } from '../services/SkillsService'
 ```
 
 Then replace all `npxService.` references in the file with `skillsService.`. There are 7 occurrences:
+
 - Line 45: `npxService.install(...)` → `skillsService.install(...)`
 - Line 76: `npxService.installStreaming(...)` → `skillsService.installStreaming(...)`
 - Line 85: `npxService.cancelInstall()` → `skillsService.cancelInstall()`
@@ -321,6 +332,7 @@ git commit -m "refactor: update skills IPC to use SkillsService"
 ### Task 6: Update renderer store and App.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/env.ts`
 - Modify: `src/renderer/src/App.vue`
 
@@ -362,6 +374,7 @@ git commit -m "refactor: remove npx from renderer env checks"
 ### Task 7: Remove npx UI from SettingsView
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue`
 
 - [ ] **Step 1: Remove handleUpdateNpx function**
@@ -427,6 +440,7 @@ npm run dev
 ```
 
 Manual verification:
+
 1. App launches without errors
 2. Settings page shows 3 env items: Node.js, npm, skills (no npx)
 3. Install/update/remove flows still work correctly

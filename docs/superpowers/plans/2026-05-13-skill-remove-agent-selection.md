@@ -13,6 +13,7 @@
 ### Task 1: Create SkillRemoveDialog component
 
 **Files:**
+
 - Create: `src/renderer/src/components/skills/SkillRemoveDialog.vue`
 
 - [ ] **Step 1: Write the component**
@@ -138,6 +139,7 @@ git commit -m "feat: add SkillRemoveDialog component for agent-targeted deletion
 ### Task 2: Wire SkillRemoveDialog into InstalledList
 
 **Files:**
+
 - Modify: `src/renderer/src/views/InstalledList.vue`
 
 - [ ] **Step 1: Update InstalledList.vue script**

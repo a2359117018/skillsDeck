@@ -12,6 +12,7 @@
 ## Capabilities
 
 ### New Capabilities
+
 - `npm-mirror`: npm 镜像源配置能力，包括设置持久化、预设选项、自定义 URL 输入，以及在 npm install/update 命令中注入 `--registry` 参数
 
 ### Modified Capabilities

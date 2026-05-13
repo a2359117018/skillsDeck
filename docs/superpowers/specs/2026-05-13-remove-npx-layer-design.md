@@ -65,15 +65,15 @@ Remove any `npx`-related type declarations if they exist independently.
 
 ## Files to Modify
 
-| File | Change |
-|------|--------|
-| `src/shared/types.ts` | Remove npx fields from EnvStatus |
-| `src/main/services/NpxService.ts` | Rename to SkillsService, change command from npx to skills |
-| `src/main/services/EnvService.ts` | Remove npx checks, simplify install command |
-| `src/main/ipc/*.ts` | Update imports |
-| `src/renderer/src/stores/env.ts` | Remove npx defaults |
-| `src/renderer/src/App.vue` | Simplify envOk check |
-| `src/renderer/src/views/SettingsView.vue` | Remove npx UI elements |
+| File                                      | Change                                                     |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `src/shared/types.ts`                     | Remove npx fields from EnvStatus                           |
+| `src/main/services/NpxService.ts`         | Rename to SkillsService, change command from npx to skills |
+| `src/main/services/EnvService.ts`         | Remove npx checks, simplify install command                |
+| `src/main/ipc/*.ts`                       | Update imports                                             |
+| `src/renderer/src/stores/env.ts`          | Remove npx defaults                                        |
+| `src/renderer/src/App.vue`                | Simplify envOk check                                       |
+| `src/renderer/src/views/SettingsView.vue` | Remove npx UI elements                                     |
 
 ## Not Changed
 

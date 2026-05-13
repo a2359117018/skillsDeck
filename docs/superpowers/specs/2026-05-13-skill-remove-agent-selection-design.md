@@ -35,6 +35,7 @@ A single-purpose confirmation dialog that receives a skill name and its agent li
 Add `confirmRemoveWithAgent(name: string, agents: InstalledSkillAgent[]): Promise<{ confirmed: boolean; agent?: string }>`.
 
 Internally:
+
 - `agents.length <= 1` → delegate to existing `confirmRemove(name)`, returning `{ confirmed, agent: agents[0]?.name }`
 - `agents.length > 1` → programmatically render SkillRemoveDialog and return its result
 

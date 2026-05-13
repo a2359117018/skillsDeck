@@ -78,15 +78,15 @@ async function handleRefresh() {
 
 ### Affected Files
 
-| File | Change |
-|---|---|
+| File                                                | Change                                                    |
+| --------------------------------------------------- | --------------------------------------------------------- |
 | `src/renderer/src/composables/useCachedResource.ts` | Add `refreshing` ref, refactor `refresh()` and `ensure()` |
-| `src/renderer/src/stores/skills.ts` | Export `refreshing` computed |
-| `src/renderer/src/stores/settings.ts` | Export `refreshing` computed |
-| `src/renderer/src/stores/env.ts` | Export `refreshing` computed |
-| `src/renderer/src/views/AgentView.vue` | Remove `:loading`, add toast, update spinner condition |
-| `src/renderer/src/views/InstalledList.vue` | Remove `:loading`, add toast, update spinner condition |
-| `src/renderer/src/views/SettingsView.vue` | Remove `:loading` on env check, add toast |
+| `src/renderer/src/stores/skills.ts`                 | Export `refreshing` computed                              |
+| `src/renderer/src/stores/settings.ts`               | Export `refreshing` computed                              |
+| `src/renderer/src/stores/env.ts`                    | Export `refreshing` computed                              |
+| `src/renderer/src/views/AgentView.vue`              | Remove `:loading`, add toast, update spinner condition    |
+| `src/renderer/src/views/InstalledList.vue`          | Remove `:loading`, add toast, update spinner condition    |
+| `src/renderer/src/views/SettingsView.vue`           | Remove `:loading` on env check, add toast                 |
 
 ### Error Handling
 

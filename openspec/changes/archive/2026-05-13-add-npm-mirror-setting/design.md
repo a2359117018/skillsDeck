@@ -3,6 +3,7 @@
 当前设置页面已有一个 GitHub 代理配置（`proxyUrl`），用于在 `npx skills add` 时包装 git clone URL。但 npm 全局包的安装和更新（`npm install -g`、`npm update -g`）仍使用默认的 npm registry（`registry.npmjs.org`），国内用户经常遇到超时或下载失败。
 
 涉及 npm 命令的执行点有两处：
+
 1. `BackgroundTaskService` — update-npx、update-skills、install-skills 三个后台任务
 2. `EnvService.installSkillsCli()` — 前台安装 skills CLI
 
@@ -11,11 +12,13 @@
 ## Goals / Non-Goals
 
 **Goals:**
+
 - 让用户在设置中选择 npm 镜像源，加速全局包的安装和更新
 - 提供常用预设（淘宝、清华）和自定义 URL 支持
 - UI 交互复用现有 GitHub 代理的 preset + 自定义模式，保持一致性
 
 **Non-Goals:**
+
 - 不修改用户系统级 `.npmrc`，仅在进程命令中通过 `--registry` 参数生效
 - 不影响 `npx skills add` 等 git 操作（那部分由 GitHub 代理处理）
 - 不做自动检测网络并切换镜像的智能逻辑

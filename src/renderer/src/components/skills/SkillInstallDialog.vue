@@ -357,7 +357,10 @@ const failedLogLines = computed(() => {
         </div>
 
         <!-- Cancelled state -->
-        <div v-else-if="installStatus === 'cancelled'" class="install-result install-result--cancelled">
+        <div
+          v-else-if="installStatus === 'cancelled'"
+          class="install-result install-result--cancelled"
+        >
           <NIcon :size="48" color="#f0a020"><CloseCircle /></NIcon>
           <NText type="warning">安装已取消</NText>
         </div>
@@ -390,7 +393,11 @@ const failedLogLines = computed(() => {
             重试
           </NButton>
           <NButton
-            v-if="installStatus === 'failed' || installStatus === 'success' || installStatus === 'cancelled'"
+            v-if="
+              installStatus === 'failed' ||
+              installStatus === 'success' ||
+              installStatus === 'cancelled'
+            "
             @click="handleClose"
           >
             关闭

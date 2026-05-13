@@ -13,6 +13,7 @@
 ### Task 1: Refactor useCachedResource composable
 
 **Files:**
+
 - Modify: `src/renderer/src/composables/useCachedResource.ts`
 
 - [ ] **Step 1: Add `refreshing` ref and refactor `refresh()` / `ensure()` logic**
@@ -89,6 +90,7 @@ export function useCachedResource<T>(
 ```
 
 Key changes:
+
 - New `refreshing` ref tracks background refresh state
 - `refresh()` deduplicates: returns current data if already refreshing
 - `loading` only set to true when no cached data exists (`hasData = false`)
@@ -111,6 +113,7 @@ git commit -m "refactor: add refreshing state to useCachedResource for async ref
 ### Task 2: Update skills store to expose `refreshing`
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/skills.ts`
 
 - [ ] **Step 1: Add `refreshing` computed and export it**
@@ -179,6 +182,7 @@ git commit -m "feat: expose refreshing state from skills store"
 ### Task 3: Update settings store to expose `refreshing`
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/settings.ts`
 
 - [ ] **Step 1: Add `refreshing` computed and export it**
@@ -192,7 +196,18 @@ const refreshing = computed(() => settingsCache.refreshing.value)
 Add `refreshing` to the return object (line 51):
 
 ```typescript
-return { defaultAgent, autoCheckEnv, proxyUrl, npmRegistry, loading, fetching, refreshing, error, load, save }
+return {
+  defaultAgent,
+  autoCheckEnv,
+  proxyUrl,
+  npmRegistry,
+  loading,
+  fetching,
+  refreshing,
+  error,
+  load,
+  save
+}
 ```
 
 - [ ] **Step 2: Verify TypeScript compiles**
@@ -212,6 +227,7 @@ git commit -m "feat: expose refreshing state from settings store"
 ### Task 4: Update env store to expose `refreshing`
 
 **Files:**
+
 - Modify: `src/renderer/src/stores/env.ts`
 
 - [ ] **Step 1: Add `refreshing` computed and export it**
@@ -255,6 +271,7 @@ git commit -m "feat: expose refreshing state from env store"
 ### Task 5: Update AgentView to async refresh pattern
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue`
 
 - [ ] **Step 1: Update `handleRefresh` to async callback with toast**
@@ -297,9 +314,11 @@ With:
 - [ ] **Step 3: Verify full-page spinner condition is correct**
 
 The existing condition on line 147:
+
 ```vue
 <div v-if="skillsStore.fetching && visibleAgentResults.length === 0" class="page-loading">
 ```
+
 No change needed. After Task 1 refactor, `skillsStore.fetching` (= `installedCache.loading`) is only `true` during the first fetch when no cached data exists — exactly when we want the spinner.
 
 - [ ] **Step 4: Verify the app builds**
@@ -319,6 +338,7 @@ git commit -m "feat: AgentView refresh button uses async pattern with toast"
 ### Task 6: Update InstalledList to async refresh pattern
 
 **Files:**
+
 - Modify: `src/renderer/src/views/InstalledList.vue`
 
 - [ ] **Step 1: Update `loadSkills` and `handleRefresh`**
@@ -369,9 +389,11 @@ With:
 - [ ] **Step 3: Verify full-page spinner condition is correct**
 
 The existing condition on line 190:
+
 ```vue
 v-if="skillsStore.fetching && skillsStore.filteredSkills.length === 0"
 ```
+
 No change needed. Same reasoning as Task 5 Step 3 — `fetching` now means "initial load only".
 
 - [ ] **Step 4: Verify the app builds**
@@ -391,6 +413,7 @@ git commit -m "feat: InstalledList refresh button uses async pattern with toast"
 ### Task 7: Update SettingsView env check to async refresh pattern
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue`
 
 - [ ] **Step 1: Add `handleEnvRecheck` function with toast**
@@ -465,6 +488,7 @@ Expected: No new errors
 - [ ] **Step 3: Manual smoke test**
 
 Start dev server with `npm run dev` and verify:
+
 1. AgentView: click refresh → no spinner, toast "刷新完成"
 2. InstalledList: click refresh → no spinner, toast "刷新完成"
 3. SettingsView: click "重新检测" → no spinner, toast "环境检测完成"
