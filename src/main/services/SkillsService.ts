@@ -3,20 +3,6 @@ import { commandRunner } from './CommandRunner'
 import { getSettings } from './StoreService'
 
 class SkillsService {
-  async checkSkillsVersion(): Promise<{ ok: boolean; version: string | null }> {
-    try {
-      const result = await commandRunner.run('skills', ['--version'], {
-        timeout: 10000
-      })
-      if (result.success) {
-        return { ok: true, version: result.stdout.trim() }
-      }
-      return { ok: false, version: null }
-    } catch {
-      return { ok: false, version: null }
-    }
-  }
-
   async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
     return commandRunner.run('skills', args)
