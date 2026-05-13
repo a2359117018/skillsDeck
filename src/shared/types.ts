@@ -3,15 +3,13 @@ export interface EnvStatus {
   nodeVersion: string | null
   npmInstalled: boolean
   npmVersion: string | null
-  npxInstalled: boolean
-  npxVersion: string | null
   skillsInstalled: boolean
   skillsVersion: string | null
 }
 
 export interface BackgroundTask {
   id: string
-  type: 'update-npx' | 'update-skills' | 'install-node' | 'install-skills'
+  type: 'update-skills' | 'install-node' | 'install-skills'
   status: 'pending' | 'running' | 'success' | 'error' | 'cancelled'
   progress: number
   stdout: string
