@@ -40,6 +40,11 @@ export const useSkillsStore = defineStore('skills', () => {
     ((msg: string, type: 'success' | 'warning' | 'error') => void) | null
   >(null)
 
+  const agentScanCache = useCachedResource<AgentScanResult[]>(
+    async () => unwrapResult(await window.api.agents.scanAll()),
+    []
+  )
+
   const fetching = computed(() => installedCache.loading.value)
   const installedSkills = computed(() => installedCache.data.value)
 
@@ -47,11 +52,6 @@ export const useSkillsStore = defineStore('skills', () => {
 
   const refreshing = computed(
     () => installedCache.refreshing.value || agentScanCache.refreshing.value
-  )
-
-  const agentScanCache = useCachedResource<AgentScanResult[]>(
-    async () => unwrapResult(await window.api.agents.scanAll()),
-    []
   )
 
   const filteredSkills = computed(() => {
