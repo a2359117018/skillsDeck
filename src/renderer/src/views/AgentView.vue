@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { NDrawer, NEmpty, NText, NSpace, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
+import { NDrawer, NEmpty, NText, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
 import {
   FolderOpenOutline,
   RefreshOutline,
@@ -236,37 +236,36 @@ onUnmounted(() => {
           </div>
         </div>
         <div class="drawer-body">
-          <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-row">
-            <div class="skill-row-info">
-              <NText strong class="skill-row-name">{{ skillName }}</NText>
+          <div v-for="(skillName, idx) in selectedAgent.skills" :key="skillName" class="skill-card">
+            <div class="skill-left">
+              <div class="skill-index">{{ String(idx + 1).padStart(2, '0') }}</div>
+              <div class="skill-name">{{ skillName }}</div>
             </div>
-            <NSpace :size="8" align="center">
+            <div class="skill-actions">
               <NButton
-                text
+                quaternary
+                circle
                 size="small"
-                type="primary"
-                title="更新"
+                class="action-btn update"
                 @click="handleUpdate(skillName)"
               >
                 <template #icon>
                   <NIcon :size="16"><RefreshOutline /></NIcon>
                 </template>
-                更新
               </NButton>
               <NButton
-                text
+                quaternary
+                circle
                 size="small"
-                type="error"
-                title="删除"
+                class="action-btn delete"
                 :loading="removingSkill === skillName"
                 @click="handleRemove(skillName)"
               >
                 <template #icon>
                   <NIcon :size="16"><TrashOutline /></NIcon>
                 </template>
-                删除
               </NButton>
-            </NSpace>
+            </div>
           </div>
         </div>
       </div>
@@ -547,36 +546,86 @@ onUnmounted(() => {
   color: #2563eb !important;
 }
 
-/* Drawer Body */
+/* Drawer Body - 卡片列表 */
 .drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-lg);
-}
-
-/* Skill Row */
-.skill-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--color-hairline);
-}
-
-.skill-row:last-child {
-  border-bottom: none;
-}
-
-.skill-row-info {
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xxs);
+  gap: 8px;
+  background: #eff6ff;
+}
+
+/* Skill Card */
+.skill-card {
+  background: white;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 150ms ease;
+}
+
+.skill-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.1);
+}
+
+.skill-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
   flex: 1;
 }
 
-.skill-row-name {
+.skill-index {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-bold);
+  flex-shrink: 0;
+}
+
+.skill-name {
+  font-size: var(--text-body-md);
+  font-weight: var(--weight-semibold);
   color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Action Buttons */
+.skill-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 32px !important;
+  height: 32px !important;
+  color: #475569 !important;
+}
+
+.action-btn.update:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #2563eb !important;
+}
+
+.action-btn.delete:hover {
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
 }
 </style>
 
