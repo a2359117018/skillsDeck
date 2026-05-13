@@ -276,24 +276,6 @@ async function handleInstallSkills(): Promise<void> {
   }
 }
 
-async function handleUpdateNpx(): Promise<void> {
-  const confirmed = await confirmUpdateEnv('npx', envStore.status?.npxVersion || '')
-  if (!confirmed) return
-  taskStore
-    .start('update-npx', {
-      onSuccess: () => {
-        message.success('npx 更新成功')
-        envStore.check()
-      },
-      onError: (err) => {
-        message.error(`npx 更新失败: ${err}`)
-      }
-    })
-    .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
-    })
-}
-
 async function handleUpdateSkills(): Promise<void> {
   const confirmed = await confirmUpdateEnv('skills', envStore.status?.skillsVersion || '')
   if (!confirmed) return
@@ -519,34 +501,6 @@ async function handleUpdateAll(): Promise<void> {
               <NText depth="3" class="env-check-version">{{
                 envStore.status?.npmVersion || '未安装'
               }}</NText>
-            </div>
-          </div>
-
-          <div class="env-check-item">
-            <div
-              class="env-check-icon"
-              :class="{
-                success: envStore.status?.npxInstalled,
-                error: !envStore.status?.npxInstalled
-              }"
-            >
-              <NIcon :size="16">
-                <component :is="envStore.status?.npxInstalled ? CheckmarkOutline : CloseOutline" />
-              </NIcon>
-            </div>
-            <div class="env-check-body">
-              <NText class="env-check-name">npx</NText>
-              <NText depth="3" class="env-check-version">{{
-                envStore.status?.npxVersion || '未安装'
-              }}</NText>
-            </div>
-            <div v-if="envStore.status?.npxInstalled" class="env-check-actions">
-              <NButton size="tiny" round @click="handleUpdateNpx">
-                <template #icon>
-                  <NIcon :size="12"><RefreshOutline /></NIcon>
-                </template>
-                更新
-              </NButton>
             </div>
           </div>
 

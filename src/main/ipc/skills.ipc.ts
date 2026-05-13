@@ -130,7 +130,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       const taskId = backgroundTaskService.register('skill-update')
       backgroundTaskService.markRunning(taskId)
 
-      npxService
+      skillsService
         .update(opts.packageRef, opts.global)
         .then((result) => {
           if (result.success) {
@@ -157,7 +157,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     const taskId = backgroundTaskService.register('skill-update-all')
     backgroundTaskService.markRunning(taskId)
 
-    npxService
+    skillsService
       .updateAll(opts?.global)
       .then((result) => {
         if (result.success) {
