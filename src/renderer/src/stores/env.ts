@@ -9,8 +9,6 @@ export const useEnvStore = defineStore('env', () => {
     nodeVersion: null,
     npmInstalled: false,
     npmVersion: null,
-    npxInstalled: false,
-    npxVersion: null,
     skillsInstalled: false,
     skillsVersion: null
   })

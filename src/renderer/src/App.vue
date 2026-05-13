@@ -20,7 +20,7 @@ const isMainWindow = windowType === 'main'
 
 const envOk = computed(() => {
   const s = envStore.status
-  return s?.nodeInstalled && s?.npmInstalled && s?.npxInstalled && s?.skillsInstalled
+  return s?.nodeInstalled && s?.npmInstalled && s?.skillsInstalled
 })
 
 const envBannerVisible = computed(
