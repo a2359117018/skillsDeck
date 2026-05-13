@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import type { CommandErrorInfo } from '../../shared/types'
-import { npxService } from '../services/NpxService'
+import { skillsService } from '../services/SkillsService'
 import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'
 import { searchSkillsApi } from '../api/skills'
@@ -42,7 +42,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       try {
         return {
           ok: true,
-          data: await npxService.install(opts.source, opts.agents, opts.global)
+          data: await skillsService.install(opts.source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -73,7 +73,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         }
         return {
           ok: true,
-          data: await npxService.installStreaming(onOutput, opts.source, opts.agents, opts.global)
+          data: await skillsService.installStreaming(onOutput, opts.source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -82,12 +82,12 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
   )
 
   ipcMain.handle('skills:install-cancel', () => {
-    npxService.cancelInstall()
+    skillsService.cancelInstall()
   })
 
   ipcMain.handle('skills:update', async (_, opts: { packageRef: string; global?: boolean }) => {
     try {
-      return { ok: true, data: await npxService.update(opts.packageRef, opts.global) }
+      return { ok: true, data: await skillsService.update(opts.packageRef, opts.global) }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
     }
@@ -95,7 +95,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
   ipcMain.handle('skills:update-all', async (_, opts?: { global?: boolean }) => {
     try {
-      return { ok: true, data: await npxService.updateAll(opts?.global) }
+      return { ok: true, data: await skillsService.updateAll(opts?.global) }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
     }
@@ -107,7 +107,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       try {
         return {
           ok: true,
-          data: await npxService.remove(opts.packageRef, opts.agent, opts.global)
+          data: await skillsService.remove(opts.packageRef, opts.agent, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
