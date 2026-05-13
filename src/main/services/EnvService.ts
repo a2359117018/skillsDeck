@@ -4,7 +4,6 @@ import { join } from 'path'
 import decompress from 'decompress'
 import type { EnvStatus } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
-import { npxService } from './NpxService'
 import { getSettings } from './StoreService'
 
 let downloadAbortController: AbortController | null = null
@@ -31,17 +30,14 @@ async function safeRun(
 export async function checkAll(): Promise<EnvStatus> {
   const node = await safeRun('node', ['--version'], 10000)
   const npm = await safeRun('npm', ['--version'], 10000)
-  const npx = await npxService.checkNpxVersion()
-  const skills = await npxService.checkSkillsVersion()
+  const skills = await safeRun('skills', ['--version'], 10000)
   return {
     nodeInstalled: node.success,
     nodeVersion: node.success ? node.stdout.trim() : null,
     npmInstalled: npm.success,
     npmVersion: npm.success ? npm.stdout.trim() : null,
-    npxInstalled: npx.ok,
-    npxVersion: npx.ok ? npx.version : null,
-    skillsInstalled: skills.ok,
-    skillsVersion: skills.ok ? skills.version : null
+    skillsInstalled: skills.success,
+    skillsVersion: skills.success ? skills.stdout.trim() : null
   }
 }
 
@@ -151,7 +147,7 @@ export function registerNodeInPath(nodeDir: string): void {
  */
 export async function installSkillsCli(): Promise<{ success: boolean; stdout: string }> {
   try {
-    const args = ['install', '-g', 'npx', 'skills']
+    const args = ['install', '-g', 'skills']
     const registry = getSettings().npmRegistry
     if (registry) {
       args.push('--registry', registry)
