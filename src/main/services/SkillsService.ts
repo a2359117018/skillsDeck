@@ -2,22 +2,10 @@ import type { CommandResult } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
 import { getSettings } from './StoreService'
 
-class NpxService {
-  async checkNpxVersion(): Promise<{ ok: boolean; version: string | null }> {
-    try {
-      const result = await commandRunner.run('npx', ['--version'], { timeout: 10000 })
-      if (result.success) {
-        return { ok: true, version: result.stdout.trim() }
-      }
-      return { ok: false, version: null }
-    } catch {
-      return { ok: false, version: null }
-    }
-  }
-
+class SkillsService {
   async checkSkillsVersion(): Promise<{ ok: boolean; version: string | null }> {
     try {
-      const result = await commandRunner.run('npx', ['skills', '--version'], {
+      const result = await commandRunner.run('skills', ['--version'], {
         timeout: 10000
       })
       if (result.success) {
@@ -31,7 +19,7 @@ class NpxService {
 
   async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    return commandRunner.run('npx', args)
+    return commandRunner.run('skills', args)
   }
 
   async installStreaming(
@@ -41,7 +29,7 @@ class NpxService {
     global?: boolean
   ): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    return commandRunner.run('npx', args, { onOutput })
+    return commandRunner.run('skills', args, { onOutput })
   }
 
   cancelInstall(): void {
@@ -51,24 +39,24 @@ class NpxService {
   async update(name: string, global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', name, '-y')
     if (global) args.push('-g')
-    return commandRunner.run('npx', args)
+    return commandRunner.run('skills', args)
   }
 
   async updateAll(global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', '-y')
     if (global) args.push('-g')
-    return commandRunner.run('npx', args)
+    return commandRunner.run('skills', args)
   }
 
   async remove(name: string, agent?: string, global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('remove', name, '-y')
     if (global) args.push('-g')
     if (agent) args.push('-a', agent)
-    return commandRunner.run('npx', args)
+    return commandRunner.run('skills', args)
   }
 
   private buildArgs(subcommand: string, ...parts: string[]): string[] {
-    return ['skills', subcommand, ...parts]
+    return [subcommand, ...parts]
   }
 
   private buildGitUrl(source: string): string {
@@ -92,4 +80,4 @@ class NpxService {
   }
 }
 
-export const npxService = new NpxService()
+export const skillsService = new SkillsService()
