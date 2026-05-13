@@ -209,23 +209,31 @@ onUnmounted(() => {
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
         <div class="drawer-header">
-          <div class="drawer-header-content">
-            <div>
-              <div class="drawer-header-name">{{ selectedAgent.agentName }}</div>
-              <div class="drawer-header-count">{{ selectedAgent.count }} 个技能</div>
+          <div class="header-left">
+            <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
+            <div class="header-info">
+              <div class="header-name">{{ selectedAgent.agentName }}</div>
+              <div class="header-count">{{ selectedAgent.count }} 个技能</div>
             </div>
-            <NButton secondary size="small" @click="openAgentFolder(selectedAgent!)">
+          </div>
+          <div class="header-actions">
+            <NButton
+              quaternary
+              circle
+              size="small"
+              class="header-icon-btn"
+              @click="openAgentFolder(selectedAgent!)"
+            >
               <template #icon>
-                <NIcon :size="16"><FolderOpenOutline /></NIcon>
+                <NIcon :size="18"><FolderOpenOutline /></NIcon>
               </template>
-              打开文件夹
+            </NButton>
+            <NButton quaternary circle size="small" class="header-icon-btn" @click="closeDrawer">
+              <template #icon>
+                <NIcon :size="18"><CloseOutline /></NIcon>
+              </template>
             </NButton>
           </div>
-          <NButton quaternary circle class="drawer-close-btn" @click="closeDrawer">
-            <template #icon>
-              <NIcon :size="20"><CloseOutline /></NIcon>
-            </template>
-          </NButton>
         </div>
         <div class="drawer-body">
           <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-row">
@@ -470,37 +478,73 @@ onUnmounted(() => {
   background: white;
 }
 
-/* Drawer Header */
+/* Drawer Header - 紧凑一行布局 */
 .drawer-header {
-  padding: var(--space-lg) var(--space-xxl);
-  background: #f8f9fa;
+  padding: 12px 20px;
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-hairline);
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
 }
 
-.drawer-header-content {
+.header-left {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
-.drawer-header-name {
-  font-size: var(--text-heading-lg);
+.header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-body-sm);
+  flex-shrink: 0;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-name {
+  font-size: var(--text-body-lg);
   font-weight: var(--weight-bold);
   color: var(--color-ink);
 }
 
-.drawer-header-count {
-  font-size: var(--text-body-sm);
-  color: var(--color-stone);
-  margin-top: var(--space-xxs);
+.header-count {
+  font-size: var(--text-caption);
+  color: #475569;
+  background: rgba(37, 99, 235, 0.08);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  width: fit-content;
 }
 
-.drawer-close-btn {
-  position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-icon-btn {
+  width: 34px !important;
+  height: 34px !important;
+  color: #475569 !important;
+}
+
+.header-icon-btn:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #2563eb !important;
 }
 
 /* Drawer Body */
