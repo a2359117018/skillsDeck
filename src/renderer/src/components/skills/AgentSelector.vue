@@ -53,7 +53,10 @@ function toggleAgent(agentFlag: string): void {
 function toggleSelectAll(): void {
   const flags = filteredAgents.value.map((a) => a.agentFlag)
   if (allFilteredSelected.value) {
-    emit('update:modelValue', props.modelValue.filter((s) => !flags.includes(s)))
+    emit(
+      'update:modelValue',
+      props.modelValue.filter((s) => !flags.includes(s))
+    )
   } else {
     emit('update:modelValue', [...new Set([...props.modelValue, ...flags])])
   }
@@ -125,9 +128,7 @@ defineExpose({ canConfirm })
         </NSpace>
       </div>
 
-      <NText depth="3" class="selected-count">
-        已选: {{ modelValue.length }} 个 agent
-      </NText>
+      <NText depth="3" class="selected-count"> 已选: {{ modelValue.length }} 个 agent </NText>
     </div>
   </div>
 </template>

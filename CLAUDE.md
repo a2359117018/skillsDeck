@@ -89,14 +89,14 @@ src/
 
 ### IPC Channels
 
-| Category | Channels |
-|----------|----------|
-| Skills | `skills:search`, `skills:list`, `skills:install`, `skills:install-streaming`, `skills:install-cancel`, `skills:update`, `skills:update-all`, `skills:remove` |
-| Agents | `agent:scan-all`, `agent:scan-one` |
-| Environment | `env:check`, `env:install-node`, `env:install-skills`, `env:cancel-install-node`, `env:download-progress` |
-| Settings | `store:get-settings`, `store:set-settings` |
-| Tasks | `tasks:start`, `tasks:cancel`, `tasks:get-all`, `tasks:update` |
-| Shell | `shell:open-path`, `window:open-settings` |
+| Category    | Channels                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Skills      | `skills:search`, `skills:list`, `skills:install`, `skills:install-streaming`, `skills:install-cancel`, `skills:update`, `skills:update-all`, `skills:remove` |
+| Agents      | `agent:scan-all`, `agent:scan-one`                                                                                                                           |
+| Environment | `env:check`, `env:install-node`, `env:install-skills`, `env:cancel-install-node`, `env:download-progress`                                                    |
+| Settings    | `store:get-settings`, `store:set-settings`                                                                                                                   |
+| Tasks       | `tasks:start`, `tasks:cancel`, `tasks:get-all`, `tasks:update`                                                                                               |
+| Shell       | `shell:open-path`, `window:open-settings`                                                                                                                    |
 
 ### Shared Types (shared/types.ts)
 

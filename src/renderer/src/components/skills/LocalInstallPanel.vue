@@ -5,7 +5,7 @@ import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
 
-const props = defineProps<{
+defineProps<{
   skills: ScannedSkill[]
   loading?: boolean
   error?: string | null
@@ -36,9 +36,7 @@ async function handleInstall(): Promise<void> {
   installing.value = true
   installResult.value = null
   try {
-    const agents = isGlobal.value
-      ? []
-      : selectedAgents.value
+    const agents = isGlobal.value ? [] : selectedAgents.value
     emit('install', {
       skillDirs: selectedSkills.value,
       agents,
@@ -52,9 +50,7 @@ async function handleInstall(): Promise<void> {
 function showInstallResult(result: LocalInstallResult): void {
   installResult.value = result
   if (result.failed.length > 0) {
-    message.error(
-      `安装完成：${result.success.length} 个成功，${result.failed.length} 个失败`
-    )
+    message.error(`安装完成：${result.success.length} 个成功，${result.failed.length} 个失败`)
   } else {
     message.success(`成功安装 ${result.success.length} 个技能`)
   }
@@ -77,15 +73,12 @@ defineExpose({ showInstallResult })
     <div v-else-if="skills.length > 0" class="panel-content">
       <div class="panel-section">
         <NText depth="3" class="section-title">扫描到的技能</NText>
-        <SkillScanResult v-model:modelValue="selectedSkills" :skills="skills" />
+        <SkillScanResult v-model:model-value="selectedSkills" :skills="skills" />
       </div>
 
       <div class="panel-section">
         <NText depth="3" class="section-title">安装目标</NText>
-        <AgentSelector
-          v-model:modelValue="selectedAgents"
-          v-model:isGlobal="isGlobal"
-        />
+        <AgentSelector v-model:model-value="selectedAgents" v-model:is-global="isGlobal" />
       </div>
 
       <div class="panel-actions">
@@ -100,19 +93,12 @@ defineExpose({ showInstallResult })
       </div>
 
       <div v-if="installResult" class="install-result">
-        <NText
-          v-if="installResult.success.length > 0"
-          type="success"
-        >
+        <NText v-if="installResult.success.length > 0" type="success">
           成功: {{ installResult.success.join(', ') }}
         </NText>
         <div v-if="installResult.failed.length > 0">
           <NText type="error">失败:</NText>
-          <div
-            v-for="f in installResult.failed"
-            :key="f.name"
-            class="fail-item"
-          >
+          <div v-for="f in installResult.failed" :key="f.name" class="fail-item">
             <NText type="error">{{ f.name }}: {{ f.error }}</NText>
           </div>
         </div>

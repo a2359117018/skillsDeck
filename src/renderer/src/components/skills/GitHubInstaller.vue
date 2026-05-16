@@ -109,9 +109,7 @@ async function handleInstall(payload: {
       >
         解析
       </NButton>
-      <NButton v-if="parsing && showProgress" @click="handleCancel">
-        取消
-      </NButton>
+      <NButton v-if="parsing && showProgress" @click="handleCancel"> 取消 </NButton>
     </div>
 
     <div v-if="showProgress" class="progress-section">

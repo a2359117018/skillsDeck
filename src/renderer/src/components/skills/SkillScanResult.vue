@@ -17,15 +17,17 @@ const allSelected = computed(
 )
 
 const someSelected = computed(
-  () =>
-    props.skills.some((s) => props.modelValue.includes(s.path)) && !allSelected.value
+  () => props.skills.some((s) => props.modelValue.includes(s.path)) && !allSelected.value
 )
 
 function toggleAll(): void {
   if (allSelected.value) {
     emit('update:modelValue', [])
   } else {
-    emit('update:modelValue', props.skills.map((s) => s.path))
+    emit(
+      'update:modelValue',
+      props.skills.map((s) => s.path)
+    )
   }
 }
 
@@ -44,21 +46,13 @@ function toggleSkill(path: string): void {
 <template>
   <div class="scan-result">
     <div v-if="skills.length > 0" class="scan-header">
-      <NCheckbox
-        :checked="allSelected"
-        :indeterminate="someSelected"
-        @update:checked="toggleAll"
-      >
+      <NCheckbox :checked="allSelected" :indeterminate="someSelected" @update:checked="toggleAll">
         全选 ({{ modelValue.length }} / {{ skills.length }})
       </NCheckbox>
     </div>
     <div v-if="skills.length > 0" class="scan-list">
       <NSpace vertical :size="8">
-        <div
-          v-for="skill in skills"
-          :key="skill.path"
-          class="scan-item"
-        >
+        <div v-for="skill in skills" :key="skill.path" class="scan-item">
           <NCheckbox
             :checked="modelValue.includes(skill.path)"
             @update:checked="() => toggleSkill(skill.path)"
