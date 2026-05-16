@@ -138,7 +138,11 @@ export class GitHubSkillInstaller {
         : extractDir
 
     if (subPath) {
-      scanDir = path.join(scanDir, subPath)
+      const cleanSubPath = subPath.replace(/\.{2}/g, '').replace(/^[\\/]+/, '')
+      if (!cleanSubPath) {
+        throw new Error('Invalid subPath in GitHub URL')
+      }
+      scanDir = path.join(scanDir, cleanSubPath)
     }
 
     return localSkillInstaller.scanSkills(scanDir)

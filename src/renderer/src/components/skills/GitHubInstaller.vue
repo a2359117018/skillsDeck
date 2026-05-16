@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
 import { NInput, NButton, NProgress, NText, useMessage } from 'naive-ui'
-import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
+import type { ScannedSkill } from '../../../../shared/types'
 import LocalInstallPanel from './LocalInstallPanel.vue'
 
 const emit = defineEmits<{
@@ -30,6 +30,10 @@ async function handleParse(): Promise<void> {
     message.warning('请输入 GitHub 仓库链接')
     return
   }
+  if (removeProgressListener) {
+    removeProgressListener()
+    removeProgressListener = null
+  }
   parsing.value = true
   error.value = null
   scannedSkills.value = []
@@ -45,7 +49,7 @@ async function handleParse(): Promise<void> {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    scannedSkills.value = result.data as ScannedSkill[]
+    scannedSkills.value = result.data
     if (scannedSkills.value.length === 0) {
       message.info('未在仓库中扫描到技能文件')
     }
@@ -81,8 +85,7 @@ async function handleInstall(payload: {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    const data = result.data as LocalInstallResult
-    panelRef.value?.showInstallResult(data)
+    panelRef.value?.showInstallResult(result.data)
     emit('installComplete')
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)

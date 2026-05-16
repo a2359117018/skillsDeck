@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { NButton, NText, useMessage, NIcon } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
-import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
+import type { ScannedSkill } from '../../../../shared/types'
 import LocalInstallPanel from './LocalInstallPanel.vue'
 
 const emit = defineEmits<{
@@ -23,7 +23,7 @@ async function handleSelectFile(): Promise<void> {
       if (result.error.message === '未选择文件') return
       throw new Error(result.error.message)
     }
-    selectedFile.value = result.data as string
+    selectedFile.value = result.data
     await handleExtract()
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
@@ -41,7 +41,7 @@ async function handleExtract(): Promise<void> {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    scannedSkills.value = result.data as ScannedSkill[]
+    scannedSkills.value = result.data
     if (scannedSkills.value.length === 0) {
       message.info('未在压缩包中扫描到技能文件')
     }
@@ -66,8 +66,7 @@ async function handleInstall(payload: {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    const data = result.data as LocalInstallResult
-    panelRef.value?.showInstallResult(data)
+    panelRef.value?.showInstallResult(result.data)
     emit('installComplete')
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)

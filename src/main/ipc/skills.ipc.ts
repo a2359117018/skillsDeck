@@ -126,6 +126,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
   ipcMain.handle('skills:parse-github', async (_, url: string) => {
     const mainWindow = getMainWindow()
+    let zipPath = ''
     try {
       const parsed = githubSkillInstaller.parseUrl(url)
       if (!parsed) {
@@ -147,7 +148,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         }
       }
 
-      const zipPath = await githubSkillInstaller.downloadZipball(
+      zipPath = await githubSkillInstaller.downloadZipball(
         parsed.owner,
         parsed.repo,
         parsed.branch,
@@ -159,10 +160,13 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         parsed.repo,
         parsed.branch
       )
-      await localSkillInstaller.cleanupTempDir(path.dirname(zipPath))
       return { ok: true, data: skills }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
+    } finally {
+      if (zipPath) {
+        await localSkillInstaller.cleanupTempDir(path.dirname(zipPath))
+      }
     }
   })
 

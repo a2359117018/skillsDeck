@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { NButton, NText, NSpin, useMessage } from 'naive-ui'
 import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
 
-defineProps<{
+const props = defineProps<{
   skills: ScannedSkill[]
   loading?: boolean
   error?: string | null
@@ -21,6 +21,30 @@ const selectedAgents = ref<string[]>([])
 const isGlobal = ref(false)
 const installing = ref(false)
 const installResult = ref<LocalInstallResult | null>(null)
+
+watch(
+  () => props.skills,
+  () => {
+    selectedSkills.value = []
+    selectedAgents.value = []
+    isGlobal.value = false
+    installing.value = false
+    installResult.value = null
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.skills,
+  () => {
+    selectedSkills.value = []
+    selectedAgents.value = []
+    isGlobal.value = false
+    installing.value = false
+    installResult.value = null
+  },
+  { deep: true }
+)
 
 const canInstall = computed(() => {
   if (selectedSkills.value.length === 0) return false
