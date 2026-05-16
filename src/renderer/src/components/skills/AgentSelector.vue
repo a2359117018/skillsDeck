@@ -65,13 +65,6 @@ function toggleSelectAll(): void {
 function toggleGlobal(val: boolean): void {
   emit('update:isGlobal', val)
 }
-
-const canConfirm = computed(() => {
-  if (props.isGlobal) return true
-  return props.modelValue.length > 0
-})
-
-defineExpose({ canConfirm })
 </script>
 
 <template>

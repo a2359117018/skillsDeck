@@ -28,8 +28,14 @@ export class ArchiveSkillInstaller {
 
   async extractAndScan(filePath: string): Promise<ScannedSkill[]> {
     const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'skills-archive-'))
+    const resolvedTemp = path.resolve(tempDir)
     try {
-      await decompress(filePath, tempDir)
+      const files = await decompress(filePath, tempDir)
+      for (const f of files) {
+        if (!path.resolve(tempDir, f.path).startsWith(resolvedTemp + path.sep)) {
+          throw new Error('Archive contains entries outside the target directory')
+        }
+      }
       return localSkillInstaller.scanSkills(tempDir)
     } catch (e) {
       await localSkillInstaller.cleanupTempDir(tempDir)

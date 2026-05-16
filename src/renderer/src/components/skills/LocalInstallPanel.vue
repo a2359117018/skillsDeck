@@ -35,19 +35,16 @@ async function handleInstall(): Promise<void> {
   }
   installing.value = true
   installResult.value = null
-  try {
-    const agents = isGlobal.value ? [] : selectedAgents.value
-    emit('install', {
-      skillDirs: selectedSkills.value,
-      agents,
-      isGlobal: isGlobal.value
-    })
-  } finally {
-    installing.value = false
-  }
+  const agents = isGlobal.value ? [] : selectedAgents.value
+  emit('install', {
+    skillDirs: selectedSkills.value,
+    agents,
+    isGlobal: isGlobal.value
+  })
 }
 
 function showInstallResult(result: LocalInstallResult): void {
+  installing.value = false
   installResult.value = result
   if (result.failed.length > 0) {
     message.error(`安装完成：${result.success.length} 个成功，${result.failed.length} 个失败`)

@@ -153,7 +153,12 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         parsed.branch,
         onProgress
       )
-      const skills = await githubSkillInstaller.extractAndScan(zipPath, parsed.subPath)
+      const skills = await githubSkillInstaller.extractAndScan(
+        zipPath,
+        parsed.subPath,
+        parsed.repo,
+        parsed.branch
+      )
       await localSkillInstaller.cleanupTempDir(path.dirname(zipPath))
       return { ok: true, data: skills }
     } catch (e) {

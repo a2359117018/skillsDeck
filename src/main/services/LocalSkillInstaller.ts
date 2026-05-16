@@ -70,7 +70,12 @@ export class LocalSkillInstaller {
     const result: LocalInstallResult = { success: [], failed: [] }
 
     for (const skillDir of skillDirs) {
-      const skillName = path.basename(skillDir)
+      const rawName = path.basename(skillDir)
+      const skillName = rawName.replace(/[\\/]/g, '_').replace(/^\.+/, '')
+      if (!skillName) {
+        result.failed.push({ name: rawName || 'unknown', error: 'Invalid skill name' })
+        continue
+      }
       let allSucceeded = true
       let firstError = ''
 
@@ -78,7 +83,13 @@ export class LocalSkillInstaller {
         const agent = agents.find((a) => a.agentFlag === agentFlag)
         if (!agent) continue
 
-        const targetDir = path.join(this.expandPath(agent.globalPath), skillName)
+        const agentDir = path.resolve(this.expandPath(agent.globalPath))
+        const targetDir = path.join(agentDir, skillName)
+        if (!path.resolve(targetDir).startsWith(agentDir + path.sep)) {
+          allSucceeded = false
+          firstError = 'Invalid target path'
+          break
+        }
         try {
           await fs.promises.cp(skillDir, targetDir, { recursive: true, force: true })
         } catch (e) {

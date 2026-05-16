@@ -32,7 +32,17 @@ export class GitHubSkillInstaller {
     return null
   }
 
+  private validateRef(ref: string): void {
+    const SAFE_REF = /^[a-zA-Z0-9_.\-/]+$/
+    if (!SAFE_REF.test(ref)) {
+      throw new Error(`Invalid GitHub reference: ${ref}`)
+    }
+  }
+
   private buildZipballUrl(owner: string, repo: string, branch: string): string {
+    this.validateRef(owner)
+    this.validateRef(repo)
+    this.validateRef(branch)
     const proxyUrl = getSettings().proxyUrl
     const base = `https://github.com/${owner}/${repo}/archive/${branch}.zip`
     if (proxyUrl) {
@@ -106,13 +116,26 @@ export class GitHubSkillInstaller {
     }
   }
 
-  async extractAndScan(zipPath: string, subPath?: string): Promise<ScannedSkill[]> {
+  async extractAndScan(
+    zipPath: string,
+    subPath?: string,
+    repo?: string,
+    branch?: string
+  ): Promise<ScannedSkill[]> {
     const extractDir = path.join(path.dirname(zipPath), 'extracted')
     await decompress(zipPath, extractDir)
 
     const entries = await fs.promises.readdir(extractDir, { withFileTypes: true })
-    const subDir = entries.find((e) => e.isDirectory())
-    let scanDir = subDir ? path.join(extractDir, subDir.name) : extractDir
+    const expectedDir = repo && branch ? `${repo}-${branch}` : null
+    const expectedEntry = expectedDir
+      ? entries.find((e) => e.name === expectedDir && e.isDirectory())
+      : null
+    const firstDir = entries.find((e) => e.isDirectory())
+    let scanDir = expectedEntry
+      ? path.join(extractDir, expectedEntry.name)
+      : firstDir
+        ? path.join(extractDir, firstDir.name)
+        : extractDir
 
     if (subPath) {
       scanDir = path.join(scanDir, subPath)
