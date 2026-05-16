@@ -66,6 +66,20 @@ export class LocalSkillInstaller {
     }
   }
 
+  private async copyDir(src: string, dest: string): Promise<void> {
+    await fs.promises.mkdir(dest, { recursive: true })
+    const entries = await fs.promises.readdir(src, { withFileTypes: true })
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name)
+      const destPath = path.join(dest, entry.name)
+      if (entry.isDirectory()) {
+        await this.copyDir(srcPath, destPath)
+      } else {
+        await fs.promises.copyFile(srcPath, destPath)
+      }
+    }
+  }
+
   async installSkills(skillDirs: string[], agentFlags: string[]): Promise<LocalInstallResult> {
     const result: LocalInstallResult = { success: [], failed: [] }
 
@@ -91,7 +105,7 @@ export class LocalSkillInstaller {
           break
         }
         try {
-          await fs.promises.cp(skillDir, targetDir, { recursive: true, force: true })
+          await this.copyDir(skillDir, targetDir)
         } catch (e) {
           allSucceeded = false
           firstError = e instanceof Error ? e.message : String(e)
