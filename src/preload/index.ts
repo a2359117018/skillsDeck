@@ -32,7 +32,24 @@ const api = {
     updateAllBackground: (opts?: {
       global?: boolean
     }): Promise<{ taskId: string; error?: string }> =>
-      ipcRenderer.invoke('skills:update-all-background', opts)
+      ipcRenderer.invoke('skills:update-all-background', opts),
+    parseGitHub: (url: string): Promise<unknown> =>
+      ipcRenderer.invoke('skills:parse-github', url),
+    selectArchive: (): Promise<unknown> => ipcRenderer.invoke('skills:select-archive'),
+    extractArchive: (filePath: string): Promise<unknown> =>
+      ipcRenderer.invoke('skills:extract-archive', filePath),
+    installLocal: (opts: {
+      skillDirs: string[]
+      agents: string[]
+    }): Promise<unknown> => ipcRenderer.invoke('skills:install-local', opts),
+    cancelGitHubDownload: (): Promise<void> =>
+      ipcRenderer.invoke('skills:cancel-github-download'),
+    onGitHubDownloadProgress: (callback: (percent: number) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, percent: number): void =>
+        callback(percent)
+      ipcRenderer.on('skills:github-download-progress', listener)
+      return () => ipcRenderer.removeListener('skills:github-download-progress', listener)
+    }
   },
   agents: {
     scanAll: (): Promise<unknown> => ipcRenderer.invoke('agent:scan-all'),

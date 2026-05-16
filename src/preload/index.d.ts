@@ -7,7 +7,9 @@ import type {
   CommandErrorInfo,
   InstalledSkill,
   AgentScanResult,
-  BackgroundTask
+  BackgroundTask,
+  ScannedSkill,
+  LocalInstallResult
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -42,6 +44,15 @@ export interface AppApi {
     updateAllBackground: (opts?: {
       global?: boolean
     }) => Promise<{ taskId: string; error?: string }>
+    parseGitHub: (url: string) => Promise<IpcResult<ScannedSkill[]>>
+    selectArchive: () => Promise<IpcResult<string>>
+    extractArchive: (filePath: string) => Promise<IpcResult<ScannedSkill[]>>
+    installLocal: (opts: {
+      skillDirs: string[]
+      agents: string[]
+    }) => Promise<IpcResult<LocalInstallResult>>
+    cancelGitHubDownload: () => Promise<void>
+    onGitHubDownloadProgress: (callback: (percent: number) => void) => () => void
   }
   agents: {
     scanAll: () => Promise<IpcResult<AgentScanResult[]>>
