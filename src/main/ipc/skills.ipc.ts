@@ -1,10 +1,14 @@
-import { ipcMain } from 'electron'
+import { ipcMain, dialog } from 'electron'
+import path from 'path'
 import type { CommandErrorInfo } from '../../shared/types'
 import { skillsService } from '../services/SkillsService'
 import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'
 import { searchSkillsApi } from '../api/skills'
 import { backgroundTaskService } from '../services/BackgroundTaskService'
+import { githubSkillInstaller } from '../services/GitHubSkillInstaller'
+import { archiveSkillInstaller } from '../services/ArchiveSkillInstaller'
+import { localSkillInstaller } from '../services/LocalSkillInstaller'
 
 function serializeError(e: unknown): CommandErrorInfo {
   if (e instanceof CommandError) {
@@ -119,6 +123,105 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       }
     }
   )
+
+  ipcMain.handle('skills:parse-github', async (_, url: string) => {
+    const mainWindow = getMainWindow()
+    try {
+      const parsed = githubSkillInstaller.parseUrl(url)
+      if (!parsed) {
+        return {
+          ok: false,
+          error: {
+            code: 'UNKNOWN' as const,
+            command: '',
+            stderr: '',
+            exitCode: null,
+            message: '无效的 GitHub URL，请检查格式'
+          }
+        }
+      }
+
+      const onProgress = (percent: number): void => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('skills:github-download-progress', percent)
+        }
+      }
+
+      const zipPath = await githubSkillInstaller.downloadZipball(
+        parsed.owner,
+        parsed.repo,
+        parsed.branch,
+        onProgress
+      )
+      const skills = await githubSkillInstaller.extractAndScan(zipPath, parsed.subPath)
+      await localSkillInstaller.cleanupTempDir(path.dirname(zipPath))
+      return { ok: true, data: skills }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
+  })
+
+  ipcMain.handle('skills:select-archive', async () => {
+    try {
+      const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: '压缩文件', extensions: ['zip', 'tar.gz', 'tgz'] }]
+      })
+      if (result.canceled || result.filePaths.length === 0) {
+        return {
+          ok: false,
+          error: {
+            code: 'UNKNOWN' as const,
+            command: '',
+            stderr: '',
+            exitCode: null,
+            message: '未选择文件'
+          }
+        }
+      }
+      return { ok: true, data: result.filePaths[0] }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
+  })
+
+  ipcMain.handle('skills:extract-archive', async (_, filePath: string) => {
+    try {
+      const validation = archiveSkillInstaller.validate(filePath)
+      if (!validation.valid) {
+        return {
+          ok: false,
+          error: {
+            code: 'UNKNOWN' as const,
+            command: '',
+            stderr: '',
+            exitCode: null,
+            message: validation.error
+          }
+        }
+      }
+      const skills = await archiveSkillInstaller.extractAndScan(filePath)
+      return { ok: true, data: skills }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
+  })
+
+  ipcMain.handle(
+    'skills:install-local',
+    async (_, opts: { skillDirs: string[]; agents: string[] }) => {
+      try {
+        const result = await localSkillInstaller.installSkills(opts.skillDirs, opts.agents)
+        return { ok: true, data: result }
+      } catch (e) {
+        return { ok: false, error: serializeError(e) }
+      }
+    }
+  )
+
+  ipcMain.handle('skills:cancel-github-download', () => {
+    githubSkillInstaller.cancelDownload()
+  })
 
   function hasPendingTask(type: string): boolean {
     return Array.from(backgroundTaskService.getAll()).some(
