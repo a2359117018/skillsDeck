@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NSpin, NEmpty, NText } from 'naive-ui'
+import { NSpin, NEmpty, NText, NTabs, NTabPane } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
 import SkillInstallDialog from '@renderer/components/skills/SkillInstallDialog.vue'
+import GitHubInstaller from '@renderer/components/skills/GitHubInstaller.vue'
+import ArchiveInstaller from '@renderer/components/skills/ArchiveInstaller.vue'
 
 const skillsStore = useSkillsStore()
 const showInstallDialog = ref(false)
@@ -25,40 +27,63 @@ function handleInstallComplete(): void {
   showInstallDialog.value = false
   selectedSource.value = ''
 }
+
+function handleLocalInstallComplete(): void {
+  skillsStore.fetchInstalled()
+}
 </script>
 
 <template>
   <div class="search-page">
-    <SkillSearchBar @search="handleSearch" />
-    <div class="search-scroll">
-      <div v-if="skillsStore.searching" class="search-loading">
-        <NSpin size="large" />
-      </div>
-      <template v-else-if="hasSearched">
-        <div class="search-results">
-          <div class="search-meta">
-            <NText depth="3" class="search-meta-text">
-              搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
-              {{ skillsStore.searchResults.length }} 个结果
-            </NText>
+    <NTabs type="line" animated>
+      <NTabPane name="search" tab="搜索安装">
+        <div class="tab-content">
+          <SkillSearchBar @search="handleSearch" />
+          <div class="search-scroll">
+            <div v-if="skillsStore.searching" class="search-loading">
+              <NSpin size="large" />
+            </div>
+            <template v-else-if="hasSearched">
+              <div class="search-results">
+                <div class="search-meta">
+                  <NText depth="3" class="search-meta-text">
+                    搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
+                    {{ skillsStore.searchResults.length }} 个结果
+                  </NText>
+                </div>
+                <div class="search-grid">
+                  <SearchResultCard
+                    v-for="result in skillsStore.searchResults"
+                    :key="result.id"
+                    :result="result"
+                    @install="handleInstall"
+                  />
+                </div>
+                <NEmpty
+                  v-if="skillsStore.searchResults.length === 0"
+                  description="无搜索结果"
+                  class="search-empty"
+                />
+              </div>
+            </template>
+            <NEmpty v-else description="输入关键词搜索技能" class="search-empty" />
           </div>
-          <div class="search-grid">
-            <SearchResultCard
-              v-for="result in skillsStore.searchResults"
-              :key="result.id"
-              :result="result"
-              @install="handleInstall"
-            />
-          </div>
-          <NEmpty
-            v-if="skillsStore.searchResults.length === 0"
-            description="无搜索结果"
-            class="search-empty"
-          />
         </div>
-      </template>
-      <NEmpty v-else description="输入关键词搜索技能" class="search-empty" />
-    </div>
+      </NTabPane>
+
+      <NTabPane name="github" tab="GitHub链接">
+        <div class="tab-content">
+          <GitHubInstaller @install-complete="handleLocalInstallComplete" />
+        </div>
+      </NTabPane>
+
+      <NTabPane name="archive" tab="压缩包">
+        <div class="tab-content">
+          <ArchiveInstaller @install-complete="handleLocalInstallComplete" />
+        </div>
+      </NTabPane>
+    </NTabs>
+
     <SkillInstallDialog
       v-model:show="showInstallDialog"
       :source="selectedSource"
@@ -75,6 +100,10 @@ function handleInstallComplete(): void {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+}
+
+.tab-content {
+  padding-top: var(--space-md);
 }
 
 .search-scroll {
