@@ -93,3 +93,21 @@ export function formatInstalls(n: number): string {
   if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
   return String(n)
 }
+
+export interface ScannedSkill {
+  name: string
+  path: string
+  relativePath: string
+}
+
+export interface LocalInstallResult {
+  success: string[]
+  failed: { name: string; error: string }[]
+}
+
+export interface ParsedGitHubUrl {
+  owner: string
+  repo: string
+  branch: string
+  subPath: string
+}
