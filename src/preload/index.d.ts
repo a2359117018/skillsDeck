@@ -16,6 +16,8 @@ import type {
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
 
 export interface AppApi {
+  /** 从拖拽的 File 对象获取本地文件路径（contextIsolation 兼容） */
+  getPathForFile: (file: File) => string
   skills: {
     search: (keyword: string) => Promise<IpcResult<SkillSearchResponse>>
     list: () => Promise<IpcResult<InstalledSkill[]>>

@@ -49,11 +49,7 @@ async function handleDrop(e: DragEvent): Promise<void> {
   const file = e.dataTransfer?.files[0]
   if (!file) return
 
-  const filePath = (file as File & { path: string }).path
-  if (!filePath) {
-    message.error('无法获取文件路径')
-    return
-  }
+  const filePath = window.api.getPathForFile(file)
 
   const supportedExt = ['.zip', '.tar.gz', '.tgz']
   if (!supportedExt.some((ext) => filePath.endsWith(ext))) {

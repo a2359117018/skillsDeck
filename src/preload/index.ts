@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type {
   ScannedSkill,
@@ -10,6 +10,8 @@ import type {
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
 
 const api = {
+  /** 从拖拽的 File 对象获取本地文件路径（contextIsolation 兼容） */
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   skills: {
     search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
     list: (): Promise<unknown[]> => ipcRenderer.invoke('skills:list'),

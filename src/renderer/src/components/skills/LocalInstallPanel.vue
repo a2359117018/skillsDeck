@@ -153,7 +153,7 @@ async function handleInstall(): Promise<void> {
 .panel-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 @media (max-width: 640px) {
@@ -167,6 +167,7 @@ async function handleInstall(): Promise<void> {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
+  min-height: 200px;
 }
 
 .section-title {
