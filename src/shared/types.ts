@@ -111,3 +111,8 @@ export interface ParsedGitHubUrl {
   branch: string
   subPath: string
 }
+
+export interface GitHubParseResult {
+  skills: ScannedSkill[]
+  tempDir: string
+}
