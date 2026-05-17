@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import * as yauzl from 'yauzl'
-import type { ScannedSkill, ParsedGitHubUrl } from '../../shared/types'
+import type { ScannedSkill, ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
 import { getSettings } from './StoreService'
 import { localSkillInstaller } from './LocalSkillInstaller'
 
@@ -221,7 +221,7 @@ export class GitHubSkillInstaller {
     subPath?: string,
     repo?: string,
     branch?: string
-  ): Promise<ScannedSkill[]> {
+  ): Promise<GitHubParseResult> {
     const extractDir = path.join(path.dirname(zipPath), 'extracted')
     await this.extractZip(zipPath, extractDir)
 
@@ -245,7 +245,8 @@ export class GitHubSkillInstaller {
       scanDir = path.join(scanDir, cleanSubPath)
     }
 
-    return localSkillInstaller.scanSkills(scanDir)
+    const skills = await localSkillInstaller.scanSkills(scanDir)
+    return { skills, tempDir: path.dirname(zipPath) }
   }
 
   cancelDownload(): void {
