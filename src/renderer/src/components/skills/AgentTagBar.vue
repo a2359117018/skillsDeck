@@ -118,6 +118,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 
 .panel-body {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md) var(--space-md);
   border-top: 1px solid var(--color-hairline);
