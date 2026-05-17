@@ -68,26 +68,29 @@ GitHub 链接安装技能的 UI 存在四个核心问题：
 ### 4. 临时文件清理（三层保障）
 
 **第一层 — 组件卸载时清理：**
+
 - `GitHubInstaller` 的 `onUnmounted` 中，如有未安装的解析结果，调用新 IPC `skills:cleanup-temp` 清理临时目录
 - 需要在组件中记录临时目录路径
 
 **第二层 — 新操作覆盖旧操作：**
+
 - 用户输入新 URL 点击解析时，先清理上一次未安装的临时文件
 
 **第三层 — 应用启动时兜底：**
+
 - 主进程 `app.on('ready')` 时扫描 `os.tmpdir()` 下 `skills-github-*` 和 `skills-archive-*` 目录，清理所有遗留
 - 处理应用崩溃或被强制关闭的场景
 
 ## Components Affected
 
-| Component | Change |
-|-----------|--------|
-| `GitHubInstaller.vue` | 左右分栏重构 + 通知栏 + 内联安装逻辑（不再使用 LocalInstallPanel） + 临时文件路径追踪 |
-| `SkillsSearch.vue` | 移除 `animated` 属性 |
-| `skills.ipc.ts` | 新增 `skills:cleanup-temp` IPC handler；`skills:parse-github` 返回值增加 `tempDir` 字段 |
-| `shared/types.ts` | `ScannedSkill` 或新增类型中包含 `tempDir` 路径信息 |
-| `GitHubSkillInstaller.ts`（或相关 service） | 新增 `cleanupTempDirs()` 方法；`parseGitHub` 返回 tempDir 路径 |
-| `src/main/index.ts` | app ready 时执行临时文件清理 |
+| Component                                   | Change                                                                                  |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `GitHubInstaller.vue`                       | 左右分栏重构 + 通知栏 + 内联安装逻辑（不再使用 LocalInstallPanel） + 临时文件路径追踪   |
+| `SkillsSearch.vue`                          | 移除 `animated` 属性                                                                    |
+| `skills.ipc.ts`                             | 新增 `skills:cleanup-temp` IPC handler；`skills:parse-github` 返回值增加 `tempDir` 字段 |
+| `shared/types.ts`                           | `ScannedSkill` 或新增类型中包含 `tempDir` 路径信息                                      |
+| `GitHubSkillInstaller.ts`（或相关 service） | 新增 `cleanupTempDirs()` 方法；`parseGitHub` 返回 tempDir 路径                          |
+| `src/main/index.ts`                         | app ready 时执行临时文件清理                                                            |
 
 ## Implementation Notes
 

@@ -14,6 +14,7 @@
 ### 1. 左右等高
 
 `GitHubInstaller.vue` 的 `.split-layout` 改为：
+
 ```css
 .split-layout {
   display: grid;
@@ -34,6 +35,7 @@
 ### 2. 全局安装时不收起 Agent 区域
 
 `AgentSelector.vue`：
+
 - 将 `v-if="!isGlobal"` 改为 `v-show="!isGlobal"`
 - 在 `.agent-section` 上添加 `opacity: 0.5; pointer-events: none;` 当 `isGlobal` 为 true
 - 或者更优雅：在全局安装时给 agent-section 添加 `disabled` 类，样式上降低透明度并禁用交互

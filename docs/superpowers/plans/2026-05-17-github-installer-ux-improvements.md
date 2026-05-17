@@ -12,22 +12,23 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|------|--------|----------------|
-| `src/shared/types.ts` | Modify | Add `GitHubParseResult` type |
-| `src/main/services/GitHubSkillInstaller.ts` | Modify | `extractAndScan` returns `GitHubParseResult` with `tempDir` |
-| `src/main/ipc/skills.ipc.ts` | Modify | Update `skills:parse-github` handler return type; add `skills:cleanup-temp` handler |
-| `src/main/index.ts` | Modify | Add startup temp file cleanup |
-| `src/preload/index.ts` | Modify | Add `cleanupTemp` method |
-| `src/preload/index.d.ts` | Modify | Add `cleanupTemp` type declaration |
-| `src/renderer/src/components/skills/GitHubInstaller.vue` | Rewrite | Left-right split layout, inline install logic, error alert, temp dir tracking |
-| `src/renderer/src/views/SkillsSearch.vue` | Modify | Remove `animated` from NTabs |
+| File                                                     | Action  | Responsibility                                                                      |
+| -------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `src/shared/types.ts`                                    | Modify  | Add `GitHubParseResult` type                                                        |
+| `src/main/services/GitHubSkillInstaller.ts`              | Modify  | `extractAndScan` returns `GitHubParseResult` with `tempDir`                         |
+| `src/main/ipc/skills.ipc.ts`                             | Modify  | Update `skills:parse-github` handler return type; add `skills:cleanup-temp` handler |
+| `src/main/index.ts`                                      | Modify  | Add startup temp file cleanup                                                       |
+| `src/preload/index.ts`                                   | Modify  | Add `cleanupTemp` method                                                            |
+| `src/preload/index.d.ts`                                 | Modify  | Add `cleanupTemp` type declaration                                                  |
+| `src/renderer/src/components/skills/GitHubInstaller.vue` | Rewrite | Left-right split layout, inline install logic, error alert, temp dir tracking       |
+| `src/renderer/src/views/SkillsSearch.vue`                | Modify  | Remove `animated` from NTabs                                                        |
 
 ---
 
 ### Task 1: Add `GitHubParseResult` type to shared types
 
 **Files:**
+
 - Modify: `src/shared/types.ts`
 
 - [ ] **Step 1: Add the new type**
@@ -53,6 +54,7 @@ git commit -m "feat: add GitHubParseResult type for temp dir tracking"
 ### Task 2: Update GitHubSkillInstaller to return tempDir
 
 **Files:**
+
 - Modify: `src/main/services/GitHubSkillInstaller.ts`
 
 - [ ] **Step 1: Update import and return type**
@@ -94,14 +96,14 @@ to:
 And change the return statement at the end from:
 
 ```typescript
-    return localSkillInstaller.scanSkills(scanDir)
+return localSkillInstaller.scanSkills(scanDir)
 ```
 
 to:
 
 ```typescript
-    const skills = await localSkillInstaller.scanSkills(scanDir)
-    return { skills, tempDir: path.dirname(zipPath) }
+const skills = await localSkillInstaller.scanSkills(scanDir)
+return { skills, tempDir: path.dirname(zipPath) }
 ```
 
 Note: `zipPath` is `path.join(tempDir, 'download.zip')` from `downloadZipball`, so `path.dirname(zipPath)` gives us the `skills-github-*` temp directory root.
@@ -118,6 +120,7 @@ git commit -m "feat: GitHubSkillInstaller.extractAndScan returns tempDir"
 ### Task 3: Update IPC handlers — parse-github return type + cleanup-temp
 
 **Files:**
+
 - Modify: `src/main/ipc/skills.ipc.ts`
 
 - [ ] **Step 1: Add import for GitHubParseResult**
@@ -135,25 +138,25 @@ The handler currently returns `{ ok: true, data: skills }` where `skills` is `Sc
 Replace the line:
 
 ```typescript
-      const skills = await githubSkillInstaller.extractAndScan(
-        zipPath,
-        parsed.subPath,
-        parsed.repo,
-        parsed.branch
-      )
-      return { ok: true, data: skills }
+const skills = await githubSkillInstaller.extractAndScan(
+  zipPath,
+  parsed.subPath,
+  parsed.repo,
+  parsed.branch
+)
+return { ok: true, data: skills }
 ```
 
 with:
 
 ```typescript
-      const result = await githubSkillInstaller.extractAndScan(
-        zipPath,
-        parsed.subPath,
-        parsed.repo,
-        parsed.branch
-      )
-      return { ok: true, data: result }
+const result = await githubSkillInstaller.extractAndScan(
+  zipPath,
+  parsed.subPath,
+  parsed.repo,
+  parsed.branch
+)
+return { ok: true, data: result }
 ```
 
 - [ ] **Step 3: Add `skills:cleanup-temp` handler**
@@ -161,15 +164,15 @@ with:
 Add a new handler after the `skills:cancel-github-download` handler:
 
 ```typescript
-  ipcMain.handle('skills:cleanup-temp', async (_, tempDirs: string[]) => {
-    const tmpDir = os.tmpdir()
-    for (const dir of tempDirs) {
-      const resolved = path.resolve(dir)
-      if (resolved.startsWith(tmpDir) && path.basename(resolved).startsWith('skills-')) {
-        await localSkillInstaller.cleanupTempDir(resolved)
-      }
+ipcMain.handle('skills:cleanup-temp', async (_, tempDirs: string[]) => {
+  const tmpDir = os.tmpdir()
+  for (const dir of tempDirs) {
+    const resolved = path.resolve(dir)
+    if (resolved.startsWith(tmpDir) && path.basename(resolved).startsWith('skills-')) {
+      await localSkillInstaller.cleanupTempDir(resolved)
     }
-  })
+  }
+})
 ```
 
 - [ ] **Step 4: Commit**
@@ -184,6 +187,7 @@ git commit -m "feat: update parse-github IPC to return GitHubParseResult, add cl
 ### Task 4: Add app startup temp file cleanup
 
 **Files:**
+
 - Modify: `src/main/index.ts`
 
 - [ ] **Step 1: Add imports and cleanup function**
@@ -237,6 +241,7 @@ git commit -m "feat: clean orphaned skills-* temp dirs on app startup"
 ### Task 5: Update preload — add cleanupTemp and update parseGitHub type
 
 **Files:**
+
 - Modify: `src/preload/index.ts`
 - Modify: `src/preload/index.d.ts`
 
@@ -245,7 +250,12 @@ git commit -m "feat: clean orphaned skills-* temp dirs on app startup"
 Add `GitHubParseResult` to the import:
 
 ```typescript
-import type { ScannedSkill, LocalInstallResult, CommandErrorInfo, GitHubParseResult } from '../shared/types'
+import type {
+  ScannedSkill,
+  LocalInstallResult,
+  CommandErrorInfo,
+  GitHubParseResult
+} from '../shared/types'
 ```
 
 Change `parseGitHub` return type:
@@ -286,14 +296,14 @@ import type {
 Update `parseGitHub` in the `AppApi.skills` interface:
 
 ```typescript
-    parseGitHub: (url: string) => Promise<IpcResult<GitHubParseResult>>
+parseGitHub: (url: string) => Promise<IpcResult<GitHubParseResult>>
 ```
 
 Add `cleanupTemp` after `cancelGitHubDownload`:
 
 ```typescript
-    cancelGitHubDownload: () => Promise<void>
-    cleanupTemp: (tempDirs: string[]) => Promise<void>
+cancelGitHubDownload: () => Promise<void>
+cleanupTemp: (tempDirs: string[]) => Promise<void>
 ```
 
 - [ ] **Step 3: Commit**
@@ -308,6 +318,7 @@ git commit -m "feat: add cleanupTemp IPC and update parseGitHub return type in p
 ### Task 6: Rewrite GitHubInstaller.vue with split layout
 
 This is the largest task. The component will be rewritten to:
+
 - Use left-right split layout (scan results left, agent selector + install button right)
 - Inline the install logic from `LocalInstallPanel` (select skills, select agents, install)
 - Add persistent `NAlert` error notification
@@ -315,6 +326,7 @@ This is the largest task. The component will be rewritten to:
 - Cleanup temp dir on `onUnmounted` and before new parse
 
 **Files:**
+
 - Rewrite: `src/renderer/src/components/skills/GitHubInstaller.vue`
 
 - [ ] **Step 1: Write the new GitHubInstaller.vue**
@@ -365,8 +377,7 @@ const allSkillsSelected = computed(
 )
 
 const someSkillsSelected = computed(
-  () =>
-    skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
+  () => skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
 )
 
 const canInstall = computed(() => {
@@ -526,13 +537,7 @@ onUnmounted(async () => {
       <NButton v-if="parsing && showProgress" @click="handleCancel"> 取消 </NButton>
     </div>
 
-    <NAlert
-      v-if="alertError"
-      type="error"
-      closable
-      class="error-alert"
-      @close="clearAlert"
-    >
+    <NAlert v-if="alertError" type="error" closable class="error-alert" @close="clearAlert">
       {{ alertError }}
     </NAlert>
 
@@ -741,6 +746,7 @@ git commit -m "feat: rewrite GitHubInstaller with split layout, error alert, tem
 ### Task 7: Remove `animated` from NTabs in SkillsSearch.vue
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SkillsSearch.vue`
 
 - [ ] **Step 1: Remove animated prop**
@@ -748,13 +754,13 @@ git commit -m "feat: rewrite GitHubInstaller with split layout, error alert, tem
 Change:
 
 ```html
-    <NTabs type="line" animated>
+<NTabs type="line" animated></NTabs>
 ```
 
 to:
 
 ```html
-    <NTabs type="line">
+<NTabs type="line"></NTabs>
 ```
 
 - [ ] **Step 2: Commit**

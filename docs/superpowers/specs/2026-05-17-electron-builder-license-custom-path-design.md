@@ -20,16 +20,16 @@
 
 ### 新增/更新文件
 
-| 文件 | 操作 | 说明 |
-|------|------|------|
-| `LICENSE` | 新增 | 从 `origin/main` 获取的标准 Apache License 2.0 全文 |
-| `build/declaration.txt` | 新增 | 使用声明与免责条款文本 |
-| `build/installer.nsh` | 新增 | 自定义 NSIS 脚本，在安装流程中插入使用声明页 |
+| 文件                    | 操作 | 说明                                                |
+| ----------------------- | ---- | --------------------------------------------------- |
+| `LICENSE`               | 新增 | 从 `origin/main` 获取的标准 Apache License 2.0 全文 |
+| `build/declaration.txt` | 新增 | 使用声明与免责条款文本                              |
+| `build/installer.nsh`   | 新增 | 自定义 NSIS 脚本，在安装流程中插入使用声明页        |
 
 ### 修改文件
 
-| 文件 | 变更内容 |
-|------|----------|
+| 文件                   | 变更内容                                                                                                             |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `electron-builder.yml` | 在 `nsis:` 块下新增 `license: LICENSE`、`allowToChangeInstallationDirectory: true` 和 `include: build/installer.nsh` |
 
 ## 配置细节
@@ -42,9 +42,9 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-  license: LICENSE                          # 原生协议页：Apache 2.0
-  allowToChangeInstallationDirectory: true  # 允许用户修改安装目录
-  include: build/installer.nsh              # 自定义脚本：插入使用声明页
+  license: LICENSE # 原生协议页：Apache 2.0
+  allowToChangeInstallationDirectory: true # 允许用户修改安装目录
+  include: build/installer.nsh # 自定义脚本：插入使用声明页
 ```
 
 ### `build/installer.nsh`

@@ -12,18 +12,19 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|------|--------|---------------|
-| `build/declaration.txt` | Create | Usage declaration and disclaimer text shown on the first license page |
-| `build/installer.nsh` | Create | Custom NSIS script defining `customWelcomePage` macro to insert welcome + declaration pages |
-| `electron-builder.yml` | Modify | Add `license`, `allowToChangeInstallationDirectory`, and `include` to the `nsis` block |
-| `LICENSE` | Existing | Apache 2.0 license text (already fetched from `origin/main`) |
+| File                    | Action   | Responsibility                                                                              |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `build/declaration.txt` | Create   | Usage declaration and disclaimer text shown on the first license page                       |
+| `build/installer.nsh`   | Create   | Custom NSIS script defining `customWelcomePage` macro to insert welcome + declaration pages |
+| `electron-builder.yml`  | Modify   | Add `license`, `allowToChangeInstallationDirectory`, and `include` to the `nsis` block      |
+| `LICENSE`               | Existing | Apache 2.0 license text (already fetched from `origin/main`)                                |
 
 ---
 
 ### Task 1: Create Usage Declaration Text File
 
 **Files:**
+
 - Create: `build/declaration.txt`
 
 - [ ] **Step 1: Write the declaration text file**
@@ -64,6 +65,7 @@
 ### Task 2: Create Custom NSIS Script
 
 **Files:**
+
 - Create: `build/installer.nsh`
 
 - [ ] **Step 1: Write the custom NSIS script**
@@ -107,6 +109,7 @@
 ### Task 3: Update electron-builder.yml
 
 **Files:**
+
 - Modify: `electron-builder.yml`
 
 - [ ] **Step 1: Update the NSIS configuration block**
@@ -129,9 +132,9 @@
     shortcutName: ${productName}
     uninstallDisplayName: ${productName}
     createDesktopShortcut: always
-    license: LICENSE                          # Apache 2.0 license page
-    allowToChangeInstallationDirectory: true  # Enable custom install path selection
-    include: build/installer.nsh              # Custom script for declaration page
+    license: LICENSE # Apache 2.0 license page
+    allowToChangeInstallationDirectory: true # Enable custom install path selection
+    include: build/installer.nsh # Custom script for declaration page
   ```
 
 - [ ] **Step 2: Verify YAML syntax**
@@ -158,6 +161,7 @@
 ### Task 4: Verify Build
 
 **Files:**
+
 - Test: Generated installer `out/npx-skills-ui-1.0.0-setup.exe`
 
 - [ ] **Step 1: Run Windows build**
@@ -206,22 +210,26 @@
 ## Self-Review
 
 **1. Spec coverage:**
+
 - ✅ Usage declaration page before license — Task 2 (`customWelcomePage` macro with `MUI_PAGE_LICENSE "declaration.txt"`)
 - ✅ Apache 2.0 license agreement — Task 3 (`license: LICENSE` in electron-builder.yml)
 - ✅ Custom installation directory — Task 3 (`allowToChangeInstallationDirectory: true`)
 - ✅ Windows NSIS only — No changes to macOS or Linux blocks
 
 **2. Placeholder scan:**
+
 - ✅ No "TBD", "TODO", or "implement later"
 - ✅ All code blocks contain complete, copy-pasteable content
 - ✅ All file paths are exact and absolute relative to project root
 - ✅ No vague instructions like "add appropriate error handling"
 
 **3. Type consistency:**
+
 - ✅ `declaration.txt` referenced consistently as `"declaration.txt"` in `installer.nsh`
 - ✅ `build/installer.nsh` referenced consistently as `build/installer.nsh` in YAML and plan
 - ✅ `LICENSE` referenced consistently as `LICENSE` in YAML
 
 **4. Known limitations / edge cases:**
+
 - The `declaration.txt` file path in `installer.nsh` uses a relative path `"declaration.txt"`. This relies on NSIS resolving it relative to the `build/` directory where both `installer.nsh` and `declaration.txt` reside. If electron-builder copies `installer.nsh` to a different location during compilation, this path may need to be adjusted to an absolute path or use `${BUILD_RESOURCES_DIR}` if available.
 - Non-ASCII characters (Chinese) in `declaration.txt` require UTF-8 encoding. electron-builder\'s `nsisLicense.js` automatically converts license files to UTF-8 with BOM, so this should be handled correctly.

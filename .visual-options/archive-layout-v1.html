@@ -1,0 +1,266 @@
+<h2>压缩包安装技能 — 布局方案对比</h2>
+<p class="subtitle">对比当前布局与改进方案，在终端告诉我你的偏好</p>
+
+<div class="split" style="margin-top: 20px">
+  <!-- 当前布局 -->
+  <div class="mockup">
+    <div class="mockup-header" style="color: #dc2626; font-weight: 600">当前布局（有问题）</div>
+    <div class="mockup-body" style="background: #fff">
+      <!-- 文件选择行 -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px">
+        <div
+          style="
+            padding: 6px 14px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          "
+        >
+          <span>📦</span> 选择压缩包
+        </div>
+        <span style="font-size: 11px; color: #999">（只能点击按钮选择，无法拖拽）</span>
+      </div>
+
+      <!-- 垂直堆叠 -->
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <!-- 扫描到的技能 - 空的 -->
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
+          <div style="font-size: 11px; color: #999; margin-bottom: 8px; font-weight: 600">
+            扫描到的技能
+          </div>
+          <div style="padding: 20px; text-align: center; color: #ccc; font-size: 12px">
+            选择压缩包后显示技能列表...
+          </div>
+        </div>
+
+        <!-- 安装目标 - 空的 -->
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
+          <div style="font-size: 11px; color: #999; margin-bottom: 8px; font-weight: 600">
+            安装目标
+          </div>
+          <div style="padding: 20px; text-align: center; color: #ccc; font-size: 12px">
+            Agent 选择器...
+          </div>
+        </div>
+
+        <!-- 安装按钮 -->
+        <div style="text-align: right">
+          <div
+            style="
+              display: inline-block;
+              padding: 6px 14px;
+              background: #93c5fd;
+              border-radius: 9999px;
+              font-size: 12px;
+              color: white;
+              opacity: 0.5;
+            "
+          >
+            安装选中技能
+          </div>
+        </div>
+      </div>
+
+      <!-- 问题标注 -->
+      <div
+        style="
+          margin-top: 12px;
+          padding: 8px;
+          background: #fef2f2;
+          border-radius: 6px;
+          font-size: 11px;
+          color: #dc2626;
+        "
+      >
+        <div>❌ 无法拖拽导入</div>
+        <div>❌ 页面空旷，无默认内容</div>
+        <div>❌ 技能名显示 skills-archive-xxx 而非真实名称</div>
+        <div>❌ 垂直布局浪费空间</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 改进方案 -->
+  <div class="mockup">
+    <div class="mockup-header" style="color: #2563eb; font-weight: 600">改进方案（推荐）</div>
+    <div class="mockup-body" style="background: #fff">
+      <!-- 拖拽区域 -->
+      <div
+        style="
+          padding: 16px;
+          border: 2px dashed #93c5fd;
+          border-radius: 12px;
+          text-align: center;
+          margin-bottom: 12px;
+          background: #eff6ff;
+        "
+      >
+        <div style="font-size: 20px; margin-bottom: 4px">📁</div>
+        <div style="font-size: 12px; color: #2563eb; font-weight: 500">拖拽压缩包到此处</div>
+        <div style="font-size: 11px; color: #999; margin-top: 2px">
+          或点击选择文件 · 支持 .zip .tar.gz .tgz
+        </div>
+      </div>
+
+      <!-- 水平两栏布局 -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+        <!-- 左侧：扫描到的技能 -->
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
+          <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-weight: 600">
+            扫描到的技能
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 8px;
+                background: white;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+                font-size: 12px;
+                cursor: pointer;
+              "
+            >
+              <input type="checkbox" checked style="margin: 0" />
+              <div>
+                <div style="font-weight: 500; color: #111">find-skills</div>
+                <div style="font-size: 10px; color: #999">find-skills-0.1.0/find-skills/</div>
+              </div>
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 8px;
+                background: white;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+                font-size: 12px;
+                cursor: pointer;
+              "
+            >
+              <input type="checkbox" checked style="margin: 0" />
+              <div>
+                <div style="font-weight: 500; color: #111">code-review</div>
+                <div style="font-size: 10px; color: #999">find-skills-0.1.0/code-review/</div>
+              </div>
+            </label>
+          </div>
+          <div style="margin-top: 6px; font-size: 10px; color: #16a34a">✓ 名称从 SKILL.md 提取</div>
+        </div>
+
+        <!-- 右侧：安装目标 -->
+        <div
+          style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb"
+        >
+          <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-weight: 600">
+            安装目标
+          </div>
+          <!-- 默认选中全局 -->
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              padding: 6px 8px;
+              background: #eff6ff;
+              border-radius: 6px;
+              border: 1px solid #93c5fd;
+              font-size: 12px;
+              margin-bottom: 8px;
+              cursor: pointer;
+            "
+          >
+            <input type="checkbox" checked style="margin: 0" />
+            <span style="font-weight: 500; color: #2563eb">🌐 全局安装</span>
+          </label>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 8px;
+                font-size: 11px;
+                color: #666;
+              "
+            >
+              <input type="checkbox" style="margin: 0" /> Claude Code
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 8px;
+                font-size: 11px;
+                color: #666;
+              "
+            >
+              <input type="checkbox" style="margin: 0" /> Cursor
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 8px;
+                font-size: 11px;
+                color: #666;
+              "
+            >
+              <input type="checkbox" style="margin: 0" /> Copilot CLI
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 安装按钮 -->
+      <div style="display: flex; justify-content: flex-end; margin-top: 12px">
+        <div
+          style="
+            display: inline-block;
+            padding: 8px 20px;
+            background: #2563eb;
+            border-radius: 9999px;
+            font-size: 13px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+          "
+        >
+          安装选中技能
+        </div>
+      </div>
+
+      <!-- 改进标注 -->
+      <div
+        style="
+          margin-top: 8px;
+          padding: 8px;
+          background: #f0fdf4;
+          border-radius: 6px;
+          font-size: 11px;
+          color: #16a34a;
+        "
+      >
+        <div>✓ 支持拖拽导入 + 点击选择</div>
+        <div>✓ 水平两栏布局，空间利用率高</div>
+        <div>✓ 技能名从 SKILL.md 提取（显示 find-skills 而非 skills-archive-xxx）</div>
+        <div>✓ 默认展示内容：全局安装预选中，页面不空旷</div>
+      </div>
+    </div>
+  </div>
+</div>

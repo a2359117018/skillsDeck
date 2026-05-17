@@ -18,10 +18,10 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-  oneClick: false                           # Required for assisted installer + custom path
-  license: LICENSE                          # Apache 2.0 license page
-  allowToChangeInstallationDirectory: true  # Enable custom install path selection
-  include: build/installer.nsh              # Custom script for declaration page
+  oneClick: false # Required for assisted installer + custom path
+  license: LICENSE # Apache 2.0 license page
+  allowToChangeInstallationDirectory: true # Enable custom install path selection
+  include: build/installer.nsh # Custom script for declaration page
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

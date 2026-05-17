@@ -12,22 +12,23 @@
 
 ## 文件变更清单
 
-| 文件 | 操作 | 改动点数 |
-|---|---|---|
-| `src/main/services/WindowManager.ts` | 修改 | 1 |
-| `src/renderer/src/components/skills/GitHubInstaller.vue` | 修改 | 3 |
-| `src/renderer/src/views/AgentView.vue` | 修改 | 1 |
-| `src/renderer/src/views/SkillsSearch.vue` | 修改 | 1 |
-| `src/renderer/src/components/skills/AgentTagBar.vue` | 修改 | 1 |
-| `src/renderer/src/components/skills/SkillRow.vue` | 修改 | 1 |
-| `src/renderer/src/components/skills/AgentSelector.vue` | 修改 | 1 |
-| `src/renderer/src/components/skills/SkillScanResult.vue` | 修改 | 1 |
+| 文件                                                     | 操作 | 改动点数 |
+| -------------------------------------------------------- | ---- | -------- |
+| `src/main/services/WindowManager.ts`                     | 修改 | 1        |
+| `src/renderer/src/components/skills/GitHubInstaller.vue` | 修改 | 3        |
+| `src/renderer/src/views/AgentView.vue`                   | 修改 | 1        |
+| `src/renderer/src/views/SkillsSearch.vue`                | 修改 | 1        |
+| `src/renderer/src/components/skills/AgentTagBar.vue`     | 修改 | 1        |
+| `src/renderer/src/components/skills/SkillRow.vue`        | 修改 | 1        |
+| `src/renderer/src/components/skills/AgentSelector.vue`   | 修改 | 1        |
+| `src/renderer/src/components/skills/SkillScanResult.vue` | 修改 | 1        |
 
 ---
 
 ### Task 1: 设置主窗口最小尺寸
 
 **Files:**
+
 - Modify: `src/main/services/WindowManager.ts:15-25`
 
 `createWindowOptions` 函数需要接收并传递 minWidth/minHeight。当前函数只从 opts 中取 width 和 height。
@@ -65,13 +66,19 @@ interface WindowOptions {
 ```typescript
 // 文件: src/main/services/WindowManager.ts 第 44-46 行
 // 原:
-  mainWindow = new BrowserWindow(
-    createWindowOptions({ width: 1200, height: 800, title: 'NPX Skills UI' })
-  )
+mainWindow = new BrowserWindow(
+  createWindowOptions({ width: 1200, height: 800, title: 'NPX Skills UI' })
+)
 // 改为:
-  mainWindow = new BrowserWindow(
-    createWindowOptions({ width: 1200, height: 800, minWidth: 1100, minHeight: 700, title: 'NPX Skills UI' })
-  )
+mainWindow = new BrowserWindow(
+  createWindowOptions({
+    width: 1200,
+    height: 800,
+    minWidth: 1100,
+    minHeight: 700,
+    title: 'NPX Skills UI'
+  })
+)
 ```
 
 - [ ] **Step 3: 提交**
@@ -86,6 +93,7 @@ git commit -m "feat: set main window min dimensions to 1100×700"
 ### Task 2: 清理 GitHubInstaller.vue 的响应式样式
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/GitHubInstaller.vue`
 
 共 3 处改动。
@@ -129,9 +137,9 @@ git commit -m "feat: set main window min dimensions to 1100×700"
 /* 文件: src/renderer/src/components/skills/GitHubInstaller.vue 第 422 行 */
 /* .result-toast 规则中 */
 /* 原: */
-  max-height: 70vh;
+max-height: 70vh;
 /* 改为: */
-  max-height: 500px;
+max-height: 500px;
 ```
 
 - [ ] **Step 4: 提交**
@@ -146,6 +154,7 @@ git commit -m "refactor: remove responsive CSS from GitHubInstaller"
 ### Task 3: 固定 AgentView grid 列数
 
 **Files:**
+
 - Modify: `src/renderer/src/views/AgentView.vue:378`
 
 - [ ] **Step 1: 替换 auto-fill minmax 为固定列数**
@@ -154,9 +163,9 @@ git commit -m "refactor: remove responsive CSS from GitHubInstaller"
 /* 文件: src/renderer/src/views/AgentView.vue 第 378 行 */
 /* .agent-grid 规则中 */
 /* 原: */
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 /* 改为: */
-  grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(3, 1fr);
 ```
 
 - [ ] **Step 2: 提交**
@@ -171,6 +180,7 @@ git commit -m "refactor: use fixed 3-column grid in AgentView"
 ### Task 4: 固定 SkillsSearch grid 列数
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SkillsSearch.vue:159`
 
 - [ ] **Step 1: 替换 auto-fill minmax 为固定列数**
@@ -179,9 +189,9 @@ git commit -m "refactor: use fixed 3-column grid in AgentView"
 /* 文件: src/renderer/src/views/SkillsSearch.vue 第 159 行 */
 /* .search-grid 规则中 */
 /* 原: */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 /* 改为: */
-  grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(3, 1fr);
 ```
 
 - [ ] **Step 2: 提交**
@@ -196,6 +206,7 @@ git commit -m "refactor: use fixed 3-column grid in SkillsSearch"
 ### Task 5: 移除 AgentTagBar 和 SkillRow 的 flex-wrap
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/AgentTagBar.vue:121`
 - Modify: `src/renderer/src/components/skills/SkillRow.vue:127`
 
@@ -255,6 +266,7 @@ git commit -m "refactor: remove flex-wrap from tag components"
 ### Task 6: 移除触摸适配 (touch-action)
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/AgentSelector.vue:166`
 - Modify: `src/renderer/src/components/skills/SkillScanResult.vue:86`
 
@@ -336,6 +348,7 @@ npm run dev
 ```
 
 验证：
+
 1. 主窗口可以正常显示
 2. 拖动窗口边缘缩小，确认不能小于 1100×700
 3. SkillsSearch 页面卡片为固定 3 列
