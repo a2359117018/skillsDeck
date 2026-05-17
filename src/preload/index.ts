@@ -1,6 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { ScannedSkill, LocalInstallResult, CommandErrorInfo } from '../shared/types'
+import type {
+  ScannedSkill,
+  LocalInstallResult,
+  CommandErrorInfo,
+  GitHubParseResult
+} from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
 
@@ -36,7 +41,7 @@ const api = {
       global?: boolean
     }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('skills:update-all-background', opts),
-    parseGitHub: (url: string): Promise<IpcResult<ScannedSkill[]>> =>
+    parseGitHub: (url: string): Promise<IpcResult<GitHubParseResult>> =>
       ipcRenderer.invoke('skills:parse-github', url),
     selectArchive: (): Promise<IpcResult<string>> => ipcRenderer.invoke('skills:select-archive'),
     extractArchive: (filePath: string): Promise<IpcResult<ScannedSkill[]>> =>
@@ -46,6 +51,8 @@ const api = {
       agents: string[]
     }): Promise<IpcResult<LocalInstallResult>> => ipcRenderer.invoke('skills:install-local', opts),
     cancelGitHubDownload: (): Promise<void> => ipcRenderer.invoke('skills:cancel-github-download'),
+    cleanupTemp: (tempDirs: string[]): Promise<void> =>
+      ipcRenderer.invoke('skills:cleanup-temp', tempDirs),
     onGitHubDownloadProgress: (callback: (percent: number) => void): (() => void) => {
       const listener = (_event: Electron.IpcRendererEvent, percent: number): void =>
         callback(percent)

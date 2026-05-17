@@ -9,7 +9,8 @@ import type {
   AgentScanResult,
   BackgroundTask,
   ScannedSkill,
-  LocalInstallResult
+  LocalInstallResult,
+  GitHubParseResult
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -44,7 +45,7 @@ export interface AppApi {
     updateAllBackground: (opts?: {
       global?: boolean
     }) => Promise<{ taskId: string; error?: string }>
-    parseGitHub: (url: string) => Promise<IpcResult<ScannedSkill[]>>
+    parseGitHub: (url: string) => Promise<IpcResult<GitHubParseResult>>
     selectArchive: () => Promise<IpcResult<string>>
     extractArchive: (filePath: string) => Promise<IpcResult<ScannedSkill[]>>
     installLocal: (opts: {
@@ -52,6 +53,7 @@ export interface AppApi {
       agents: string[]
     }) => Promise<IpcResult<LocalInstallResult>>
     cancelGitHubDownload: () => Promise<void>
+    cleanupTemp: (tempDirs: string[]) => Promise<void>
     onGitHubDownloadProgress: (callback: (percent: number) => void) => () => void
   }
   agents: {
