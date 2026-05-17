@@ -124,7 +124,6 @@ const emit = defineEmits<{
 
 .skill-agents {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--space-xxs);
 }
 
