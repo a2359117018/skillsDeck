@@ -257,17 +257,16 @@ onUnmounted(() => {
         <div class="section-card">
           <NText depth="3" class="section-title">安装目标</NText>
           <AgentSelector v-model:model-value="selectedAgents" v-model:is-global="isGlobal" />
-        </div>
-
-        <div class="install-actions">
-          <NButton
-            type="primary"
-            :disabled="!canInstall || installing"
-            :loading="installing"
-            @click="handleInstall"
-          >
-            安装选中技能
-          </NButton>
+          <div class="install-actions">
+            <NButton
+              type="primary"
+              :disabled="!canInstall || installing"
+              :loading="installing"
+              @click="handleInstall"
+            >
+              安装选中技能
+            </NButton>
+          </div>
         </div>
       </div>
     </div>
@@ -345,6 +344,10 @@ onUnmounted(() => {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .section-title {
@@ -361,7 +364,8 @@ onUnmounted(() => {
 }
 
 .scan-list {
-  max-height: 240px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   touch-action: pan-y;
 }
