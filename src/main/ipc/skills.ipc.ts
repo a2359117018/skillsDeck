@@ -163,6 +163,10 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       )
       return { ok: true, data: result }
     } catch (e) {
+      // 解析失败时清理已下载的临时文件
+      if (zipPath) {
+        await localSkillInstaller.cleanupTempDir(path.dirname(zipPath)).catch(() => {})
+      }
       return { ok: false, error: serializeError(e) }
     }
   })

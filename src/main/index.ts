@@ -14,7 +14,10 @@ function cleanupOrphanedTempDirs(): void {
   try {
     const entries = fs.readdirSync(tmpDir, { withFileTypes: true })
     for (const entry of entries) {
-      if (entry.isDirectory() && entry.name.startsWith('skills-')) {
+      if (
+        entry.isDirectory() &&
+        (entry.name.startsWith('skills-github-') || entry.name.startsWith('skills-archive-'))
+      ) {
         fs.rmSync(path.join(tmpDir, entry.name), { recursive: true, force: true })
       }
     }
