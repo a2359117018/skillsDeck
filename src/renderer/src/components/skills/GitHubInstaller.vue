@@ -41,8 +41,7 @@ const allSkillsSelected = computed(
 )
 
 const someSkillsSelected = computed(
-  () =>
-    skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
+  () => skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
 )
 
 const canInstall = computed(() => {
@@ -153,6 +152,11 @@ async function handleInstall(): Promise<void> {
       throw new Error(result.error.message)
     }
     installResult.value = result.data
+    // 安装完成后清理临时目录（无论成功或失败，后端已处理文件复制）
+    if (scanResult.value?.tempDir) {
+      window.api.skills.cleanupTemp([scanResult.value.tempDir]).catch(() => {})
+      scanResult.value = { ...scanResult.value, tempDir: '' }
+    }
     if (result.data.failed.length > 0) {
       alertError.value = `安装完成：${result.data.success.length} 个成功，${result.data.failed.length} 个失败`
     } else {
@@ -166,17 +170,13 @@ async function handleInstall(): Promise<void> {
   }
 }
 
-onUnmounted(async () => {
+onUnmounted(() => {
   if (removeProgressListener) {
     removeProgressListener()
     removeProgressListener = null
   }
   if (scanResult.value?.tempDir) {
-    try {
-      await window.api.skills.cleanupTemp([scanResult.value.tempDir])
-    } catch {
-      // ignore cleanup errors
-    }
+    window.api.skills.cleanupTemp([scanResult.value.tempDir]).catch(() => {})
   }
 })
 </script>
@@ -202,13 +202,7 @@ onUnmounted(async () => {
       <NButton v-if="parsing && showProgress" @click="handleCancel"> 取消 </NButton>
     </div>
 
-    <NAlert
-      v-if="alertError"
-      type="error"
-      closable
-      class="error-alert"
-      @close="clearAlert"
-    >
+    <NAlert v-if="alertError" type="error" closable class="error-alert" @close="clearAlert">
       {{ alertError }}
     </NAlert>
 
