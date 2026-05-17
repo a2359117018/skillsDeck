@@ -347,12 +347,6 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-@media (max-width: 640px) {
-  .split-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section-card {
   padding: var(--space-md);
   background: var(--color-surface);
@@ -381,7 +375,6 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  touch-action: pan-y;
 }
 
 .scan-item {
@@ -419,7 +412,7 @@ onUnmounted(() => {
 .result-toast {
   min-width: 360px;
   max-width: 480px;
-  max-height: 70vh;
+  max-height: 500px;
   overflow-y: auto;
   background: var(--color-surface);
   border-radius: var(--radius-lg);
