@@ -1,6 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import path from 'path'
-import type { CommandErrorInfo } from '../../shared/types'
+import os from 'os'
+import type { CommandErrorInfo, GitHubParseResult } from '../../shared/types'
 import { skillsService } from '../services/SkillsService'
 import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'
@@ -154,19 +155,15 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         parsed.branch,
         onProgress
       )
-      const skills = await githubSkillInstaller.extractAndScan(
+      const result = await githubSkillInstaller.extractAndScan(
         zipPath,
         parsed.subPath,
         parsed.repo,
         parsed.branch
       )
-      return { ok: true, data: skills }
+      return { ok: true, data: result }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
-    } finally {
-      if (zipPath) {
-        await localSkillInstaller.cleanupTempDir(path.dirname(zipPath))
-      }
     }
   })
 
@@ -221,6 +218,20 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     async (_, opts: { skillDirs: string[]; agents: string[] }) => {
       try {
         const result = await localSkillInstaller.installSkills(opts.skillDirs, opts.agents)
+        // 安装完成后清理临时目录（skills-github-* / skills-archive-*）
+        const tmpDir = os.tmpdir()
+        const tempRoots = new Set<string>()
+        for (const dir of opts.skillDirs) {
+          if (dir.startsWith(tmpDir)) {
+            const relative = dir.substring(tmpDir.length + 1).split(path.sep)[0] || ''
+            if (relative.startsWith('skills-github-') || relative.startsWith('skills-archive-')) {
+              tempRoots.add(path.join(tmpDir, relative))
+            }
+          }
+        }
+        for (const root of tempRoots) {
+          await localSkillInstaller.cleanupTempDir(root)
+        }
         return { ok: true, data: result }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -230,6 +241,16 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
   ipcMain.handle('skills:cancel-github-download', () => {
     githubSkillInstaller.cancelDownload()
+  })
+
+  ipcMain.handle('skills:cleanup-temp', async (_, tempDirs: string[]) => {
+    const tmpDir = os.tmpdir()
+    for (const dir of tempDirs) {
+      const resolved = path.resolve(dir)
+      if (resolved.startsWith(tmpDir) && path.basename(resolved).startsWith('skills-')) {
+        await localSkillInstaller.cleanupTempDir(resolved)
+      }
+    }
   })
 
   function hasPendingTask(type: string): boolean {
