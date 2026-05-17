@@ -54,6 +54,10 @@ function clearAlert(): void {
   alertError.value = null
 }
 
+function closeInstallResult(): void {
+  installResult.value = null
+}
+
 function toggleAllSkills(): void {
   if (allSkillsSelected.value) {
     selectedSkills.value = []
@@ -271,14 +275,24 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="installResult" class="install-result">
-      <NText v-if="installResult.success.length > 0" type="success">
-        成功: {{ installResult.success.join(', ') }}
-      </NText>
-      <div v-if="installResult.failed.length > 0">
-        <NText type="error">失败:</NText>
-        <div v-for="f in installResult.failed" :key="f.name" class="fail-item">
-          <NText type="error">{{ f.name }}: {{ f.error }}</NText>
+    <!-- 安装结果浮动面板 -->
+    <div v-if="installResult" class="result-overlay" @click="closeInstallResult">
+      <div class="result-toast" @click.stop>
+        <div class="result-header">
+          <NText strong>安装结果</NText>
+          <NButton text size="tiny" @click="closeInstallResult">关闭</NButton>
+        </div>
+        <div class="result-body">
+          <div v-if="installResult.success.length > 0" class="result-success">
+            <NText type="success">成功 ({{ installResult.success.length }}):</NText>
+            <div class="result-list">{{ installResult.success.join(', ') }}</div>
+          </div>
+          <div v-if="installResult.failed.length > 0" class="result-fail">
+            <NText type="error">失败 ({{ installResult.failed.length }}):</NText>
+            <div v-for="f in installResult.failed" :key="f.name" class="fail-item">
+              <NText type="error">{{ f.name }}: {{ f.error }}</NText>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -392,14 +406,56 @@ onUnmounted(() => {
   margin-top: var(--space-md);
 }
 
-.install-result {
-  padding: var(--space-md);
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 2000;
+}
+
+.result-toast {
+  min-width: 360px;
+  max-width: 480px;
+  max-height: 70vh;
+  overflow-y: auto;
   background: var(--color-surface);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.result-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.result-success .result-list {
+  margin-top: var(--space-xs);
+  font-size: 13px;
+  color: var(--color-success);
+}
+
+.result-fail {
+  margin-top: var(--space-xs);
 }
 
 .fail-item {
   margin-top: var(--space-xs);
+  font-size: 13px;
 }
 </style>
