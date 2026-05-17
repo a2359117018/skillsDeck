@@ -9,11 +9,15 @@ let settingsWindow: BrowserWindow | null = null
 function createWindowOptions(opts: {
   width: number
   height: number
+  minWidth?: number
+  minHeight?: number
   title: string
 }): Electron.BrowserWindowConstructorOptions {
   return {
     width: opts.width,
     height: opts.height,
+    minWidth: opts.minWidth,
+    minHeight: opts.minHeight,
     show: false,
     autoHideMenuBar: true,
     title: opts.title,
@@ -42,7 +46,7 @@ function loadWindow(win: BrowserWindow, query?: Record<string, string>): void {
 
 export function createMainWindow(): BrowserWindow {
   mainWindow = new BrowserWindow(
-    createWindowOptions({ width: 1200, height: 800, title: 'NPX Skills UI' })
+    createWindowOptions({ width: 1200, height: 800, minWidth: 1100, minHeight: 700, title: 'NPX Skills UI' })
   )
   loadWindow(mainWindow)
   mainWindow.on('closed', () => {
