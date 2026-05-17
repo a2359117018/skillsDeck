@@ -325,6 +325,13 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 2fr 3fr;
   gap: var(--space-lg);
+  align-items: stretch;
+}
+
+.split-left,
+.split-right {
+  display: flex;
+  flex-direction: column;
 }
 
 @media (max-width: 640px) {

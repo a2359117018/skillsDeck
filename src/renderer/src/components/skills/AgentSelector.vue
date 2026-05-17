@@ -73,7 +73,7 @@ function toggleGlobal(val: boolean): void {
       全局安装（不指定 agent）
     </NCheckbox>
 
-    <div v-if="!isGlobal" class="agent-section">
+    <div :class="['agent-section', { disabled: isGlobal }]">
       <NText depth="3" class="section-label">常用 Agent</NText>
       <NSpace :size="8" :wrap="true" class="common-agents">
         <NButton
@@ -133,6 +133,12 @@ function toggleGlobal(val: boolean): void {
 
 .agent-section {
   margin-top: var(--space-md);
+  transition: opacity 0.2s ease;
+}
+
+.agent-section.disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .section-label {
@@ -157,6 +163,7 @@ function toggleGlobal(val: boolean): void {
 .agent-list-scroll {
   max-height: 180px;
   overflow-y: auto;
+  touch-action: pan-y;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm);
