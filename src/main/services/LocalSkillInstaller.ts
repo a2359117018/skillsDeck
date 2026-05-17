@@ -27,6 +27,23 @@ export class LocalSkillInstaller {
     return results
   }
 
+  /**
+   * 从 SKILL.md frontmatter 提取技能名。
+   * 解析 `---` 之间的 YAML，查找 `name:` 字段。
+   * 若解析失败或无 name 字段，回退到目录名。
+   */
+  private extractSkillName(skillMdPath: string, fallbackName: string): string {
+    try {
+      const content = fs.readFileSync(skillMdPath, 'utf-8')
+      const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)
+      if (!frontmatterMatch) return fallbackName
+      const nameMatch = frontmatterMatch[1].match(/^name:\s*['"]?(.+?)['"]?\s*$/m)
+      return nameMatch ? nameMatch[1].trim() : fallbackName
+    } catch {
+      return fallbackName
+    }
+  }
+
   private async scanDir(
     currentPath: string,
     basePath: string,
@@ -36,10 +53,11 @@ export class LocalSkillInstaller {
   ): Promise<void> {
     if (depth > maxDepth) return
 
+    const skillMdPath = path.join(currentPath, 'SKILL.md')
     try {
-      await fs.promises.access(path.join(currentPath, 'SKILL.md'))
+      await fs.promises.access(skillMdPath)
       results.push({
-        name: path.basename(currentPath),
+        name: this.extractSkillName(skillMdPath, path.basename(currentPath)),
         path: currentPath,
         relativePath: path.relative(basePath, currentPath)
       })
