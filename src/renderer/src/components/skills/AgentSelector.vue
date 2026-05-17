@@ -163,7 +163,6 @@ function toggleGlobal(val: boolean): void {
 .agent-list-scroll {
   max-height: 180px;
   overflow-y: auto;
-  touch-action: pan-y;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm);
