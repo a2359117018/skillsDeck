@@ -35,7 +35,7 @@ function handleLocalInstallComplete(): void {
 
 <template>
   <div class="search-page">
-    <NTabs type="line" animated>
+    <NTabs type="line">
       <NTabPane name="search" tab="搜索安装">
         <div class="tab-content">
           <SkillSearchBar @search="handleSearch" />
@@ -102,8 +102,29 @@ function handleLocalInstallComplete(): void {
   overflow: hidden;
 }
 
+/* 让 NTabs 填满剩余空间 */
+.search-page :deep(.n-tabs) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.search-page :deep(.n-tabs-pane-wrapper) {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.search-page :deep(.n-tab-pane) {
+  height: 100%;
+}
+
 .tab-content {
   padding-top: var(--space-md);
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .search-scroll {
