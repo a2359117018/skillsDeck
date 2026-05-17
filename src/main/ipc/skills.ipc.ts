@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import path from 'path'
 import os from 'os'
-import type { CommandErrorInfo, GitHubParseResult } from '../../shared/types'
+import type { CommandErrorInfo } from '../../shared/types'
 import { skillsService } from '../services/SkillsService'
 import { agentScanner } from '../services/AgentScanner'
 import { CommandError } from '../services/CommandRunner'

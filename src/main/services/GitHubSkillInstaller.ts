@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import * as yauzl from 'yauzl'
-import type { ScannedSkill, ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
+import type { ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
 import { getSettings } from './StoreService'
 import { localSkillInstaller } from './LocalSkillInstaller'
 
