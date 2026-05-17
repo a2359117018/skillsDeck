@@ -32,9 +32,9 @@ export class LocalSkillInstaller {
    * 解析 `---` 之间的 YAML，查找 `name:` 字段。
    * 若解析失败或无 name 字段，回退到目录名。
    */
-  private extractSkillName(skillMdPath: string, fallbackName: string): string {
+  private async extractSkillName(skillMdPath: string, fallbackName: string): Promise<string> {
     try {
-      const content = fs.readFileSync(skillMdPath, 'utf-8')
+      const content = await fs.promises.readFile(skillMdPath, 'utf-8')
       const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)
       if (!frontmatterMatch) return fallbackName
       const nameMatch = frontmatterMatch[1].match(/^name:\s*['"]?(.+?)['"]?\s*$/m)
@@ -57,7 +57,7 @@ export class LocalSkillInstaller {
     try {
       await fs.promises.access(skillMdPath)
       results.push({
-        name: this.extractSkillName(skillMdPath, path.basename(currentPath)),
+        name: await this.extractSkillName(skillMdPath, path.basename(currentPath)),
         path: currentPath,
         relativePath: path.relative(basePath, currentPath)
       })
@@ -104,6 +104,7 @@ export class LocalSkillInstaller {
     for (const skillDir of skillDirs) {
       const rawName = path.basename(skillDir)
       const skillName = rawName.replace(/[\\/]/g, '_').replace(/^\.+/, '')
+      const displayName = await this.extractSkillName(path.join(skillDir, 'SKILL.md'), skillName)
       if (!skillName) {
         result.failed.push({ name: rawName || 'unknown', error: 'Invalid skill name' })
         continue
@@ -132,9 +133,9 @@ export class LocalSkillInstaller {
       }
 
       if (allSucceeded) {
-        result.success.push(skillName)
+        result.success.push(displayName)
       } else {
-        result.failed.push({ name: skillName, error: firstError })
+        result.failed.push({ name: displayName, error: firstError })
       }
     }
 

@@ -17,6 +17,9 @@ const scannedSkills = ref<ScannedSkill[]>([])
 const error = ref<string | null>(null)
 const isDragging = ref(false)
 
+const DRAG_ACTIVE_COLOR = 'var(--color-brand-blue)'
+const DRAG_DEFAULT_COLOR = 'var(--color-muted)'
+
 /** 处理拖拽进入 */
 function handleDragEnter(e: DragEvent): void {
   e.preventDefault()
@@ -112,7 +115,7 @@ async function extractArchive(): Promise<void> {
       @click="handleClickSelect"
     >
       <div class="drop-zone-content">
-        <NIcon :size="28" :color="isDragging ? '#1456f0' : '#9ca3af'">
+        <NIcon :size="28" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
           <ArchiveOutline />
         </NIcon>
         <div class="drop-zone-text">
