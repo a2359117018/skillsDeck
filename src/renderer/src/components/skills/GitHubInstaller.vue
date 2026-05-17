@@ -14,8 +14,8 @@ const parsing = ref(false)
 const downloadProgress = ref(0)
 const showProgress = ref(false)
 const scannedSkills = ref<ScannedSkill[]>([])
+const tempDir = ref<string | null>(null)
 const error = ref<string | null>(null)
-const panelRef = ref<InstanceType<typeof LocalInstallPanel> | null>(null)
 let removeProgressListener: (() => void) | null = null
 
 onUnmounted(() => {
@@ -49,7 +49,8 @@ async function handleParse(): Promise<void> {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    scannedSkills.value = result.data
+    scannedSkills.value = result.data.skills
+    tempDir.value = result.data.tempDir
     if (scannedSkills.value.length === 0) {
       message.info('未在仓库中扫描到技能文件')
     }
@@ -70,27 +71,6 @@ function handleCancel(): void {
   window.api.skills.cancelGitHubDownload()
   parsing.value = false
   showProgress.value = false
-}
-
-async function handleInstall(payload: {
-  skillDirs: string[]
-  agents: string[]
-  isGlobal: boolean
-}): Promise<void> {
-  try {
-    const result = await window.api.skills.installLocal({
-      skillDirs: payload.skillDirs,
-      agents: payload.isGlobal ? [] : payload.agents
-    })
-    if (!result.ok) {
-      throw new Error(result.error.message)
-    }
-    panelRef.value?.showInstallResult(result.data)
-    emit('installComplete')
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    message.error('安装失败: ' + msg)
-  }
 }
 </script>
 
@@ -127,11 +107,10 @@ async function handleInstall(payload: {
     </div>
 
     <LocalInstallPanel
-      ref="panelRef"
       :skills="scannedSkills"
       :loading="parsing"
       :error="error"
-      @install="handleInstall"
+      @install-complete="emit('installComplete')"
     />
   </div>
 </template>
