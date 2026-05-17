@@ -12,34 +12,22 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  install: [payload: { skillDirs: string[]; agents: string[]; isGlobal: boolean }]
+  installComplete: []
 }>()
 
 const message = useMessage()
 const selectedSkills = ref<string[]>([])
 const selectedAgents = ref<string[]>([])
-const isGlobal = ref(false)
+const isGlobal = ref(true)
 const installing = ref(false)
 const installResult = ref<LocalInstallResult | null>(null)
 
 watch(
   () => props.skills,
   () => {
-    selectedSkills.value = []
+    selectedSkills.value = props.skills.map((s) => s.path)
     selectedAgents.value = []
-    isGlobal.value = false
-    installing.value = false
-    installResult.value = null
-  },
-  { deep: true }
-)
-
-watch(
-  () => props.skills,
-  () => {
-    selectedSkills.value = []
-    selectedAgents.value = []
-    isGlobal.value = false
+    isGlobal.value = true
     installing.value = false
     installResult.value = null
   },
@@ -52,6 +40,7 @@ const canInstall = computed(() => {
   return selectedAgents.value.length > 0
 })
 
+/** 直接执行 IPC 安装调用，避免 emit/callback 异步断层导致状态不一致 */
 async function handleInstall(): Promise<void> {
   if (!canInstall.value) {
     message.warning('请选择要安装的技能和目标 agent')
@@ -59,25 +48,30 @@ async function handleInstall(): Promise<void> {
   }
   installing.value = true
   installResult.value = null
-  const agents = isGlobal.value ? [] : selectedAgents.value
-  emit('install', {
-    skillDirs: selectedSkills.value,
-    agents,
-    isGlobal: isGlobal.value
-  })
-}
-
-function showInstallResult(result: LocalInstallResult): void {
-  installing.value = false
-  installResult.value = result
-  if (result.failed.length > 0) {
-    message.error(`安装完成：${result.success.length} 个成功，${result.failed.length} 个失败`)
-  } else {
-    message.success(`成功安装 ${result.success.length} 个技能`)
+  try {
+    const result = await window.api.skills.installLocal({
+      skillDirs: [...selectedSkills.value],
+      agents: isGlobal.value ? [] : [...selectedAgents.value]
+    })
+    if (!result.ok) {
+      throw new Error(result.error.message)
+    }
+    installResult.value = result.data
+    if (result.data.failed.length > 0) {
+      message.error(
+        `安装完成：${result.data.success.length} 个成功，${result.data.failed.length} 个失败`
+      )
+    } else {
+      message.success(`成功安装 ${result.data.success.length} 个技能`)
+    }
+    emit('installComplete')
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    message.error('安装失败: ' + msg)
+  } finally {
+    installing.value = false
   }
 }
-
-defineExpose({ showInstallResult })
 </script>
 
 <template>
@@ -92,14 +86,16 @@ defineExpose({ showInstallResult })
     </div>
 
     <div v-else-if="skills.length > 0" class="panel-content">
-      <div class="panel-section">
-        <NText depth="3" class="section-title">扫描到的技能</NText>
-        <SkillScanResult v-model:model-value="selectedSkills" :skills="skills" />
-      </div>
+      <div class="panel-grid">
+        <div class="panel-section">
+          <NText depth="3" class="section-title">扫描到的技能</NText>
+          <SkillScanResult v-model:model-value="selectedSkills" :skills="skills" />
+        </div>
 
-      <div class="panel-section">
-        <NText depth="3" class="section-title">安装目标</NText>
-        <AgentSelector v-model:model-value="selectedAgents" v-model:is-global="isGlobal" />
+        <div class="panel-section">
+          <NText depth="3" class="section-title">安装目标</NText>
+          <AgentSelector v-model:model-value="selectedAgents" v-model:is-global="isGlobal" />
+        </div>
       </div>
 
       <div class="panel-actions">
@@ -143,15 +139,27 @@ defineExpose({ showInstallResult })
 
 .panel-error {
   padding: var(--space-md);
-  background: #fef2f2;
+  background: var(--color-error-bg);
   border-radius: var(--radius-md);
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-error);
 }
 
 .panel-content {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .panel-section {
