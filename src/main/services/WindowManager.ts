@@ -46,7 +46,13 @@ function loadWindow(win: BrowserWindow, query?: Record<string, string>): void {
 
 export function createMainWindow(): BrowserWindow {
   mainWindow = new BrowserWindow(
-    createWindowOptions({ width: 1200, height: 800, minWidth: 1100, minHeight: 700, title: 'NPX Skills UI' })
+    createWindowOptions({
+      width: 1200,
+      height: 800,
+      minWidth: 1100,
+      minHeight: 700,
+      title: 'NPX Skills UI'
+    })
   )
   loadWindow(mainWindow)
   mainWindow.on('closed', () => {
