@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { NText, NIcon, useMessage } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
-import type { ScannedSkill } from '../../../../shared/types'
 import LocalInstallPanel from './LocalInstallPanel.vue'
+import { useSkillInstall } from '@renderer/composables/useSkillInstall'
+import type { ScannedSkill } from '../../../../shared/types'
 
-/** 压缩包安装组件 - 支持拖拽导入和点击选择 */
 const emit = defineEmits<{
   installComplete: []
 }>()
 
 const message = useMessage()
+
+const {
+  selectedSkills,
+  selectedAgents,
+  isGlobal,
+  installing,
+  installResult,
+  hasContent,
+  canInstall,
+  setSkills,
+  setTempDir,
+  install,
+  cleanup
+} = useSkillInstall()
+
 const selectedFile = ref('')
 const extracting = ref(false)
 const scannedSkills = ref<ScannedSkill[]>([])
@@ -20,14 +35,12 @@ const isDragging = ref(false)
 const DRAG_ACTIVE_COLOR = 'var(--color-brand-blue)'
 const DRAG_DEFAULT_COLOR = 'var(--color-muted)'
 
-/** 处理拖拽进入 */
 function handleDragEnter(e: DragEvent): void {
   e.preventDefault()
   e.stopPropagation()
   isDragging.value = true
 }
 
-/** 处理拖拽离开 */
 function handleDragLeave(e: DragEvent): void {
   e.preventDefault()
   e.stopPropagation()
@@ -37,13 +50,11 @@ function handleDragLeave(e: DragEvent): void {
   isDragging.value = false
 }
 
-/** 处理拖拽悬停 */
 function handleDragOver(e: DragEvent): void {
   e.preventDefault()
   e.stopPropagation()
 }
 
-/** 处理拖拽释放 */
 async function handleDrop(e: DragEvent): Promise<void> {
   e.preventDefault()
   e.stopPropagation()
@@ -64,7 +75,6 @@ async function handleDrop(e: DragEvent): Promise<void> {
   await extractArchive()
 }
 
-/** 点击拖拽区域，触发文件选择对话框 */
 async function handleClickSelect(): Promise<void> {
   try {
     const result = await window.api.skills.selectArchive()
@@ -80,9 +90,12 @@ async function handleClickSelect(): Promise<void> {
   }
 }
 
-/** 解压并扫描压缩包 */
 async function extractArchive(): Promise<void> {
   if (!selectedFile.value) return
+
+  // 清理旧的临时目录
+  await cleanup()
+
   extracting.value = true
   error.value = null
   scannedSkills.value = []
@@ -91,8 +104,10 @@ async function extractArchive(): Promise<void> {
     if (!result.ok) {
       throw new Error(result.error.message)
     }
-    scannedSkills.value = result.data
-    if (scannedSkills.value.length === 0) {
+    scannedSkills.value = result.data.skills
+    setSkills(result.data.skills)
+    setTempDir(result.data.tempDir)
+    if (result.data.skills.length === 0) {
       message.info('未在压缩包中扫描到技能文件')
     }
   } catch (e) {
@@ -102,6 +117,19 @@ async function extractArchive(): Promise<void> {
     extracting.value = false
   }
 }
+
+async function handleInstall(): Promise<void> {
+  const result = await install()
+  if (result) {
+    emit('installComplete')
+  }
+}
+
+defineExpose({ hasContent, cleanup })
+
+onUnmounted(() => {
+  cleanup()
+})
 </script>
 
 <template>
@@ -132,9 +160,18 @@ async function extractArchive(): Promise<void> {
 
     <LocalInstallPanel
       :skills="scannedSkills"
+      :selected-skills="selectedSkills"
+      :selected-agents="selectedAgents"
+      :is-global="isGlobal"
+      :installing="installing"
+      :install-result="installResult"
+      :can-install="canInstall"
       :loading="extracting"
       :error="error"
-      @install-complete="emit('installComplete')"
+      @update:selected-skills="selectedSkills = $event"
+      @update:selected-agents="selectedAgents = $event"
+      @update:is-global="isGlobal = $event"
+      @install="handleInstall"
     />
   </div>
 </template>
@@ -144,6 +181,7 @@ async function extractArchive(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  height: 100%;
 }
 
 .drop-zone {
@@ -154,6 +192,7 @@ async function extractArchive(): Promise<void> {
   cursor: pointer;
   transition: all var(--transition-base);
   background: var(--color-canvas);
+  flex-shrink: 0;
 }
 
 .drop-zone:hover {
