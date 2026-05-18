@@ -333,7 +333,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
 }
 
