@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
-import { NText, NIcon, useMessage } from 'naive-ui'
+import { NText, NIcon, NButton, NEmpty, NSpin, useMessage } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
-import LocalInstallPanel from './LocalInstallPanel.vue'
+import SkillScanResult from './SkillScanResult.vue'
+import AgentSelector from './AgentSelector.vue'
 import { useSkillInstall } from '@renderer/composables/useSkillInstall'
 import type { ScannedSkill } from '../../../../shared/types'
 
@@ -93,7 +94,6 @@ async function handleClickSelect(): Promise<void> {
 async function extractArchive(): Promise<void> {
   if (!selectedFile.value) return
 
-  // 清理旧的临时目录
   await cleanup()
 
   extracting.value = true
@@ -134,45 +134,104 @@ onUnmounted(() => {
 
 <template>
   <div class="archive-installer">
-    <div
-      :class="['drop-zone', { active: isDragging }]"
-      @dragenter="handleDragEnter"
-      @dragleave="handleDragLeave"
-      @dragover="handleDragOver"
-      @drop="handleDrop"
-      @click="handleClickSelect"
-    >
-      <div class="drop-zone-content">
-        <NIcon :size="28" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
-          <ArchiveOutline />
-        </NIcon>
-        <div class="drop-zone-text">
-          <NText :depth="isDragging ? 1 : 3" style="font-weight: 500">
-            {{ isDragging ? '释放以导入' : '拖拽压缩包到此处' }}
-          </NText>
-          <NText depth="3" class="drop-zone-hint"> 或点击选择文件 · 支持 .zip .tar.gz .tgz </NText>
-        </div>
-      </div>
-      <NText v-if="selectedFile && !extracting" depth="3" class="selected-file">
-        {{ selectedFile }}
-      </NText>
+    <!-- Loading state -->
+    <div v-if="extracting" class="archive-loading">
+      <NSpin size="large" />
+      <NText depth="3">正在解压扫描...</NText>
     </div>
 
-    <LocalInstallPanel
-      :skills="scannedSkills"
-      :selected-skills="selectedSkills"
-      :selected-agents="selectedAgents"
-      :is-global="isGlobal"
-      :installing="installing"
-      :install-result="installResult"
-      :can-install="canInstall"
-      :loading="extracting"
-      :error="error"
-      @update:selected-skills="selectedSkills = $event"
-      @update:selected-agents="selectedAgents = $event"
-      @update:is-global="isGlobal = $event"
-      @install="handleInstall"
-    />
+    <!-- Error state -->
+    <div v-else-if="error" class="archive-error">
+      <NText type="error">{{ error }}</NText>
+    </div>
+
+    <!-- Main two-column layout -->
+    <div v-else class="archive-columns">
+      <!-- Left column: drag zone + skill list -->
+      <div class="column-left">
+        <div
+          :class="['drop-zone', { active: isDragging }]"
+          @dragenter="handleDragEnter"
+          @dragleave="handleDragLeave"
+          @dragover="handleDragOver"
+          @drop="handleDrop"
+          @click="handleClickSelect"
+        >
+          <div class="drop-zone-content">
+            <NIcon :size="24" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
+              <ArchiveOutline />
+            </NIcon>
+            <div class="drop-zone-text">
+              <NText :depth="isDragging ? 1 : 3" style="font-weight: 500">
+                {{ isDragging ? '释放以导入' : '拖拽或点击选择压缩包' }}
+              </NText>
+            </div>
+          </div>
+          <NText v-if="selectedFile && !extracting" depth="3" class="selected-file">
+            {{ selectedFile }}
+          </NText>
+        </div>
+
+        <div v-if="scannedSkills.length > 0" class="step-header">
+          <span class="step-number">1</span>
+          <span class="step-title">选择技能</span>
+          <span class="step-count">{{ selectedSkills.length }} / {{ scannedSkills.length }}</span>
+        </div>
+
+        <div v-if="scannedSkills.length > 0" class="skill-list-area">
+          <SkillScanResult
+            :skills="scannedSkills"
+            :model-value="selectedSkills"
+            @update:model-value="selectedSkills = $event"
+          />
+        </div>
+      </div>
+
+      <!-- Right column: agent selector + install button -->
+      <div class="column-right">
+        <div v-if="scannedSkills.length > 0" class="step-header">
+          <span class="step-number">2</span>
+          <span class="step-title">选择目标</span>
+        </div>
+
+        <div v-if="scannedSkills.length > 0" class="agent-area">
+          <AgentSelector
+            :model-value="selectedAgents"
+            :is-global="isGlobal"
+            @update:model-value="selectedAgents = $event"
+            @update:is-global="isGlobal = $event"
+          />
+        </div>
+
+        <NEmpty v-else description="选择压缩包后显示安装选项" class="right-empty" />
+
+        <div v-if="scannedSkills.length > 0" class="column-actions">
+          <NButton
+            type="primary"
+            :disabled="!canInstall || installing"
+            :loading="installing"
+            round
+            block
+            @click="handleInstall"
+          >
+            安装选中技能 ({{ selectedSkills.length }})
+          </NButton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Install result -->
+    <div v-if="installResult" class="install-result">
+      <NText v-if="installResult.success.length > 0" type="success">
+        成功: {{ installResult.success.join(', ') }}
+      </NText>
+      <div v-if="installResult.failed.length > 0">
+        <NText type="error">失败:</NText>
+        <div v-for="f in installResult.failed" :key="f.name" class="fail-item">
+          <NText type="error">{{ f.name }}: {{ f.error }}</NText>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -184,10 +243,41 @@ onUnmounted(() => {
   height: 100%;
 }
 
+.archive-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xxxl) 0;
+}
+
+.archive-error {
+  padding: var(--space-md);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-error);
+}
+
+.archive-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  flex: 1;
+  min-height: 0;
+}
+
+/* --- Left column --- */
+.column-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 0;
+}
+
 .drop-zone {
   border: 2px dashed var(--color-hairline);
   border-radius: var(--radius-xl);
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -210,7 +300,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xxs);
 }
 
 .drop-zone-text {
@@ -219,14 +309,90 @@ onUnmounted(() => {
   gap: 2px;
 }
 
-.drop-zone-hint {
-  font-size: var(--text-micro);
-}
-
 .selected-file {
   display: block;
-  margin-top: var(--space-sm);
+  margin-top: var(--space-xs);
   font-size: var(--text-micro);
   word-break: break-all;
+}
+
+/* --- Step header (shared) --- */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.step-number {
+  background: var(--color-brand-blue);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+}
+
+.step-title {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+}
+
+.step-count {
+  font-size: var(--text-micro);
+  color: var(--color-muted);
+}
+
+/* --- Skill list area --- */
+.skill-list-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  background: var(--color-canvas);
+}
+
+/* --- Right column --- */
+.column-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 0;
+}
+
+.agent-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.right-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.column-actions {
+  flex-shrink: 0;
+}
+
+/* --- Install result --- */
+.install-result {
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline);
+  flex-shrink: 0;
+}
+
+.fail-item {
+  margin-top: var(--space-xxs);
 }
 </style>
