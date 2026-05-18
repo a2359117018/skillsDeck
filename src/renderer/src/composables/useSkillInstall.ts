@@ -92,6 +92,10 @@ export function useSkillInstall(): {
         // ignore cleanup errors
       }
       tempDir.value = ''
+      selectedSkills.value = []
+      selectedAgents.value = []
+      isGlobal.value = true
+      installResult.value = null
     }
   }
 

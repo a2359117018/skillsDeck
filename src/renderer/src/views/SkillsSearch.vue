@@ -64,8 +64,8 @@ onBeforeRouteLeave(() => {
         content: '当前有未完成的安装操作，离开后解析结果将丢失。确定要离开吗？',
         positiveText: '确认离开',
         negativeText: '留在当前页',
-        onPositiveClick: () => {
-          cleanupActiveTab()
+        onPositiveClick: async () => {
+          await cleanupActiveTab()
           resolve(true)
         },
         onNegativeClick: () => resolve(false),
