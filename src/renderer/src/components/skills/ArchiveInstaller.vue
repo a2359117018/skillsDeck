@@ -178,21 +178,21 @@ onUnmounted(() => {
           <NText depth="3">正在解压扫描...</NText>
         </div>
 
-        <template v-if="hasScannedSkills">
-          <div class="step-header">
-            <span class="step-number">1</span>
-            <span class="step-title">选择技能</span>
-            <span class="step-count">{{ selectedSkills.length }} / {{ scannedSkills.length }}</span>
-          </div>
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <span class="step-title">选择技能</span>
+          <span v-if="hasScannedSkills" class="step-count">
+            {{ selectedSkills.length }} / {{ scannedSkills.length }}
+          </span>
+        </div>
 
-          <div class="skill-list-area">
-            <SkillScanResult
-              :skills="scannedSkills"
-              :model-value="selectedSkills"
-              @update:model-value="selectedSkills = $event"
-            />
-          </div>
-        </template>
+        <div class="skill-list-area">
+          <SkillScanResult
+            :skills="scannedSkills"
+            :model-value="selectedSkills"
+            @update:model-value="selectedSkills = $event"
+          />
+        </div>
       </div>
 
       <!-- Right column: agent selector + install button -->
