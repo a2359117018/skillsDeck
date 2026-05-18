@@ -27,6 +27,8 @@ const {
   cleanup
 } = useSkillInstall()
 
+isGlobal.value = false
+
 const selectedFile = ref('')
 const extracting = ref(false)
 const scannedSkills = ref<ScannedSkill[]>([])
@@ -358,6 +360,7 @@ onUnmounted(() => {
 
 /* --- Skill list area --- */
 .skill-list-area {
+  flex: 1;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm);
