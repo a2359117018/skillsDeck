@@ -282,6 +282,7 @@ onUnmounted(() => {
   gap: var(--space-sm);
   min-height: 0;
   overflow-y: auto;
+  padding-bottom: var(--space-lg);
 }
 
 .drop-zone {
