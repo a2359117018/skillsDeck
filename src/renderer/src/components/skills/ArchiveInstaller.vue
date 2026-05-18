@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { NText, NIcon, NButton, NEmpty, NSpin, useMessage } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
 import SkillScanResult from './SkillScanResult.vue'
@@ -32,6 +32,8 @@ const extracting = ref(false)
 const scannedSkills = ref<ScannedSkill[]>([])
 const error = ref<string | null>(null)
 const isDragging = ref(false)
+
+const hasScannedSkills = computed(() => scannedSkills.value.length > 0)
 
 const DRAG_ACTIVE_COLOR = 'var(--color-brand-blue)'
 const DRAG_DEFAULT_COLOR = 'var(--color-muted)'
@@ -134,28 +136,21 @@ onUnmounted(() => {
 
 <template>
   <div class="archive-installer">
-    <!-- Loading state -->
-    <div v-if="extracting" class="archive-loading">
-      <NSpin size="large" />
-      <NText depth="3">正在解压扫描...</NText>
-    </div>
-
-    <!-- Error state -->
-    <div v-else-if="error" class="archive-error">
-      <NText type="error">{{ error }}</NText>
-    </div>
-
-    <!-- Main two-column layout -->
-    <div v-else class="archive-columns">
+    <!-- Main two-column layout (always visible) -->
+    <div class="archive-columns">
       <!-- Left column: drag zone + skill list -->
       <div class="column-left">
         <div
           :class="['drop-zone', { active: isDragging }]"
+          role="button"
+          tabindex="0"
           @dragenter="handleDragEnter"
           @dragleave="handleDragLeave"
           @dragover="handleDragOver"
           @drop="handleDrop"
           @click="handleClickSelect"
+          @keydown.enter="handleClickSelect"
+          @keydown.space.prevent="handleClickSelect"
         >
           <div class="drop-zone-content">
             <NIcon :size="24" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
@@ -167,56 +162,71 @@ onUnmounted(() => {
               </NText>
             </div>
           </div>
-          <NText v-if="selectedFile && !extracting" depth="3" class="selected-file">
+          <NText v-if="selectedFile" depth="3" class="selected-file">
             {{ selectedFile }}
           </NText>
         </div>
 
-        <div v-if="scannedSkills.length > 0" class="step-header">
-          <span class="step-number">1</span>
-          <span class="step-title">选择技能</span>
-          <span class="step-count">{{ selectedSkills.length }} / {{ scannedSkills.length }}</span>
+        <!-- Inline error (keeps drop zone visible for retry) -->
+        <div v-if="error" class="archive-error">
+          <NText type="error">{{ error }}</NText>
         </div>
 
-        <div v-if="scannedSkills.length > 0" class="skill-list-area">
-          <SkillScanResult
-            :skills="scannedSkills"
-            :model-value="selectedSkills"
-            @update:model-value="selectedSkills = $event"
-          />
+        <!-- Loading indicator inside left column -->
+        <div v-if="extracting" class="archive-loading">
+          <NSpin size="large" />
+          <NText depth="3">正在解压扫描...</NText>
         </div>
+
+        <template v-if="hasScannedSkills">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <span class="step-title">选择技能</span>
+            <span class="step-count">{{ selectedSkills.length }} / {{ scannedSkills.length }}</span>
+          </div>
+
+          <div class="skill-list-area">
+            <SkillScanResult
+              :skills="scannedSkills"
+              :model-value="selectedSkills"
+              @update:model-value="selectedSkills = $event"
+            />
+          </div>
+        </template>
       </div>
 
       <!-- Right column: agent selector + install button -->
       <div class="column-right">
-        <div v-if="scannedSkills.length > 0" class="step-header">
-          <span class="step-number">2</span>
-          <span class="step-title">选择目标</span>
-        </div>
+        <template v-if="hasScannedSkills">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <span class="step-title">选择目标</span>
+          </div>
 
-        <div v-if="scannedSkills.length > 0" class="agent-area">
-          <AgentSelector
-            :model-value="selectedAgents"
-            :is-global="isGlobal"
-            @update:model-value="selectedAgents = $event"
-            @update:is-global="isGlobal = $event"
-          />
-        </div>
+          <div class="agent-area">
+            <AgentSelector
+              :model-value="selectedAgents"
+              :is-global="isGlobal"
+              @update:model-value="selectedAgents = $event"
+              @update:is-global="isGlobal = $event"
+            />
+          </div>
+
+          <div class="column-actions">
+            <NButton
+              type="primary"
+              :disabled="!canInstall || installing"
+              :loading="installing"
+              round
+              block
+              @click="handleInstall"
+            >
+              安装选中技能 ({{ selectedSkills.length }})
+            </NButton>
+          </div>
+        </template>
 
         <NEmpty v-else description="选择压缩包后显示安装选项" class="right-empty" />
-
-        <div v-if="scannedSkills.length > 0" class="column-actions">
-          <NButton
-            type="primary"
-            :disabled="!canInstall || installing"
-            :loading="installing"
-            round
-            block
-            @click="handleInstall"
-          >
-            安装选中技能 ({{ selectedSkills.length }})
-          </NButton>
-        </div>
       </div>
     </div>
 
@@ -248,7 +258,8 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-xxxl) 0;
+  padding: var(--space-xl) 0;
+  flex-shrink: 0;
 }
 
 .archive-error {
