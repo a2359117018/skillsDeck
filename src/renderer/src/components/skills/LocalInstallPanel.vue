@@ -1,77 +1,27 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { NButton, NText, NSpin, useMessage } from 'naive-ui'
+import { NButton, NText, NSpin } from 'naive-ui'
 import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
 
 const props = defineProps<{
   skills: ScannedSkill[]
+  selectedSkills: string[]
+  selectedAgents: string[]
+  isGlobal: boolean
+  installing: boolean
+  installResult: LocalInstallResult | null
+  canInstall: boolean
   loading?: boolean
   error?: string | null
 }>()
 
 const emit = defineEmits<{
-  installComplete: []
+  'update:selectedSkills': [value: string[]]
+  'update:selectedAgents': [value: string[]]
+  'update:isGlobal': [value: boolean]
+  install: []
 }>()
-
-const message = useMessage()
-const selectedSkills = ref<string[]>([])
-const selectedAgents = ref<string[]>([])
-const isGlobal = ref(true)
-const installing = ref(false)
-const installResult = ref<LocalInstallResult | null>(null)
-
-watch(
-  () => props.skills,
-  () => {
-    selectedSkills.value = props.skills.map((s) => s.path)
-    selectedAgents.value = []
-    isGlobal.value = true
-    installing.value = false
-    installResult.value = null
-  },
-  { deep: true }
-)
-
-const canInstall = computed(() => {
-  if (selectedSkills.value.length === 0) return false
-  if (isGlobal.value) return true
-  return selectedAgents.value.length > 0
-})
-
-/** 直接执行 IPC 安装调用，避免 emit/callback 异步断层导致状态不一致 */
-async function handleInstall(): Promise<void> {
-  if (!canInstall.value) {
-    message.warning('请选择要安装的技能和目标 agent')
-    return
-  }
-  installing.value = true
-  installResult.value = null
-  try {
-    const result = await window.api.skills.installLocal({
-      skillDirs: [...selectedSkills.value],
-      agents: isGlobal.value ? [] : [...selectedAgents.value]
-    })
-    if (!result.ok) {
-      throw new Error(result.error.message)
-    }
-    installResult.value = result.data
-    if (result.data.failed.length > 0) {
-      message.error(
-        `安装完成：${result.data.success.length} 个成功，${result.data.failed.length} 个失败`
-      )
-    } else {
-      message.success(`成功安装 ${result.data.success.length} 个技能`)
-    }
-    emit('installComplete')
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    message.error('安装失败: ' + msg)
-  } finally {
-    installing.value = false
-  }
-}
 </script>
 
 <template>
@@ -89,12 +39,21 @@ async function handleInstall(): Promise<void> {
       <div class="panel-grid">
         <div class="panel-section">
           <NText depth="3" class="section-title">扫描到的技能</NText>
-          <SkillScanResult v-model:model-value="selectedSkills" :skills="skills" />
+          <SkillScanResult
+            :skills="skills"
+            :model-value="selectedSkills"
+            @update:model-value="emit('update:selectedSkills', $event)"
+          />
         </div>
 
         <div class="panel-section">
           <NText depth="3" class="section-title">安装目标</NText>
-          <AgentSelector v-model:model-value="selectedAgents" v-model:is-global="isGlobal" />
+          <AgentSelector
+            :model-value="selectedAgents"
+            :is-global="isGlobal"
+            @update:model-value="emit('update:selectedAgents', $event)"
+            @update:is-global="emit('update:isGlobal', $event)"
+          />
         </div>
       </div>
 
@@ -103,7 +62,7 @@ async function handleInstall(): Promise<void> {
           type="primary"
           :disabled="!canInstall || installing"
           :loading="installing"
-          @click="handleInstall"
+          @click="emit('install')"
         >
           安装选中技能
         </NButton>
@@ -127,6 +86,10 @@ async function handleInstall(): Promise<void> {
 <style scoped>
 .local-install-panel {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .panel-loading {
@@ -147,6 +110,8 @@ async function handleInstall(): Promise<void> {
 .panel-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: var(--space-lg);
 }
 
@@ -154,12 +119,8 @@ async function handleInstall(): Promise<void> {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
-}
-
-@media (max-width: 640px) {
-  .panel-grid {
-    grid-template-columns: 1fr;
-  }
+  flex: 1;
+  min-height: 0;
 }
 
 .panel-section {
@@ -167,7 +128,10 @@ async function handleInstall(): Promise<void> {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
-  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .section-title {
@@ -175,11 +139,13 @@ async function handleInstall(): Promise<void> {
   font-weight: 600;
   margin-bottom: var(--space-sm);
   display: block;
+  flex-shrink: 0;
 }
 
 .panel-actions {
   display: flex;
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .install-result {
@@ -187,6 +153,7 @@ async function handleInstall(): Promise<void> {
   background: var(--color-surface);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-hairline);
+  flex-shrink: 0;
 }
 
 .fail-item {
