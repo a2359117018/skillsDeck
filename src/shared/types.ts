@@ -116,3 +116,8 @@ export interface GitHubParseResult {
   skills: ScannedSkill[]
   tempDir: string
 }
+
+export interface ArchiveScanResult {
+  skills: ScannedSkill[]
+  tempDir: string
+}

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import decompress from 'decompress'
-import type { ScannedSkill } from '../../shared/types'
+import type { ScannedSkill, ArchiveScanResult } from '../../shared/types'
 import { localSkillInstaller } from './LocalSkillInstaller'
 
 const SUPPORTED_EXTENSIONS = ['.zip', '.tar.gz', '.tgz']
@@ -26,7 +26,7 @@ export class ArchiveSkillInstaller {
     return { valid: true }
   }
 
-  async extractAndScan(filePath: string): Promise<ScannedSkill[]> {
+  async extractAndScan(filePath: string): Promise<ArchiveScanResult> {
     const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'skills-archive-'))
     const resolvedTemp = path.resolve(tempDir)
     try {
@@ -36,7 +36,8 @@ export class ArchiveSkillInstaller {
           throw new Error('Archive contains entries outside the target directory')
         }
       }
-      return localSkillInstaller.scanSkills(tempDir)
+      const skills = await localSkillInstaller.scanSkills(tempDir)
+      return { skills, tempDir }
     } catch (e) {
       await localSkillInstaller.cleanupTempDir(tempDir)
       throw e

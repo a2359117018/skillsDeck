@@ -210,8 +210,8 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
           }
         }
       }
-      const skills = await archiveSkillInstaller.extractAndScan(filePath)
-      return { ok: true, data: skills }
+      const result = await archiveSkillInstaller.extractAndScan(filePath)
+      return { ok: true, data: result }
     } catch (e) {
       return { ok: false, error: serializeError(e) }
     }
@@ -222,20 +222,6 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     async (_, opts: { skillDirs: string[]; agents: string[] }) => {
       try {
         const result = await localSkillInstaller.installSkills(opts.skillDirs, opts.agents)
-        // 安装完成后清理临时目录（skills-github-* / skills-archive-*）
-        const tmpDir = os.tmpdir()
-        const tempRoots = new Set<string>()
-        for (const dir of opts.skillDirs) {
-          if (dir.startsWith(tmpDir)) {
-            const relative = dir.substring(tmpDir.length + 1).split(path.sep)[0] || ''
-            if (relative.startsWith('skills-github-') || relative.startsWith('skills-archive-')) {
-              tempRoots.add(path.join(tmpDir, relative))
-            }
-          }
-        }
-        for (const root of tempRoots) {
-          await localSkillInstaller.cleanupTempDir(root)
-        }
         return { ok: true, data: result }
       } catch (e) {
         return { ok: false, error: serializeError(e) }

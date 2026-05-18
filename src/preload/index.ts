@@ -4,7 +4,8 @@ import type {
   ScannedSkill,
   LocalInstallResult,
   CommandErrorInfo,
-  GitHubParseResult
+  GitHubParseResult,
+  ArchiveScanResult
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -46,7 +47,7 @@ const api = {
     parseGitHub: (url: string): Promise<IpcResult<GitHubParseResult>> =>
       ipcRenderer.invoke('skills:parse-github', url),
     selectArchive: (): Promise<IpcResult<string>> => ipcRenderer.invoke('skills:select-archive'),
-    extractArchive: (filePath: string): Promise<IpcResult<ScannedSkill[]>> =>
+    extractArchive: (filePath: string): Promise<IpcResult<ArchiveScanResult>> =>
       ipcRenderer.invoke('skills:extract-archive', filePath),
     installLocal: (opts: {
       skillDirs: string[]

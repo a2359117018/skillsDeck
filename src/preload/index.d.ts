@@ -10,7 +10,8 @@ import type {
   BackgroundTask,
   ScannedSkill,
   LocalInstallResult,
-  GitHubParseResult
+  GitHubParseResult,
+  ArchiveScanResult
 } from '../shared/types'
 
 type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
@@ -49,7 +50,7 @@ export interface AppApi {
     }) => Promise<{ taskId: string; error?: string }>
     parseGitHub: (url: string) => Promise<IpcResult<GitHubParseResult>>
     selectArchive: () => Promise<IpcResult<string>>
-    extractArchive: (filePath: string) => Promise<IpcResult<ScannedSkill[]>>
+    extractArchive: (filePath: string) => Promise<IpcResult<ArchiveScanResult>>
     installLocal: (opts: {
       skillDirs: string[]
       agents: string[]
