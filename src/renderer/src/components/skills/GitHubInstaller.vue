@@ -8,29 +8,37 @@ import {
   NAlert,
   NCheckbox,
   NSpace,
-  NSpin,
-  useMessage
+  NSpin
 } from 'naive-ui'
-import type { GitHubParseResult, LocalInstallResult } from '../../../../shared/types'
+import type { GitHubParseResult } from '../../../../shared/types'
 import AgentSelector from './AgentSelector.vue'
+import { useSkillInstall } from '@renderer/composables/useSkillInstall'
 
 const emit = defineEmits<{
   installComplete: []
 }>()
 
-const message = useMessage()
+const {
+  selectedSkills,
+  selectedAgents,
+  isGlobal,
+  installing,
+  installResult,
+  hasContent,
+  canInstall,
+  setSkills,
+  setTempDir,
+  install,
+  cleanup,
+  resetResult
+} = useSkillInstall()
+
 const url = ref('')
 const parsing = ref(false)
 const downloadProgress = ref(0)
 const showProgress = ref(false)
 const scanResult = ref<GitHubParseResult | null>(null)
 const alertError = ref<string | null>(null)
-
-const selectedSkills = ref<string[]>([])
-const selectedAgents = ref<string[]>([])
-const isGlobal = ref(false)
-const installing = ref(false)
-const installResult = ref<LocalInstallResult | null>(null)
 
 let removeProgressListener: (() => void) | null = null
 
@@ -41,21 +49,16 @@ const allSkillsSelected = computed(
 )
 
 const someSkillsSelected = computed(
-  () => skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
+  () =>
+    skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
 )
-
-const canInstall = computed(() => {
-  if (selectedSkills.value.length === 0) return false
-  if (isGlobal.value) return true
-  return selectedAgents.value.length > 0
-})
 
 function clearAlert(): void {
   alertError.value = null
 }
 
 function closeInstallResult(): void {
-  installResult.value = null
+  resetResult()
 }
 
 function toggleAllSkills(): void {
@@ -77,26 +80,13 @@ function toggleSkill(path: string): void {
   selectedSkills.value = current
 }
 
-async function cleanupPreviousTemp(): Promise<void> {
-  if (scanResult.value?.tempDir) {
-    try {
-      await window.api.skills.cleanupTemp([scanResult.value.tempDir])
-    } catch {
-      // ignore cleanup errors
-    }
-    scanResult.value = null
-    selectedSkills.value = []
-    installResult.value = null
-  }
-}
-
 async function handleParse(): Promise<void> {
   if (!url.value.trim()) {
-    message.warning('请输入 GitHub 仓库链接')
     return
   }
 
-  await cleanupPreviousTemp()
+  // 清理旧的临时目录
+  await cleanup()
 
   if (removeProgressListener) {
     removeProgressListener()
@@ -106,7 +96,7 @@ async function handleParse(): Promise<void> {
   clearAlert()
   downloadProgress.value = 0
   showProgress.value = true
-  installResult.value = null
+  resetResult()
 
   removeProgressListener = window.api.skills.onGitHubDownloadProgress((percent) => {
     downloadProgress.value = percent
@@ -118,8 +108,10 @@ async function handleParse(): Promise<void> {
       throw new Error(result.error.message)
     }
     scanResult.value = result.data
+    setSkills(result.data.skills)
+    setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
-      message.info('未在仓库中扫描到技能文件')
+      alertError.value = '未在仓库中扫描到技能文件'
     }
   } catch (e) {
     alertError.value = e instanceof Error ? e.message : String(e)
@@ -140,48 +132,20 @@ function handleCancel(): void {
 }
 
 async function handleInstall(): Promise<void> {
-  if (!canInstall.value) {
-    message.warning('请选择要安装的技能和目标 agent')
-    return
-  }
-  installing.value = true
-  clearAlert()
-  installResult.value = null
-  try {
-    const result = await window.api.skills.installLocal({
-      skillDirs: [...selectedSkills.value],
-      agents: isGlobal.value ? [] : [...selectedAgents.value]
-    })
-    if (!result.ok) {
-      throw new Error(result.error.message)
-    }
-    installResult.value = result.data
-    // 安装完成后清理临时目录（无论成功或失败，后端已处理文件复制）
-    if (scanResult.value?.tempDir) {
-      window.api.skills.cleanupTemp([scanResult.value.tempDir]).catch(() => {})
-      scanResult.value = { ...scanResult.value, tempDir: '' }
-    }
-    if (result.data.failed.length > 0) {
-      alertError.value = `安装完成：${result.data.success.length} 个成功，${result.data.failed.length} 个失败`
-    } else {
-      message.success(`成功安装 ${result.data.success.length} 个技能`)
-    }
+  const result = await install()
+  if (result) {
     emit('installComplete')
-  } catch (e) {
-    alertError.value = e instanceof Error ? e.message : String(e)
-  } finally {
-    installing.value = false
   }
 }
+
+defineExpose({ hasContent, cleanup })
 
 onUnmounted(() => {
   if (removeProgressListener) {
     removeProgressListener()
     removeProgressListener = null
   }
-  if (scanResult.value?.tempDir) {
-    window.api.skills.cleanupTemp([scanResult.value.tempDir]).catch(() => {})
-  }
+  cleanup()
 })
 </script>
 
