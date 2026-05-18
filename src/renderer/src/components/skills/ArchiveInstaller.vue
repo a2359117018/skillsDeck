@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { NText, NIcon, NButton, NEmpty, NSpin, useMessage } from 'naive-ui'
+import { NText, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
@@ -197,36 +197,32 @@ onUnmounted(() => {
 
       <!-- Right column: agent selector + install button -->
       <div class="column-right">
-        <template v-if="hasScannedSkills">
-          <div class="step-header">
-            <span class="step-number">2</span>
-            <span class="step-title">选择目标</span>
-          </div>
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <span class="step-title">选择目标</span>
+        </div>
 
-          <div class="agent-area">
-            <AgentSelector
-              :model-value="selectedAgents"
-              :is-global="isGlobal"
-              @update:model-value="selectedAgents = $event"
-              @update:is-global="isGlobal = $event"
-            />
-          </div>
+        <div class="agent-area">
+          <AgentSelector
+            :model-value="selectedAgents"
+            :is-global="isGlobal"
+            @update:model-value="selectedAgents = $event"
+            @update:is-global="isGlobal = $event"
+          />
+        </div>
 
-          <div class="column-actions">
-            <NButton
-              type="primary"
-              :disabled="!canInstall || installing"
-              :loading="installing"
-              round
-              block
-              @click="handleInstall"
-            >
-              安装选中技能 ({{ selectedSkills.length }})
-            </NButton>
-          </div>
-        </template>
-
-        <NEmpty v-else description="选择压缩包后显示安装选项" class="right-empty" />
+        <div class="column-actions">
+          <NButton
+            type="primary"
+            :disabled="!canInstall || installing"
+            :loading="installing"
+            round
+            block
+            @click="handleInstall"
+          >
+            安装选中技能 ({{ selectedSkills.length }})
+          </NButton>
+        </div>
       </div>
     </div>
 
@@ -283,6 +279,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
+  overflow-y: auto;
 }
 
 .drop-zone {
@@ -361,9 +358,6 @@ onUnmounted(() => {
 
 /* --- Skill list area --- */
 .skill-list-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm);
@@ -376,18 +370,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
-}
-
-.agent-area {
-  flex: 1;
-  min-height: 0;
   overflow-y: auto;
-}
-
-.right-empty {
-  flex: 1;
-  display: flex;
-  align-items: center;
 }
 
 .column-actions {
