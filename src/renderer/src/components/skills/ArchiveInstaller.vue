@@ -110,6 +110,7 @@ async function extractArchive(): Promise<void> {
     }
     scannedSkills.value = result.data.skills
     setSkills(result.data.skills)
+    isGlobal.value = false
     setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
       message.info('未在压缩包中扫描到技能文件')
@@ -337,7 +338,7 @@ onUnmounted(() => {
 
 .step-number {
   background: var(--color-brand-blue);
-  color: white;
+  color: var(--color-canvas);
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -362,6 +363,8 @@ onUnmounted(() => {
 /* --- Skill list area --- */
 .skill-list-area {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm);
@@ -373,6 +376,12 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.agent-area {
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
