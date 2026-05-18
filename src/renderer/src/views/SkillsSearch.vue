@@ -74,6 +74,7 @@ onBeforeRouteLeave(() => {
       })
     })
   }
+  return true
 })
 
 function handleBeforeUnload(e: BeforeUnloadEvent): void {

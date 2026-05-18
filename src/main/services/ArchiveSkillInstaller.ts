@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import decompress from 'decompress'
-import type { ScannedSkill, ArchiveScanResult } from '../../shared/types'
+import type { ArchiveScanResult } from '../../shared/types'
 import { localSkillInstaller } from './LocalSkillInstaller'
 
 const SUPPORTED_EXTENSIONS = ['.zip', '.tar.gz', '.tgz']

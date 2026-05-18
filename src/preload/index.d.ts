@@ -8,7 +8,6 @@ import type {
   InstalledSkill,
   AgentScanResult,
   BackgroundTask,
-  ScannedSkill,
   LocalInstallResult,
   GitHubParseResult,
   ArchiveScanResult

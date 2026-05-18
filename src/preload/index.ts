@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type {
-  ScannedSkill,
   LocalInstallResult,
   CommandErrorInfo,
   GitHubParseResult,

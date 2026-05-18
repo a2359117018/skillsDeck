@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import {
-  NInput,
-  NButton,
-  NProgress,
-  NText,
-  NAlert,
-  NCheckbox,
-  NSpace,
-  NSpin
-} from 'naive-ui'
+import { NInput, NButton, NProgress, NText, NAlert, NCheckbox, NSpace, NSpin } from 'naive-ui'
 import type { GitHubParseResult } from '../../../../shared/types'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillInstall } from '@renderer/composables/useSkillInstall'
@@ -49,8 +40,7 @@ const allSkillsSelected = computed(
 )
 
 const someSkillsSelected = computed(
-  () =>
-    skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
+  () => skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
 )
 
 function clearAlert(): void {

@@ -3,7 +3,21 @@ import { useMessage } from 'naive-ui'
 import type { ScannedSkill, LocalInstallResult } from '../../../shared/types'
 
 /** 技能安装流程共享逻辑 composable */
-export function useSkillInstall() {
+export function useSkillInstall(): {
+  selectedSkills: import('vue').Ref<string[]>
+  selectedAgents: import('vue').Ref<string[]>
+  isGlobal: import('vue').Ref<boolean>
+  installing: import('vue').Ref<boolean>
+  installResult: import('vue').Ref<LocalInstallResult | null>
+  tempDir: import('vue').Ref<string>
+  hasContent: import('vue').ComputedRef<boolean>
+  canInstall: import('vue').ComputedRef<boolean>
+  setSkills: (skills: ScannedSkill[]) => void
+  setTempDir: (dir: string) => void
+  install: () => Promise<LocalInstallResult | null>
+  cleanup: () => Promise<void>
+  resetResult: () => void
+} {
   const selectedSkills = ref<string[]>([])
   const selectedAgents = ref<string[]>([])
   const isGlobal = ref(true)

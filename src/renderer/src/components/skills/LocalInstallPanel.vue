@@ -4,7 +4,7 @@ import type { ScannedSkill, LocalInstallResult } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
 
-const props = defineProps<{
+defineProps<{
   skills: ScannedSkill[]
   selectedSkills: string[]
   selectedAgents: string[]
