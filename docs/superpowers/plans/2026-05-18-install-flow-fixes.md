@@ -1,5 +1,7 @@
 # Install Flow Fixes Implementation Plan
 
+> **Status:** ✅ Completed (2026-05-18) — all tasks implemented, typecheck/lint pass, code reviewed, pushed to origin/main.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Fix navigation guards, temp folder cleanup, and layout issues in GitHub link and archive skill installation flows by extracting shared logic into a composable.
@@ -36,7 +38,7 @@
 - Modify: `src/main/services/ArchiveSkillInstaller.ts` (return `ArchiveScanResult`)
 - Modify: `src/main/ipc/skills.ipc.ts` (update handler, remove auto-cleanup)
 
-- [ ] **Step 1: Add `ArchiveScanResult` type to shared/types.ts**
+- [x] **Step 1: Add `ArchiveScanResult` type to shared/types.ts**
 
 Append after the `GitHubParseResult` interface (line 118):
 
@@ -47,7 +49,7 @@ export interface ArchiveScanResult {
 }
 ```
 
-- [ ] **Step 2: Update `ArchiveSkillInstaller.extractAndScan` return type**
+- [x] **Step 2: Update `ArchiveSkillInstaller.extractAndScan` return type**
 
 File: `src/main/services/ArchiveSkillInstaller.ts`
 
@@ -79,7 +81,7 @@ async extractAndScan(filePath: string): Promise<ArchiveScanResult> {
 }
 ```
 
-- [ ] **Step 3: Update `skills:extract-archive` IPC handler**
+- [x] **Step 3: Update `skills:extract-archive` IPC handler**
 
 File: `src/main/ipc/skills.ipc.ts`
 
@@ -109,7 +111,7 @@ ipcMain.handle('skills:extract-archive', async (_, filePath: string) => {
 })
 ```
 
-- [ ] **Step 4: Remove auto-cleanup from `skills:install-local` IPC handler**
+- [x] **Step 4: Remove auto-cleanup from `skills:install-local` IPC handler**
 
 File: `src/main/ipc/skills.ipc.ts`
 
@@ -131,7 +133,7 @@ ipcMain.handle(
 
 After this change, the `os` and `path` imports at the top of the file may become unused. Remove `import os from 'os'` if no other handler uses it (check: `os.tmpdir()` is no longer referenced in this file after removing the auto-cleanup). Keep `import path from 'path'` — it's used in `skills:parse-github` error handler.
 
-- [ ] **Step 5: Update preload types**
+- [x] **Step 5: Update preload types**
 
 File: `src/preload/index.ts`
 
@@ -181,7 +183,7 @@ Change the `extractArchive` type in `AppApi`:
 extractArchive: (filePath: string) => Promise<IpcResult<ArchiveScanResult>>
 ```
 
-- [ ] **Step 6: Commit backend changes**
+- [x] **Step 6: Commit backend changes**
 
 ```bash
 git add src/shared/types.ts src/main/services/ArchiveSkillInstaller.ts src/main/ipc/skills.ipc.ts src/preload/index.ts src/preload/index.d.ts
@@ -195,7 +197,7 @@ git commit -m "fix: archive installer returns tempDir, remove auto-cleanup from 
 **Files:**
 - Create: `src/renderer/src/composables/useSkillInstall.ts`
 
-- [ ] **Step 1: Write the composable**
+- [x] **Step 1: Write the composable**
 
 ```typescript
 import { ref, computed } from 'vue'
@@ -304,7 +306,7 @@ export function useSkillInstall() {
 }
 ```
 
-- [ ] **Step 2: Commit composable**
+- [x] **Step 2: Commit composable**
 
 ```bash
 git add src/renderer/src/composables/useSkillInstall.ts
@@ -320,7 +322,7 @@ git commit -m "feat: add useSkillInstall composable for shared install logic"
 
 This component currently manages its own state. Refactor it to accept state from the parent (composable) via props and emit events. Also fix the layout: flex column with scrollable content area and fixed bottom button.
 
-- [ ] **Step 1: Rewrite LocalInstallPanel.vue**
+- [x] **Step 1: Rewrite LocalInstallPanel.vue**
 
 ```vue
 <script setup lang="ts">
@@ -487,7 +489,7 @@ const emit = defineEmits<{
 </style>
 ```
 
-- [ ] **Step 2: Commit LocalInstallPanel refactor**
+- [x] **Step 2: Commit LocalInstallPanel refactor**
 
 ```bash
 git add src/renderer/src/components/skills/LocalInstallPanel.vue
@@ -501,7 +503,7 @@ git commit -m "refactor: LocalInstallPanel as controlled component with fixed la
 **Files:**
 - Modify: `src/renderer/src/components/skills/GitHubInstaller.vue`
 
-- [ ] **Step 1: Rewrite GitHubInstaller.vue**
+- [x] **Step 1: Rewrite GitHubInstaller.vue**
 
 ```vue
 <script setup lang="ts">
@@ -925,7 +927,7 @@ onUnmounted(() => {
 </style>
 ```
 
-- [ ] **Step 2: Commit GitHubInstaller refactor**
+- [x] **Step 2: Commit GitHubInstaller refactor**
 
 ```bash
 git add src/renderer/src/components/skills/GitHubInstaller.vue
@@ -939,7 +941,7 @@ git commit -m "refactor: GitHubInstaller uses useSkillInstall composable"
 **Files:**
 - Modify: `src/renderer/src/components/skills/ArchiveInstaller.vue`
 
-- [ ] **Step 1: Rewrite ArchiveInstaller.vue**
+- [x] **Step 1: Rewrite ArchiveInstaller.vue**
 
 ```vue
 <script setup lang="ts">
@@ -1175,7 +1177,7 @@ onUnmounted(() => {
 </style>
 ```
 
-- [ ] **Step 2: Commit ArchiveInstaller refactor**
+- [x] **Step 2: Commit ArchiveInstaller refactor**
 
 ```bash
 git add src/renderer/src/components/skills/ArchiveInstaller.vue
@@ -1189,7 +1191,7 @@ git commit -m "refactor: ArchiveInstaller uses useSkillInstall composable"
 **Files:**
 - Modify: `src/renderer/src/views/SkillsSearch.vue`
 
-- [ ] **Step 1: Add navigation guard, template refs, and beforeunload**
+- [x] **Step 1: Add navigation guard, template refs, and beforeunload**
 
 ```vue
 <script setup lang="ts">
@@ -1418,7 +1420,7 @@ onUnmounted(() => {
 </style>
 ```
 
-- [ ] **Step 2: Commit navigation guard**
+- [x] **Step 2: Commit navigation guard**
 
 ```bash
 git add src/renderer/src/views/SkillsSearch.vue
@@ -1429,7 +1431,7 @@ git commit -m "feat: add navigation guard to prevent losing unsaved install stat
 
 ### Task 7: Manual verification
 
-- [ ] **Step 1: Run dev server and verify**
+- [x] **Step 1: Run dev server and verify**
 
 Run: `npm run dev`
 
@@ -1445,19 +1447,19 @@ Verify each scenario:
 
 5. **Window close**: While GitHub is parsed or Archive is extracted, try closing the app window — browser should show native confirmation.
 
-- [ ] **Step 2: Run typecheck**
+- [x] **Step 2: Run typecheck**
 
 Run: `npm run typecheck`
 
 Expected: No type errors.
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run: `npm run lint`
 
 Expected: No lint errors.
 
-- [ ] **Step 4: Final commit if any fixes needed**
+- [x] **Step 4: Final commit if any fixes needed**
 
 ```bash
 git add -A

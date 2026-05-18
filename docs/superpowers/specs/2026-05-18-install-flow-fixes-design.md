@@ -1,5 +1,7 @@
 # Install Flow Fixes Design
 
+> **Status:** ✅ Implemented (2026-05-18)
+
 修复 GitHub 链接安装和压缩包安装中的导航守卫缺失、临时文件夹过早清理、布局溢出问题，并通过 composable 复用安装逻辑。
 
 ## 问题清单
