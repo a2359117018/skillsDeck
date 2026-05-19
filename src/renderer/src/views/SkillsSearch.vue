@@ -157,7 +157,7 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  padding: 0 var(--space-xl);
+  padding: var(--space-xl);
 }
 
 /* 让 NTabs 填满剩余空间 */
