@@ -52,7 +52,6 @@ function handleKeydown(e: KeyboardEvent): void {
   display: flex;
   gap: var(--space-md);
   width: 100%;
-  max-width: 680px;
   align-items: center;
 }
 
