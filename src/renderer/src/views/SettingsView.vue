@@ -553,8 +553,8 @@ async function handleUpdateAll(): Promise<void> {
           </div>
         </div>
 
-        <div v-if="!envStore.status?.nodeInstalled" class="env-actions">
-          <div v-if="envDownloading" class="env-download-progress">
+        <div v-if="envDownloading" class="env-actions">
+          <div class="env-download-progress">
             <div class="env-progress-header">
               <NText depth="3" class="env-progress-label">正在下载 Node.js</NText>
               <NText depth="3" class="env-progress-percent">{{ envDownloadProgress }}%</NText>
@@ -569,33 +569,42 @@ async function handleUpdateAll(): Promise<void> {
             />
             <NButton size="small" round @click="handleCancelInstallNode"> 取消 </NButton>
           </div>
-          <NButton v-else type="primary" round @click="handleInstallNode">
-            <template #icon>
-              <NIcon :size="14"><DownloadOutline /></NIcon>
-            </template>
-            下载并安装 Node.js
-          </NButton>
         </div>
 
-        <div
-          v-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
-          class="env-actions"
-        >
-          <NButton type="primary" round :loading="skillsInstalling" @click="handleInstallSkills">
-            <template #icon>
-              <NIcon :size="14"><DownloadOutline /></NIcon>
-            </template>
-            安装 skills CLI
-          </NButton>
-        </div>
-
-        <div class="env-actions">
-          <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
-            <template #icon>
-              <NIcon :size="14"><RefreshOutline /></NIcon>
-            </template>
-            重新检测
-          </NButton>
+        <div class="env-toolbar">
+          <div class="env-toolbar-left">
+            <NButton
+              v-if="!envStore.status?.nodeInstalled && !envDownloading"
+              type="primary"
+              round
+              @click="handleInstallNode"
+            >
+              <template #icon>
+                <NIcon :size="14"><DownloadOutline /></NIcon>
+              </template>
+              下载并安装 Node.js
+            </NButton>
+            <NButton
+              v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
+              type="primary"
+              round
+              :loading="skillsInstalling"
+              @click="handleInstallSkills"
+            >
+              <template #icon>
+                <NIcon :size="14"><DownloadOutline /></NIcon>
+              </template>
+              安装 skills CLI
+            </NButton>
+          </div>
+          <div class="env-toolbar-right">
+            <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
+              <template #icon>
+                <NIcon :size="14"><RefreshOutline /></NIcon>
+              </template>
+              重新检测
+            </NButton>
+          </div>
         </div>
       </div>
     </NCard>
@@ -699,6 +708,7 @@ async function handleUpdateAll(): Promise<void> {
 
 .settings-select {
   width: 100%;
+  max-width: 320px;
 }
 
 /* Proxy Field */
@@ -707,6 +717,7 @@ async function handleUpdateAll(): Promise<void> {
   flex-direction: column;
   gap: var(--space-sm);
   width: 100%;
+  max-width: 320px;
 }
 
 .custom-input-wrapper {
@@ -833,9 +844,20 @@ async function handleUpdateAll(): Promise<void> {
 }
 
 .env-actions {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
   display: flex;
   flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.env-toolbar {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
