@@ -10,7 +10,6 @@ export function useSkillInstall(): {
   installing: import('vue').Ref<boolean>
   installResult: import('vue').Ref<LocalInstallResult | null>
   tempDir: import('vue').Ref<string>
-  hasContent: import('vue').ComputedRef<boolean>
   canInstall: import('vue').ComputedRef<boolean>
   setSkills: (skills: ScannedSkill[]) => void
   setTempDir: (dir: string) => void
@@ -24,8 +23,6 @@ export function useSkillInstall(): {
   const installing = ref(false)
   const installResult = ref<LocalInstallResult | null>(null)
   const tempDir = ref('')
-
-  const hasContent = computed(() => tempDir.value !== '' || selectedSkills.value.length > 0)
 
   const canInstall = computed(() => {
     if (selectedSkills.value.length === 0) return false
@@ -126,7 +123,6 @@ export function useSkillInstall(): {
     installing,
     installResult,
     tempDir,
-    hasContent,
     canInstall,
     setSkills,
     setTempDir,

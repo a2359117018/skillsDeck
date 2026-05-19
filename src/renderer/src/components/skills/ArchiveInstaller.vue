@@ -18,7 +18,6 @@ const {
   selectedAgents,
   isGlobal,
   installing,
-  hasContent,
   canInstall,
   setSkills,
   setTempDir,
@@ -145,7 +144,7 @@ async function handleInstall(): Promise<void> {
   }
 }
 
-defineExpose({ hasContent, cleanup })
+defineExpose({ cleanup })
 
 onUnmounted(() => {
   cleanup()
@@ -380,5 +379,4 @@ onUnmounted(() => {
 .column-actions {
   flex-shrink: 0;
 }
-
 </style>

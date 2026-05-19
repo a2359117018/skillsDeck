@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
-import { NSpin, NEmpty, NText, NTabs, NTabPane, useDialog } from 'naive-ui'
+import { ref } from 'vue'
+import { NSpin, NEmpty, NText, NTabs, NTabPane } from 'naive-ui'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
@@ -10,14 +9,10 @@ import GitHubInstaller from '@renderer/components/skills/GitHubInstaller.vue'
 import ArchiveInstaller from '@renderer/components/skills/ArchiveInstaller.vue'
 
 const skillsStore = useSkillsStore()
-const dialog = useDialog()
 const showInstallDialog = ref(false)
 const selectedSource = ref('')
 const hasSearched = ref(false)
 const activeTab = ref('search')
-
-const gitHubRef = ref<InstanceType<typeof GitHubInstaller> | null>(null)
-const archiveRef = ref<InstanceType<typeof ArchiveInstaller> | null>(null)
 
 function handleSearch(keyword: string): void {
   hasSearched.value = true
@@ -37,59 +32,6 @@ function handleInstallComplete(): void {
 function handleLocalInstallComplete(): void {
   skillsStore.fetchInstalled()
 }
-
-function checkHasContent(): boolean {
-  if (activeTab.value === 'github') {
-    return gitHubRef.value?.hasContent ?? false
-  }
-  if (activeTab.value === 'archive') {
-    return archiveRef.value?.hasContent ?? false
-  }
-  return false
-}
-
-async function cleanupActiveTab(): Promise<void> {
-  if (activeTab.value === 'github') {
-    await gitHubRef.value?.cleanup()
-  } else if (activeTab.value === 'archive') {
-    await archiveRef.value?.cleanup()
-  }
-}
-
-onBeforeRouteLeave(() => {
-  if (checkHasContent()) {
-    return new Promise<boolean>((resolve) => {
-      dialog.warning({
-        title: '确认离开',
-        content: '当前有未完成的安装操作，离开后解析结果将丢失。确定要离开吗？',
-        positiveText: '确认离开',
-        negativeText: '留在当前页',
-        onPositiveClick: async () => {
-          await cleanupActiveTab()
-          resolve(true)
-        },
-        onNegativeClick: () => resolve(false),
-        onClose: () => resolve(false),
-        onMaskClick: () => resolve(false)
-      })
-    })
-  }
-  return true
-})
-
-function handleBeforeUnload(e: BeforeUnloadEvent): void {
-  if (checkHasContent()) {
-    e.preventDefault()
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('beforeunload', handleBeforeUnload)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
 </script>
 
 <template>
@@ -132,13 +74,13 @@ onUnmounted(() => {
 
       <NTabPane name="github" tab="GitHub链接">
         <div class="tab-content">
-          <GitHubInstaller ref="gitHubRef" @install-complete="handleLocalInstallComplete" />
+          <GitHubInstaller @install-complete="handleLocalInstallComplete" />
         </div>
       </NTabPane>
 
       <NTabPane name="archive" tab="压缩包">
         <div class="tab-content">
-          <ArchiveInstaller ref="archiveRef" @install-complete="handleLocalInstallComplete" />
+          <ArchiveInstaller @install-complete="handleLocalInstallComplete" />
         </div>
       </NTabPane>
     </NTabs>
