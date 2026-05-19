@@ -39,7 +39,7 @@ const selectedAgent = computed(
 )
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
-const windowWidth = ref(window.innerWidth)
+const windowWidth = ref(1200)
 
 function handleResize(): void {
   windowWidth.value = window.innerWidth
@@ -129,6 +129,7 @@ async function handleRefresh(): Promise<void> {
 }
 
 onMounted(() => {
+  windowWidth.value = window.innerWidth
   window.addEventListener('resize', handleResize)
   skillsStore.fetchInstalled()
   unsubscribeTasks = taskStore.subscribe()
