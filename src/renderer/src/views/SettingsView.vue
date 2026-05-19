@@ -614,9 +614,8 @@ async function handleUpdateAll(): Promise<void> {
 
 <style scoped>
 .settings-page {
-  max-width: 720px;
-  margin: 0 auto;
   padding: var(--space-xl);
+  width: 100%;
 }
 
 /* Page Header */
