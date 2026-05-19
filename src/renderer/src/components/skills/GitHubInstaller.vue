@@ -40,13 +40,6 @@ const skills = computed(() => scanResult.value?.skills ?? [])
 
 const isParsed = computed(() => scanResult.value !== null)
 
-const repoLabel = computed(() => {
-  if (!parsedUrl.value) return ''
-  const { owner, repo, branch } = parsedUrl.value
-  const base = `${owner}/${repo}`
-  return branch === 'main' ? base : `${base} · 分支: ${branch}`
-})
-
 async function handleParse(): Promise<void> {
   if (!url.value.trim()) return
 
@@ -165,7 +158,6 @@ onUnmounted(() => {
               重新解析
             </NButton>
           </div>
-          <NText v-if="repoLabel" depth="3" class="repo-label">{{ repoLabel }}</NText>
         </div>
 
         <!-- Step 1 -->
@@ -252,6 +244,7 @@ onUnmounted(() => {
 .github-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-lg);
   flex: 1;
   min-height: 0;
@@ -263,7 +256,6 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
-  overflow-y: auto;
   padding-bottom: var(--space-lg);
 }
 
@@ -298,10 +290,6 @@ onUnmounted(() => {
 
 .input-row .n-input {
   flex: 1;
-}
-
-.repo-label {
-  font-size: var(--text-micro);
 }
 
 /* --- Step header --- */
@@ -340,6 +328,7 @@ onUnmounted(() => {
 .skill-list-area {
   flex: 1;
   min-height: 0;
+  max-height: 420px;
   overflow-y: auto;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
@@ -353,7 +342,6 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
-  overflow-y: auto;
   padding-bottom: 2em;
 }
 

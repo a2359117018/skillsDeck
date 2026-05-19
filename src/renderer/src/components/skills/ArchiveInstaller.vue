@@ -261,6 +261,7 @@ onUnmounted(() => {
 .archive-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-lg);
   flex: 1;
   min-height: 0;
@@ -272,7 +273,6 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
-  overflow-y: auto;
   padding-bottom: var(--space-lg);
 }
 
@@ -354,6 +354,7 @@ onUnmounted(() => {
 .skill-list-area {
   flex: 1;
   min-height: 0;
+  max-height: 420px;
   overflow-y: auto;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
@@ -367,7 +368,6 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 0;
-  overflow-y: auto;
   padding-bottom: 2em;
 }
 
