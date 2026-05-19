@@ -72,6 +72,9 @@ function toggleSkill(path: string): void {
 <style scoped>
 .scan-result {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .scan-header {
@@ -81,7 +84,8 @@ function toggleSkill(path: string): void {
 }
 
 .scan-list {
-  max-height: 240px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
