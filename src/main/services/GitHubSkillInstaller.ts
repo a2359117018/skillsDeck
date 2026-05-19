@@ -220,7 +220,8 @@ export class GitHubSkillInstaller {
     zipPath: string,
     subPath?: string,
     repo?: string,
-    branch?: string
+    branch?: string,
+    parsedUrl?: ParsedGitHubUrl
   ): Promise<GitHubParseResult> {
     const extractDir = path.join(path.dirname(zipPath), 'extracted')
     await this.extractZip(zipPath, extractDir)
@@ -246,7 +247,11 @@ export class GitHubSkillInstaller {
     }
 
     const skills = await localSkillInstaller.scanSkills(scanDir)
-    return { skills, tempDir: path.dirname(zipPath) }
+    return {
+      skills,
+      tempDir: path.dirname(zipPath),
+      parsedUrl: parsedUrl ?? { owner: '', repo: repo ?? '', branch: branch ?? 'main', subPath: subPath ?? '' }
+    }
   }
 
   cancelDownload(): void {

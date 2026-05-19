@@ -115,6 +115,7 @@ export interface ParsedGitHubUrl {
 export interface GitHubParseResult {
   skills: ScannedSkill[]
   tempDir: string
+  parsedUrl: ParsedGitHubUrl
 }
 
 export interface ArchiveScanResult {

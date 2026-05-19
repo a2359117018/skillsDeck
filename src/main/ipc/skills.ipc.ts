@@ -159,7 +159,8 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         zipPath,
         parsed.subPath,
         parsed.repo,
-        parsed.branch
+        parsed.branch,
+        parsed
       )
       return { ok: true, data: result }
     } catch (e) {
