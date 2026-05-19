@@ -116,15 +116,20 @@ Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `Inst
 - **新增 token 流程**：如果现有 token 不满足需求，先在 `tokens.css` 中按命名规范添加新变量，再在组件中使用
 - **样式块长度**：单个组件的 `<style>` 超过 80 行时，考虑拆分子组件或提取公共 class 到 `card.css` 等全局文件
 - **NaiveUI 样式覆盖**：优先使用 `themeOverrides` prop，其次用 `:deep()` 选择器
+- **流式布局优先**：所有页面容器使用 `width: 100%` + padding，禁止写死 `max-width` 或固定像素宽度
+- **网格使用 auto-fill**：多列卡片列表使用 `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`，禁止写死 `repeat(N, 1fr)`
+- **零 media query 原则**：布局弹性通过 flex 和 grid 的内建能力实现，不引入断点；仅在极特殊场景下可例外
 
 ## 布局约束
 
 - **整体布局使用 flex**：app shell（`.app-shell`）为 `display: flex` 水平排列（sidebar + content area），每个页面容器为 `flex-direction: column` 垂直排列
 - **卡片网格用 CSS grid**：多列卡片列表（如 Agent 卡片、搜索结果）使用 `display: grid` + `grid-template-columns: repeat(N, 1fr)`，不用 flex wrap
 - **工具栏统一 flex row**：页面顶部 toolbar 使用 `display: flex; align-items: center; gap: var(--space-*)`
-- **内容区限宽居中**：页面内容设置 `max-width`（960px 或 720px），自然居中，不用 flex/grid 居中
+- **页面容器填满内容区**：每个页面根元素为 `width: 100%`，通过 `padding` 控制内容边距，不用 `max-width` 限制
 - **间距用 gap**：flex/grid 容器中子元素间距使用 `gap` 属性 + spacing token，不在子元素上用 margin 拆分
-- **不用响应式断点**：桌面端应用，固定列数和宽度，不做 media query 适配
+- **工具栏允许换行**：`display: flex` 的 toolbar 必须设置 `flex-wrap: wrap`，防止空间不足时溢出
+- **Drawer 使用相对宽度**：侧滑抽屉宽度使用 `min(固定值, 窗口百分比)`，不用固定像素
+- **最小窗口保障**：Electron 主进程设置 `minWidth: 1200, minHeight: 800`，布局在此尺寸下必须可用
 
 ## Constraints
 
