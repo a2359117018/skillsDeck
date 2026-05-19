@@ -25,6 +25,8 @@ const {
   cleanup
 } = useSkillInstall()
 
+isGlobal.value = false
+
 const url = ref('')
 const parsing = ref(false)
 const downloadProgress = ref(0)
