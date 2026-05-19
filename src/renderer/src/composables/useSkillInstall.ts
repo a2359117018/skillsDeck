@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useNotification } from 'naive-ui'
 import type { ScannedSkill, LocalInstallResult } from '../../../shared/types'
 
 /** 技能安装流程共享逻辑 composable */
@@ -33,7 +33,7 @@ export function useSkillInstall(): {
     return selectedAgents.value.length > 0
   })
 
-  const message = useMessage()
+  const notification = useNotification()
 
   /** 设置扫描到的技能列表，默认全选 */
   function setSkills(skills: ScannedSkill[]): void {
@@ -52,7 +52,11 @@ export function useSkillInstall(): {
   /** 执行安装（不清理临时目录） */
   async function install(): Promise<LocalInstallResult | null> {
     if (!canInstall.value) {
-      message.warning('请选择要安装的技能和目标 agent')
+      notification.warning({
+        title: '无法安装',
+        content: '请选择要安装的技能和目标 agent',
+        duration: 5000
+      })
       return null
     }
     installing.value = true
@@ -67,16 +71,27 @@ export function useSkillInstall(): {
       }
       installResult.value = result.data
       if (result.data.failed.length > 0) {
-        message.error(
-          `安装完成：${result.data.success.length} 个成功，${result.data.failed.length} 个失败`
-        )
+        const failList = result.data.failed.map((f) => `${f.name}: ${f.error}`).join('\n')
+        notification.warning({
+          title: '安装部分失败',
+          content: `成功 ${result.data.success.length} 个，失败 ${result.data.failed.length} 个\n${failList}`,
+          duration: 0
+        })
       } else {
-        message.success(`成功安装 ${result.data.success.length} 个技能`)
+        notification.success({
+          title: '安装成功',
+          content: `成功安装 ${result.data.success.length} 个技能`,
+          duration: 3000
+        })
       }
       return result.data
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
-      message.error('安装失败: ' + msg)
+      notification.error({
+        title: '安装失败',
+        content: msg,
+        duration: 0
+      })
       return null
     } finally {
       installing.value = false

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import {
   NConfigProvider,
   NMessageProvider,
+  NNotificationProvider,
   NDialogProvider,
   NAlert,
   NButton,
@@ -75,7 +76,8 @@ const themeOverrides: GlobalThemeOverrides = {
 <template>
   <NConfigProvider :theme-overrides="themeOverrides">
     <NDialogProvider>
-      <NMessageProvider>
+      <NNotificationProvider placement="top-right" :max="5">
+        <NMessageProvider>
         <div v-if="windowType === 'main'" class="app-shell">
           <AppSidebar />
           <main class="content-area">
@@ -93,7 +95,8 @@ const themeOverrides: GlobalThemeOverrides = {
           </main>
         </div>
         <router-view v-else />
-      </NMessageProvider>
+        </NMessageProvider>
+      </NNotificationProvider>
     </NDialogProvider>
   </NConfigProvider>
 </template>

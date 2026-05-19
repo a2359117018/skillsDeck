@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { NText, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
+import { NText, NIcon, NButton, NSpin, useNotification } from 'naive-ui'
 import { ArchiveOutline } from '@vicons/ionicons5'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
@@ -11,14 +11,13 @@ const emit = defineEmits<{
   installComplete: []
 }>()
 
-const message = useMessage()
+const notification = useNotification()
 
 const {
   selectedSkills,
   selectedAgents,
   isGlobal,
   installing,
-  installResult,
   hasContent,
   canInstall,
   setSkills,
@@ -72,7 +71,11 @@ async function handleDrop(e: DragEvent): Promise<void> {
 
   const supportedExt = ['.zip', '.tar.gz', '.tgz']
   if (!supportedExt.some((ext) => filePath.endsWith(ext))) {
-    message.error('不支持的文件格式，仅支持 .zip .tar.gz .tgz')
+    notification.warning({
+      title: '不支持的文件格式',
+      content: '仅支持 .zip .tar.gz .tgz 格式',
+      duration: 5000
+    })
     return
   }
 
@@ -91,7 +94,11 @@ async function handleClickSelect(): Promise<void> {
     await extractArchive()
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
-    message.error('选择文件失败: ' + error.value)
+    notification.error({
+      title: '选择文件失败',
+      content: error.value,
+      duration: 0
+    })
   }
 }
 
@@ -113,11 +120,19 @@ async function extractArchive(): Promise<void> {
     isGlobal.value = false
     setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
-      message.info('未在压缩包中扫描到技能文件')
+      notification.info({
+        title: '未扫描到技能文件',
+        content: '未在压缩包中发现有效的技能文件',
+        duration: 5000
+      })
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
-    message.error('解压扫描失败: ' + error.value)
+    notification.error({
+      title: '解压扫描失败',
+      content: error.value,
+      duration: 0
+    })
   } finally {
     extracting.value = false
   }
@@ -168,11 +183,6 @@ onUnmounted(() => {
           <NText v-if="selectedFile" depth="3" class="selected-file">
             {{ selectedFile }}
           </NText>
-        </div>
-
-        <!-- Inline error (keeps drop zone visible for retry) -->
-        <div v-if="error" class="archive-error">
-          <NText type="error">{{ error }}</NText>
         </div>
 
         <!-- Loading indicator inside left column -->
@@ -228,19 +238,6 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-
-    <!-- Install result -->
-    <div v-if="installResult" class="install-result">
-      <NText v-if="installResult.success.length > 0" type="success">
-        成功: {{ installResult.success.join(', ') }}
-      </NText>
-      <div v-if="installResult.failed.length > 0">
-        <NText type="error">失败:</NText>
-        <div v-for="f in installResult.failed" :key="f.name" class="fail-item">
-          <NText type="error">{{ f.name }}: {{ f.error }}</NText>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -259,13 +256,6 @@ onUnmounted(() => {
   gap: var(--space-md);
   padding: var(--space-xl) 0;
   flex-shrink: 0;
-}
-
-.archive-error {
-  padding: var(--space-md);
-  background: var(--color-error-bg);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-error);
 }
 
 .archive-columns {
@@ -378,6 +368,7 @@ onUnmounted(() => {
   gap: var(--space-sm);
   min-height: 0;
   overflow-y: auto;
+  padding-bottom: 2em;
 }
 
 .agent-area {
@@ -390,16 +381,4 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-/* --- Install result --- */
-.install-result {
-  padding: var(--space-md);
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-hairline);
-  flex-shrink: 0;
-}
-
-.fail-item {
-  margin-top: var(--space-xxs);
-}
 </style>
