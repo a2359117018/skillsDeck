@@ -153,12 +153,11 @@ onUnmounted(() => {
 
 <style scoped>
 .search-page {
-  max-width: 960px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  padding: 0 var(--space-xl);
 }
 
 /* 让 NTabs 填满剩余空间 */
@@ -215,7 +214,7 @@ onUnmounted(() => {
 
 .search-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md);
 }
 
