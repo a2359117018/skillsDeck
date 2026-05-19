@@ -240,8 +240,7 @@ function handleFilterAgent(agentFlag: string): void {
 }
 
 .container {
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* Toolbar */
@@ -250,6 +249,7 @@ function handleFilterAgent(agentFlag: string): void {
   align-items: center;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
 }
 
 .toolbar-title {
