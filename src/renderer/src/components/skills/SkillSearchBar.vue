@@ -43,8 +43,6 @@ function handleKeydown(e: KeyboardEvent): void {
 
 <style scoped>
 .search-bar-wrapper {
-  display: flex;
-  justify-content: center;
   padding: var(--space-sm) 0 var(--space-lg);
 }
 
