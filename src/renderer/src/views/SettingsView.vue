@@ -481,20 +481,6 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-title">运行环境</span>
           <span class="section-line" />
         </div>
-        <div class="env-checks-header">
-          <NButton
-            size="small"
-            round
-            :disabled="envStore.refreshing"
-            @click="handleEnvRecheck"
-          >
-            <template #icon>
-              <NIcon :size="14"><RefreshOutline /></NIcon>
-            </template>
-            重新检测
-          </NButton>
-        </div>
-
         <div class="env-checks">
           <div class="env-check-item">
             <div
@@ -585,10 +571,7 @@ async function handleUpdateAll(): Promise<void> {
           </div>
         </div>
 
-        <div
-          v-if="(!envStore.status?.nodeInstalled && !envDownloading) || (envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled)"
-          class="env-toolbar"
-        >
+        <div class="env-toolbar">
           <div class="env-toolbar-left">
             <NButton
               v-if="!envStore.status?.nodeInstalled && !envDownloading"
@@ -612,6 +595,14 @@ async function handleUpdateAll(): Promise<void> {
                 <NIcon :size="14"><DownloadOutline /></NIcon>
               </template>
               安装 skills CLI
+            </NButton>
+          </div>
+          <div class="env-toolbar-right">
+            <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
+              <template #icon>
+                <NIcon :size="14"><RefreshOutline /></NIcon>
+              </template>
+              重新检测
             </NButton>
           </div>
         </div>
@@ -791,27 +782,23 @@ async function handleUpdateAll(): Promise<void> {
 }
 
 /* Environment Checks */
-.env-checks-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-sm);
-}
-
 .env-checks {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  max-width: 480px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
 .env-check-item {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-hairline);
+  flex: 1;
+  min-width: 140px;
 }
 
 .env-check-icon {
