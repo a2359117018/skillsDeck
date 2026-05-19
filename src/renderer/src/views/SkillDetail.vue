@@ -115,8 +115,8 @@ async function handleInstallClick(): Promise<void> {
 
 <style scoped>
 .detail-page {
-  max-width: 900px;
-  padding: var(--space-lg) 0;
+  padding: var(--space-lg) var(--space-xl);
+  width: 100%;
 }
 
 .breadcrumb-back {
