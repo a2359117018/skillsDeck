@@ -49,8 +49,8 @@ export function createMainWindow(): BrowserWindow {
     createWindowOptions({
       width: 1200,
       height: 800,
-      minWidth: 1100,
-      minHeight: 700,
+      minWidth: 1200,
+      minHeight: 800,
       title: 'NPX Skills UI'
     })
   )
