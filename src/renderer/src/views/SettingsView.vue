@@ -596,8 +596,6 @@ async function handleUpdateAll(): Promise<void> {
               </template>
               安装 skills CLI
             </NButton>
-          </div>
-          <div class="env-toolbar-right">
             <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
               <template #icon>
                 <NIcon :size="14"><RefreshOutline /></NIcon>
@@ -859,7 +857,7 @@ async function handleUpdateAll(): Promise<void> {
   border-top: 1px solid var(--color-hairline);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--space-sm);
 }
