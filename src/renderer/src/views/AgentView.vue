@@ -39,6 +39,11 @@ const selectedAgent = computed(
 )
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
+const windowWidth = ref(window.innerWidth)
+
+function handleResize(): void {
+  windowWidth.value = window.innerWidth
+}
 
 let unsubscribeTasks: (() => void) | null = null
 
@@ -124,11 +129,13 @@ async function handleRefresh(): Promise<void> {
 }
 
 onMounted(() => {
+  window.addEventListener('resize', handleResize)
   skillsStore.fetchInstalled()
   unsubscribeTasks = taskStore.subscribe()
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
   unsubscribeTasks?.()
 })
 </script>
@@ -208,7 +215,7 @@ onUnmounted(() => {
     <!-- Drawer -->
     <NDrawer
       :show="drawerVisible"
-      :width="500"
+      :width="Math.min(480, windowWidth * 0.4)"
       placement="right"
       @update:show="
         (val: boolean) => {
@@ -318,8 +325,7 @@ onUnmounted(() => {
 }
 
 .container {
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* Toolbar */
@@ -328,6 +334,7 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
 }
 
 .toolbar-title {
@@ -375,7 +382,7 @@ onUnmounted(() => {
 /* Agent Grid */
 .agent-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md);
   padding-bottom: var(--space-xl);
 }
