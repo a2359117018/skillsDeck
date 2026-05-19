@@ -123,7 +123,7 @@ Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `Inst
 ## 布局约束
 
 - **整体布局使用 flex**：app shell（`.app-shell`）为 `display: flex` 水平排列（sidebar + content area），每个页面容器为 `flex-direction: column` 垂直排列
-- **卡片网格用 CSS grid**：多列卡片列表（如 Agent 卡片、搜索结果）使用 `display: grid` + `grid-template-columns: repeat(N, 1fr)`，不用 flex wrap
+- **卡片网格用 CSS grid**：多列卡片列表（如 Agent 卡片、搜索结果）使用 `display: grid` + `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`，不用 flex wrap
 - **工具栏统一 flex row**：页面顶部 toolbar 使用 `display: flex; align-items: center; gap: var(--space-*)`
 - **页面容器填满内容区**：每个页面根元素为 `width: 100%`，通过 `padding` 控制内容边距，不用 `max-width` 限制
 - **间距用 gap**：flex/grid 容器中子元素间距使用 `gap` 属性 + spacing token，不在子元素上用 margin 拆分
