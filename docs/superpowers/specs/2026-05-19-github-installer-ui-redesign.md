@@ -33,11 +33,13 @@
 ### 左栏：GitHub 品牌化输入卡片
 
 **空态：**
+
 - GitHub SVG 图标（16px）+ 标题 "从 GitHub 安装技能"（13px, font-weight: 600）
 - URL 输入框（flex: 1）+ "解析" 按钮
 - 无额外格式提示文字
 
 **解析成功后：**
+
 - 输入框变为只读（显示已解析的 URL），"解析" 按钮变为 "重新解析"
 - 底部出现紧凑仓库信息标签：`owner/repo · 分支: main`（12px, depth=3 文字）
 
@@ -82,16 +84,17 @@
 
 去除 `GitHubInstaller.vue` 中的 `result-overlay` 浮层，全部使用 `useSkillInstall` composable 已有的通知逻辑：
 
-| 场景 | 类型 | duration |
-|------|------|----------|
-| 全部成功 | `notification.success` | 3000ms |
-| 部分失败 | `notification.warning` | 0 |
-| 全部失败 | `notification.error` | 0 |
-| 未扫描到技能 | `notification.info`（Dialog 关闭后触发） | 5000ms |
+| 场景         | 类型                                     | duration |
+| ------------ | ---------------------------------------- | -------- |
+| 全部成功     | `notification.success`                   | 3000ms   |
+| 部分失败     | `notification.warning`                   | 0        |
+| 全部失败     | `notification.error`                     | 0        |
+| 未扫描到技能 | `notification.info`（Dialog 关闭后触发） | 5000ms   |
 
 ## 删除内容
 
 从 `GitHubInstaller.vue` 中移除：
+
 - `result-overlay` 模板及其样式（约 50 行 CSS）
 - `closeInstallResult()` 方法
 - `installResult` 的引用（由 composable 处理）
@@ -106,10 +109,10 @@
 
 ## 与压缩包安装的一致性
 
-| 维度 | 压缩包安装 | GitHub 安装（新） |
-|------|-----------|-----------------|
-| 网格 | 1fr 1fr | 1fr 1fr |
-| 步骤编号 | 蓝色圆形 1/2 | 蓝色圆形 1/2 |
-| 左栏输入 | 拖拽区 + 文件路径 | URL 输入卡片 + 仓库标签 |
-| 右栏 | AgentSelector + 安装按钮 | AgentSelector + 操作条 |
-| 通知 | Naive UI notification | Naive UI notification |
+| 维度     | 压缩包安装               | GitHub 安装（新）       |
+| -------- | ------------------------ | ----------------------- |
+| 网格     | 1fr 1fr                  | 1fr 1fr                 |
+| 步骤编号 | 蓝色圆形 1/2             | 蓝色圆形 1/2            |
+| 左栏输入 | 拖拽区 + 文件路径        | URL 输入卡片 + 仓库标签 |
+| 右栏     | AgentSelector + 安装按钮 | AgentSelector + 操作条  |
+| 通知     | Naive UI notification    | Naive UI notification   |

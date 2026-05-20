@@ -12,18 +12,19 @@
 
 ## File Structure
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Modify | `src/renderer/src/components/skills/ArchiveInstaller.vue` | Rewrite template + styles for dedicated two-column layout |
-| No change | `src/renderer/src/components/skills/SkillScanResult.vue` | Reused as-is inside left column |
-| No change | `src/renderer/src/components/skills/AgentSelector.vue` | Reused as-is inside right column |
-| No change | `src/renderer/src/composables/useSkillInstall.ts` | Shared composable, reused as-is |
+| Action    | File                                                      | Responsibility                                            |
+| --------- | --------------------------------------------------------- | --------------------------------------------------------- |
+| Modify    | `src/renderer/src/components/skills/ArchiveInstaller.vue` | Rewrite template + styles for dedicated two-column layout |
+| No change | `src/renderer/src/components/skills/SkillScanResult.vue`  | Reused as-is inside left column                           |
+| No change | `src/renderer/src/components/skills/AgentSelector.vue`    | Reused as-is inside right column                          |
+| No change | `src/renderer/src/composables/useSkillInstall.ts`         | Shared composable, reused as-is                           |
 
 ---
 
 ### Task 1: Rewrite ArchiveInstaller.vue template and styles
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/ArchiveInstaller.vue` (full rewrite of `<template>` and `<style scoped>`)
 
 The `<script setup>` block stays mostly the same — only remove the `LocalInstallPanel` import and add imports for `SkillScanResult` and `AgentSelector`. The `<template>` and `<style scoped>` blocks are fully replaced.
@@ -460,6 +461,7 @@ Expected: PASS — no lint errors
 Run: `npm run dev`
 
 Manual verification checklist:
+
 1. Navigate to "搜索安装" → "压缩包" tab
 2. Verify two-column layout renders correctly
 3. Verify left column shows drag zone, right column shows empty placeholder

@@ -16,24 +16,25 @@
 
 ## File Map
 
-| Action | File | Responsibility |
-|--------|------|----------------|
-| Create | `src/renderer/src/composables/useSkillInstall.ts` | Shared install state + logic |
-| Modify | `src/shared/types.ts` | Add `ArchiveScanResult` type |
-| Modify | `src/main/services/ArchiveSkillInstaller.ts` | Return `ArchiveScanResult` (includes tempDir) |
-| Modify | `src/main/ipc/skills.ipc.ts` | Remove auto-cleanup from `skills:install-local`; update `skills:extract-archive` return type |
-| Modify | `src/preload/index.ts` | Update `extractArchive` return type |
-| Modify | `src/preload/index.d.ts` | Update `extractArchive` type declaration |
-| Modify | `src/renderer/src/components/skills/LocalInstallPanel.vue` | Convert to controlled component (props/emits, no internal state) |
-| Modify | `src/renderer/src/components/skills/GitHubInstaller.vue` | Use composable, add `defineExpose` |
-| Modify | `src/renderer/src/components/skills/ArchiveInstaller.vue` | Use composable, add `defineExpose` |
-| Modify | `src/renderer/src/views/SkillsSearch.vue` | Add `onBeforeRouteLeave` guard |
+| Action | File                                                       | Responsibility                                                                               |
+| ------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Create | `src/renderer/src/composables/useSkillInstall.ts`          | Shared install state + logic                                                                 |
+| Modify | `src/shared/types.ts`                                      | Add `ArchiveScanResult` type                                                                 |
+| Modify | `src/main/services/ArchiveSkillInstaller.ts`               | Return `ArchiveScanResult` (includes tempDir)                                                |
+| Modify | `src/main/ipc/skills.ipc.ts`                               | Remove auto-cleanup from `skills:install-local`; update `skills:extract-archive` return type |
+| Modify | `src/preload/index.ts`                                     | Update `extractArchive` return type                                                          |
+| Modify | `src/preload/index.d.ts`                                   | Update `extractArchive` type declaration                                                     |
+| Modify | `src/renderer/src/components/skills/LocalInstallPanel.vue` | Convert to controlled component (props/emits, no internal state)                             |
+| Modify | `src/renderer/src/components/skills/GitHubInstaller.vue`   | Use composable, add `defineExpose`                                                           |
+| Modify | `src/renderer/src/components/skills/ArchiveInstaller.vue`  | Use composable, add `defineExpose`                                                           |
+| Modify | `src/renderer/src/views/SkillsSearch.vue`                  | Add `onBeforeRouteLeave` guard                                                               |
 
 ---
 
 ### Task 1: Backend — ArchiveSkillInstaller returns tempDir + remove auto-cleanup
 
 **Files:**
+
 - Modify: `src/shared/types.ts` (add `ArchiveScanResult`)
 - Modify: `src/main/services/ArchiveSkillInstaller.ts` (return `ArchiveScanResult`)
 - Modify: `src/main/ipc/skills.ipc.ts` (update handler, remove auto-cleanup)
@@ -195,6 +196,7 @@ git commit -m "fix: archive installer returns tempDir, remove auto-cleanup from 
 ### Task 2: Frontend — Create `useSkillInstall` composable
 
 **Files:**
+
 - Create: `src/renderer/src/composables/useSkillInstall.ts`
 
 - [x] **Step 1: Write the composable**
@@ -318,6 +320,7 @@ git commit -m "feat: add useSkillInstall composable for shared install logic"
 ### Task 3: Frontend — Refactor `LocalInstallPanel` to controlled component
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/LocalInstallPanel.vue`
 
 This component currently manages its own state. Refactor it to accept state from the parent (composable) via props and emit events. Also fix the layout: flex column with scrollable content area and fixed bottom button.
@@ -501,6 +504,7 @@ git commit -m "refactor: LocalInstallPanel as controlled component with fixed la
 ### Task 4: Frontend — Refactor `GitHubInstaller` to use composable
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/GitHubInstaller.vue`
 
 - [x] **Step 1: Rewrite GitHubInstaller.vue**
@@ -508,16 +512,7 @@ git commit -m "refactor: LocalInstallPanel as controlled component with fixed la
 ```vue
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import {
-  NInput,
-  NButton,
-  NProgress,
-  NText,
-  NAlert,
-  NCheckbox,
-  NSpace,
-  NSpin
-} from 'naive-ui'
+import { NInput, NButton, NProgress, NText, NAlert, NCheckbox, NSpace, NSpin } from 'naive-ui'
 import type { GitHubParseResult } from '../../../../shared/types'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillInstall } from '@renderer/composables/useSkillInstall'
@@ -558,8 +553,7 @@ const allSkillsSelected = computed(
 )
 
 const someSkillsSelected = computed(
-  () =>
-    skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
+  () => skills.value.some((s) => selectedSkills.value.includes(s.path)) && !allSkillsSelected.value
 )
 
 function clearAlert(): void {
@@ -939,6 +933,7 @@ git commit -m "refactor: GitHubInstaller uses useSkillInstall composable"
 ### Task 5: Frontend — Refactor `ArchiveInstaller` to use composable
 
 **Files:**
+
 - Modify: `src/renderer/src/components/skills/ArchiveInstaller.vue`
 
 - [x] **Step 1: Rewrite ArchiveInstaller.vue**
@@ -1189,6 +1184,7 @@ git commit -m "refactor: ArchiveInstaller uses useSkillInstall composable"
 ### Task 6: Frontend — Add navigation guard to `SkillsSearch.vue`
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SkillsSearch.vue`
 
 - [x] **Step 1: Add navigation guard, template refs, and beforeunload**

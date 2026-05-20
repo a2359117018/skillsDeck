@@ -78,23 +78,25 @@ const themeOverrides: GlobalThemeOverrides = {
     <NDialogProvider>
       <NNotificationProvider placement="top-right" :max="5">
         <NMessageProvider>
-        <div v-if="windowType === 'main'" class="app-shell">
-          <AppSidebar />
-          <main class="content-area">
-            <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
-              <div class="env-banner-inner">
-                <span>运行环境不完整，部分功能可能无法使用</span>
-                <NButton size="small" round type="warning" @click="goToSettings"> 去安装 </NButton>
-              </div>
-            </NAlert>
-            <router-view v-slot="{ Component }">
-              <Transition name="fade" mode="out-in">
-                <component :is="Component" />
-              </Transition>
-            </router-view>
-          </main>
-        </div>
-        <router-view v-else />
+          <div v-if="windowType === 'main'" class="app-shell">
+            <AppSidebar />
+            <main class="content-area">
+              <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
+                <div class="env-banner-inner">
+                  <span>运行环境不完整，部分功能可能无法使用</span>
+                  <NButton size="small" round type="warning" @click="goToSettings">
+                    去安装
+                  </NButton>
+                </div>
+              </NAlert>
+              <router-view v-slot="{ Component }">
+                <Transition name="fade" mode="out-in">
+                  <component :is="Component" />
+                </Transition>
+              </router-view>
+            </main>
+          </div>
+          <router-view v-else />
         </NMessageProvider>
       </NNotificationProvider>
     </NDialogProvider>

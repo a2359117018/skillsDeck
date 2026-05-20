@@ -250,7 +250,12 @@ export class GitHubSkillInstaller {
     return {
       skills,
       tempDir: path.dirname(zipPath),
-      parsedUrl: parsedUrl ?? { owner: '', repo: repo ?? '', branch: branch ?? 'main', subPath: subPath ?? '' }
+      parsedUrl: parsedUrl ?? {
+        owner: '',
+        repo: repo ?? '',
+        branch: branch ?? 'main',
+        subPath: subPath ?? ''
+      }
     }
   }
 

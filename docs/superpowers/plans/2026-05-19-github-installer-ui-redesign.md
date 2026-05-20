@@ -12,19 +12,20 @@
 
 ## File Structure
 
-| File | Action | Responsibility |
-|------|--------|---------------|
-| `src/shared/types.ts` | Modify | Add `parsedUrl` field to `GitHubParseResult` |
-| `src/main/services/GitHubSkillInstaller.ts` | Modify | Return `ParsedGitHubUrl` from `extractAndScan` |
-| `src/main/ipc/skills.ipc.ts` | Modify | Pass parsed URL info into `extractAndScan` result |
-| `src/renderer/src/components/skills/GitHubInstaller.vue` | Modify (full rewrite) | New two-column layout + progress dialog |
-| `src/renderer/src/assets/tokens.css` | No change | All tokens already exist |
+| File                                                     | Action                | Responsibility                                    |
+| -------------------------------------------------------- | --------------------- | ------------------------------------------------- |
+| `src/shared/types.ts`                                    | Modify                | Add `parsedUrl` field to `GitHubParseResult`      |
+| `src/main/services/GitHubSkillInstaller.ts`              | Modify                | Return `ParsedGitHubUrl` from `extractAndScan`    |
+| `src/main/ipc/skills.ipc.ts`                             | Modify                | Pass parsed URL info into `extractAndScan` result |
+| `src/renderer/src/components/skills/GitHubInstaller.vue` | Modify (full rewrite) | New two-column layout + progress dialog           |
+| `src/renderer/src/assets/tokens.css`                     | No change             | All tokens already exist                          |
 
 ---
 
 ### Task 1: Extend GitHubParseResult with parsed URL info
 
 **Files:**
+
 - Modify: `src/shared/types.ts:115-118`
 
 The renderer needs `owner`, `repo`, `branch` to display the repo info label. Currently `GitHubParseResult` only has `skills` and `tempDir`. We add the parsed URL info.
@@ -46,6 +47,7 @@ export interface GitHubParseResult {
 In `src/main/services/GitHubSkillInstaller.ts`, modify the `extractAndScan` method signature and return. Find the method at ~line 219:
 
 Change the signature from:
+
 ```typescript
   async extractAndScan(
     zipPath: string,
@@ -56,6 +58,7 @@ Change the signature from:
 ```
 
 To:
+
 ```typescript
   async extractAndScan(
     zipPath: string,
@@ -67,20 +70,27 @@ To:
 ```
 
 Find the return statement near the end of `extractAndScan` (the one returning `{ skills, tempDir }`):
+
 ```typescript
-    return {
-      skills: scanned,
-      tempDir: path.dirname(zipPath)
-    }
+return {
+  skills: scanned,
+  tempDir: path.dirname(zipPath)
+}
 ```
 
 Change to:
+
 ```typescript
-    return {
-      skills: scanned,
-      tempDir: path.dirname(zipPath),
-      parsedUrl: parsedUrl ?? { owner: '', repo: repo ?? '', branch: branch ?? 'main', subPath: subPath ?? '' }
-    }
+return {
+  skills: scanned,
+  tempDir: path.dirname(zipPath),
+  parsedUrl: parsedUrl ?? {
+    owner: '',
+    repo: repo ?? '',
+    branch: branch ?? 'main',
+    subPath: subPath ?? ''
+  }
+}
 ```
 
 - [ ] **Step 3: Pass parsed URL through the IPC handler**
@@ -88,23 +98,24 @@ Change to:
 In `src/main/ipc/skills.ipc.ts`, find the `skills:parse-github` handler (~line 128). Locate the `extractAndScan` call:
 
 ```typescript
-      const result = await githubSkillInstaller.extractAndScan(
-        zipPath,
-        parsed.subPath,
-        parsed.repo,
-        parsed.branch
-      )
+const result = await githubSkillInstaller.extractAndScan(
+  zipPath,
+  parsed.subPath,
+  parsed.repo,
+  parsed.branch
+)
 ```
 
 Change to:
+
 ```typescript
-      const result = await githubSkillInstaller.extractAndScan(
-        zipPath,
-        parsed.subPath,
-        parsed.repo,
-        parsed.branch,
-        parsed
-      )
+const result = await githubSkillInstaller.extractAndScan(
+  zipPath,
+  parsed.subPath,
+  parsed.repo,
+  parsed.branch,
+  parsed
+)
 ```
 
 - [ ] **Step 4: Verify typecheck**
@@ -124,6 +135,7 @@ git commit -m "feat: include parsedUrl in GitHubParseResult for repo info displa
 ### Task 2: Rewrite GitHubInstaller.vue
 
 **Files:**
+
 - Rewrite: `src/renderer/src/components/skills/GitHubInstaller.vue` (entire file)
 
 This is the main task. The component is completely rewritten to match the approved design.
@@ -272,8 +284,16 @@ Replace the entire `<template>` block with:
       <!-- GitHub input card -->
       <div class="input-card">
         <div class="input-card-header">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-ink)" class="github-icon">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="var(--color-ink)"
+            class="github-icon"
+          >
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            />
           </svg>
           <NText class="input-card-title">从 GitHub 安装技能</NText>
         </div>
@@ -293,12 +313,7 @@ Replace the entire `<template>` block with:
           >
             解析
           </NButton>
-          <NButton
-            v-else
-            @click="handleReparse"
-          >
-            重新解析
-          </NButton>
+          <NButton v-else @click="handleReparse"> 重新解析 </NButton>
         </div>
         <NText v-if="repoLabel" depth="3" class="repo-label">{{ repoLabel }}</NText>
       </div>
@@ -574,6 +589,7 @@ This project has no test infrastructure. Manual verification in dev mode.
 Run: `npm run dev`
 
 Verify:
+
 - "GitHub链接" tab shows two-column layout
 - Left: GitHub input card with icon + title + URL input + "解析" button
 - Left: Step "1 选择技能" + empty skill list area
@@ -584,6 +600,7 @@ Verify:
 Enter a valid GitHub repo URL (e.g. `https://github.com/anthropics/anthropic-cookbook`), click "解析".
 
 Verify:
+
 - Progress dialog appears with download progress bar
 - "取消" button works to dismiss and cancel
 - On success: dialog closes, left column shows repo label + skill list with checkboxes
@@ -595,6 +612,7 @@ Verify:
 Select skills and agents, click "安装".
 
 Verify:
+
 - No inline result overlay appears
 - Notification appears in top-right corner (success, partial fail, or full fail)
 - Action bar resets appropriately
@@ -604,6 +622,7 @@ Verify:
 After a successful parse, click "重新解析".
 
 Verify:
+
 - Skill list clears, repo label disappears
 - URL input becomes editable again
 - Input card returns to empty state
@@ -613,6 +632,7 @@ Verify:
 With skills parsed but not installed, try navigating away.
 
 Verify:
+
 - Confirmation dialog appears ("当前有未完成的安装操作...")
 
 - [ ] **Step 6: Final commit if any fixes needed**
@@ -627,6 +647,7 @@ git commit -m "fix: address GitHub installer UI verification findings"
 ## Self-Review
 
 **Spec coverage:**
+
 - Always-visible two-column layout → Task 2
 - GitHub-branded input card with icon + title → Task 2
 - Repo info label (owner/repo · branch) → Task 1 (data) + Task 2 (display)

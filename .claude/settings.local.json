@@ -40,7 +40,12 @@
       "Bash(xxd)",
       "Skill(superpowers:writing-plans)",
       "Skill(superpowers:subagent-driven-development)",
-      "Skill(visual-options)"
+      "Skill(visual-options)",
+      "Bash(sed -i 's/^- \\\\[ \\\\]/- [x]/g' docs/superpowers/plans/2026-05-18-install-flow-fixes.md)",
+      "Bash(sed -i 's/^- \\\\[x\\\\] \\\\*\\\\*Self-Review Checklist$/- [x] **Self-Review Checklist/' docs/superpowers/plans/2026-05-18-install-flow-fixes.md)",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__chrome-devtools__resize_page",
+      "Skill(superpowers:finishing-a-development-branch)"
     ]
   }
 }

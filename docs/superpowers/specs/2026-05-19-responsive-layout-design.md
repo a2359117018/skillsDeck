@@ -35,25 +35,25 @@ minHeight: 800
 
 ### 页面容器
 
-| 文件 | 当前问题 | 改动方式 |
-|------|---------|---------|
-| `SkillsSearch.vue` | `max-width: 960px` + `repeat(3, 1fr)` | 移除 max-width；网格改 `auto-fill` |
-| `InstalledList.vue` | `max-width: 960px` | 移除 max-width；保留 min-height 用于空状态 |
-| `AgentView.vue` | `max-width: 960px` + 固定 3 列 + drawer width 500 | 移除 max-width；网格改 `auto-fill`；drawer 改相对宽度 |
-| `SettingsView.vue` | `max-width: 720px` + label-width 140 + FAB fixed | 移除 max-width；label 改弹性；FAB 保留但确认不遮挡 |
-| `SkillDetail.vue` | 无水平 padding + `max-width: 900px` | 添加水平 padding；移除 max-width |
+| 文件                | 当前问题                                          | 改动方式                                              |
+| ------------------- | ------------------------------------------------- | ----------------------------------------------------- |
+| `SkillsSearch.vue`  | `max-width: 960px` + `repeat(3, 1fr)`             | 移除 max-width；网格改 `auto-fill`                    |
+| `InstalledList.vue` | `max-width: 960px`                                | 移除 max-width；保留 min-height 用于空状态            |
+| `AgentView.vue`     | `max-width: 960px` + 固定 3 列 + drawer width 500 | 移除 max-width；网格改 `auto-fill`；drawer 改相对宽度 |
+| `SettingsView.vue`  | `max-width: 720px` + label-width 140 + FAB fixed  | 移除 max-width；label 改弹性；FAB 保留但确认不遮挡    |
+| `SkillDetail.vue`   | 无水平 padding + `max-width: 900px`               | 添加水平 padding；移除 max-width                      |
 
 ### 组件
 
-| 文件 | 当前问题 | 改动方式 |
-|------|---------|---------|
-| `SkillSearchBar.vue` | `max-width: 680px` | 移除 max-width，搜索框 `flex: 1` 填满 |
-| `AppSidebar.vue` | 固定 60px，不可折叠 | 无改动，60px 在 1200px+ 窗口下可接受 |
+| 文件                 | 当前问题            | 改动方式                              |
+| -------------------- | ------------------- | ------------------------------------- |
+| `SkillSearchBar.vue` | `max-width: 680px`  | 移除 max-width，搜索框 `flex: 1` 填满 |
+| `AppSidebar.vue`     | 固定 60px，不可折叠 | 无改动，60px 在 1200px+ 窗口下可接受  |
 
 ### 主进程
 
-| 文件 | 改动内容 |
-|------|---------|
+| 文件                                 | 改动内容                                        |
+| ------------------------------------ | ----------------------------------------------- |
 | `src/main/services/WindowManager.ts` | 窗口创建时增加 `minWidth: 1200, minHeight: 800` |
 
 ### Drawer 宽度策略
@@ -69,10 +69,10 @@ const drawerWidth = computed(() => Math.min(480, window.innerWidth * 0.4))
 ## 网格列数预期（供参考，非硬编码）
 
 | 窗口宽度 | 内容区宽度 (扣除 sidebar) | 估算列数 |
-|---------|------------------------|---------|
-| 1200px | ~1110px | 3 列 |
-| 1440px | ~1350px | 4 列 |
-| 1920px | ~1830px | 6 列 |
+| -------- | ------------------------- | -------- |
+| 1200px   | ~1110px                   | 3 列     |
+| 1440px   | ~1350px                   | 4 列     |
+| 1920px   | ~1830px                   | 6 列     |
 
 ## 新增布局规范（写入 CLAUDE.md）
 
