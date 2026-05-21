@@ -218,6 +218,7 @@ onUnmounted(() => {
 
     <!-- Drawer -->
     <NDrawer
+      class="agent-drawer"
       :show="drawerVisible"
       :width="Math.min(480, windowWidth * 0.4)"
       placement="right"
@@ -650,7 +651,7 @@ onUnmounted(() => {
 
 <style>
 /* NDrawer teleports to body, so scoped styles can't reach it */
-.n-drawer.n-drawer {
+.agent-drawer.n-drawer {
   background-color: transparent;
   border-radius: 0;
 }
