@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
-import { CubeOutline, SearchOutline, GitMergeOutline, SettingsOutline } from '@vicons/ionicons5'
+import {
+  CubeOutline,
+  SearchOutline,
+  GitMergeOutline,
+  SettingsOutline,
+  RocketOutline
+} from '@vicons/ionicons5'
+import { useTaskStore } from '../../stores/tasks'
 
 const router = useRouter()
 const route = useRoute()
+const taskStore = useTaskStore()
 
 interface NavItem {
   key: string
@@ -24,9 +32,24 @@ const dividers = new Set(['installed', 'agent-view'])
 
 const activeKey = computed(() => route.name as string)
 
+let unsubscribe: (() => void) | undefined
+
+onMounted(async () => {
+  unsubscribe = taskStore.subscribe()
+  await taskStore.sync()
+})
+
+onUnmounted(() => {
+  unsubscribe?.()
+})
+
 function navigate(key: string): void {
   router.push({ name: key })
 }
+
+const emit = defineEmits<{
+  'open-tasks': []
+}>()
 </script>
 
 <template>
@@ -48,6 +71,23 @@ function navigate(key: string): void {
         </button>
       </template>
     </nav>
+
+    <div class="sidebar-footer">
+      <button
+        class="sidebar-item task-indicator"
+        :class="{ 'has-active': taskStore.hasActiveTasks }"
+        title="后台任务"
+        @click="emit('open-tasks')"
+      >
+        <div class="task-icon-wrap">
+          <NIcon :size="22">
+            <RocketOutline />
+          </NIcon>
+          <span v-if="taskStore.hasActiveTasks" class="task-dot"></span>
+        </div>
+        <span class="sidebar-label">任务</span>
+      </button>
+    </div>
   </aside>
 </template>
 
@@ -84,6 +124,15 @@ function navigate(key: string): void {
   align-items: center;
   gap: var(--space-xs);
   width: 100%;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: var(--space-sm);
 }
 
 .sidebar-divider {
@@ -145,5 +194,45 @@ function navigate(key: string): void {
   text-align: center;
   white-space: nowrap;
   pointer-events: none;
+}
+
+/* Task indicator */
+.task-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-dot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-brand-coral);
+  border: 1.5px solid var(--sidebar-bg-start);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.85);
+  }
+}
+
+.task-indicator:hover {
+  color: var(--sidebar-icon-hover-color);
+}
+
+.task-indicator.has-active {
+  color: var(--sidebar-icon-active-color);
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, h } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import type { VNodeChild, Component } from 'vue'
 import {
   NCard,
@@ -55,7 +55,6 @@ const originalSettings = ref({
   proxyUrl: '',
   npmRegistry: ''
 })
-let unsubscribeTasks: (() => void) | null = null
 
 const agentOptions = AGENTS.map((a) => ({ label: a.name, value: a.agentFlag }))
 
@@ -97,7 +96,6 @@ const customRegistryUrl = ref('')
 onMounted(() => {
   envStore.check()
   taskStore.sync()
-  unsubscribeTasks = taskStore.subscribe()
   settingsStore.load().then(() => {
     const stored = settingsStore.proxyUrl
     const preset = proxyOptions.find((o) => o.value === stored)
@@ -133,10 +131,6 @@ onMounted(() => {
     }
     isLoaded.value = true
   })
-})
-
-onUnmounted(() => {
-  unsubscribeTasks?.()
 })
 
 const showCustomInput = computed(() => selectedProxy.value === CUSTOM_PROXY_VALUE)

@@ -45,8 +45,6 @@ function handleResize(): void {
   windowWidth.value = window.innerWidth
 }
 
-let unsubscribeTasks: (() => void) | null = null
-
 const visibleAgentResults = computed(() =>
   skillsStore.sortedAgentResults.filter((a) => {
     if (a.count === 0) return false
@@ -132,12 +130,10 @@ onMounted(() => {
   windowWidth.value = window.innerWidth
   window.addEventListener('resize', handleResize)
   skillsStore.fetchInstalled()
-  unsubscribeTasks = taskStore.subscribe()
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
-  unsubscribeTasks?.()
 })
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   NConfigProvider,
@@ -11,6 +11,7 @@ import {
   type GlobalThemeOverrides
 } from 'naive-ui'
 import AppSidebar from './components/layout/AppSidebar.vue'
+import TaskDrawer from './components/tasks/TaskDrawer.vue'
 import { useEnvStore } from './stores/env'
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
@@ -18,6 +19,7 @@ const envStore = useEnvStore()
 const router = useRouter()
 
 const isMainWindow = windowType === 'main'
+const taskDrawerVisible = ref(false)
 
 const envOk = computed(() => {
   const s = envStore.status
@@ -36,6 +38,10 @@ onMounted(() => {
 
 function goToSettings(): void {
   router.push({ name: 'settings' })
+}
+
+function openTaskDrawer(): void {
+  taskDrawerVisible.value = true
 }
 
 const themeOverrides: GlobalThemeOverrides = {
@@ -79,7 +85,7 @@ const themeOverrides: GlobalThemeOverrides = {
       <NNotificationProvider placement="top-right" :max="5">
         <NMessageProvider>
           <div v-if="windowType === 'main'" class="app-shell">
-            <AppSidebar />
+            <AppSidebar @open-tasks="openTaskDrawer" />
             <main class="content-area">
               <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
                 <div class="env-banner-inner">
@@ -95,6 +101,7 @@ const themeOverrides: GlobalThemeOverrides = {
                 </Transition>
               </router-view>
             </main>
+            <TaskDrawer v-model:show="taskDrawerVisible" />
           </div>
           <router-view v-else />
         </NMessageProvider>

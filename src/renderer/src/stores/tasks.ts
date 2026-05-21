@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { BackgroundTask } from '../../../shared/types'
 
 interface TaskCallbacks {
@@ -70,9 +70,15 @@ export const useTaskStore = defineStore('tasks', () => {
     })
   }
 
+  const activeTasks = computed(() =>
+    tasks.value.filter((t) => t.status === 'running' || t.status === 'pending')
+  )
+
+  const hasActiveTasks = computed(() => activeTasks.value.length > 0)
+
   function isRunning(type: BackgroundTask['type']): boolean {
     return tasks.value.some((t) => t.type === type && t.status === 'running')
   }
 
-  return { tasks, start, cancel, sync, subscribe, isRunning }
+  return { tasks, activeTasks, hasActiveTasks, start, cancel, sync, subscribe, isRunning }
 })
