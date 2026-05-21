@@ -74,13 +74,11 @@
   --color-error-bg: #fef2f2;
 
   /* Sidebar */
-  --sidebar-bg-start: #0a0a0a;
-  --sidebar-bg-end: #1a1a2e;
+  --sidebar-bg: #111111;
   --sidebar-width: 60px;
   --sidebar-icon-color: rgba(255, 255, 255, 0.55);
   --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
   --sidebar-icon-active-color: #ffffff;
-  --sidebar-active-bar-color: var(--color-brand-coral);
   --sidebar-divider-color: rgba(255, 255, 255, 0.12);
 
   /* --- Spacing --- */

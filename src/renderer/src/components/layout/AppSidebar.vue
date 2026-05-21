@@ -63,7 +63,6 @@ const emit = defineEmits<{
           :title="item.label"
           @click="navigate(item.key)"
         >
-          <div class="active-bar"></div>
           <NIcon :size="22">
             <component :is="item.icon" />
           </NIcon>
@@ -96,26 +95,11 @@ const emit = defineEmits<{
   width: var(--sidebar-width);
   flex-shrink: 0;
   height: 100vh;
-  background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
+  background: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: var(--space-md) 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.sidebar::after {
-  content: '';
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(20, 86, 240, 0.15) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 .sidebar-nav {
@@ -163,28 +147,12 @@ const emit = defineEmits<{
 
 .sidebar-item:hover {
   color: var(--sidebar-icon-hover-color);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-item.active {
   color: var(--sidebar-icon-active-color);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.active-bar {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) scaleY(0);
-  width: 3px;
-  height: 20px;
-  border-radius: 0 3px 3px 0;
-  background: var(--sidebar-active-bar-color);
-  transition: transform var(--transition-base);
-}
-
-.sidebar-item.active .active-bar {
-  transform: translateY(-50%) scaleY(1);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .sidebar-label {
@@ -212,7 +180,7 @@ const emit = defineEmits<{
   height: 8px;
   border-radius: 50%;
   background: var(--color-brand-coral);
-  border: 1.5px solid var(--sidebar-bg-start);
+  border: 1.5px solid var(--sidebar-bg);
   animation: pulse-dot 2s ease-in-out infinite;
 }
 

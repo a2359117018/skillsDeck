@@ -78,8 +78,14 @@ function handleLocalInstallComplete(): void {
                   v-if="skillsStore.searchResults.length === 0"
                   :icon="SearchOutline"
                   title="未找到相关技能"
-                  description="尝试使用其他关键词重新搜索"
-                />
+                  description="尝试使用其他关键词，或通过 GitHub 链接直接安装"
+                >
+                  <template #actions>
+                    <NButton size="small" round secondary @click="activeTab = 'github'">
+                      GitHub 安装
+                    </NButton>
+                  </template>
+                </EmptyState>
               </div>
             </template>
             <EmptyState
