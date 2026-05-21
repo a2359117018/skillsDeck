@@ -144,7 +144,7 @@ const emit = defineEmits<{
 
 .sidebar-item {
   position: relative;
-  width: 52px;
+  width: 44px;
   padding: 6px 0;
   display: flex;
   flex-direction: column;

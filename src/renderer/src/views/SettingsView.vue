@@ -738,7 +738,7 @@ async function handleUpdateAll(): Promise<void> {
 .settings-fab {
   position: fixed;
   bottom: var(--space-xl);
-  right: var(--space-xl);
+  right: 32px;
   z-index: 100;
 }
 

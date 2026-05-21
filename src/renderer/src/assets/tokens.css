@@ -36,6 +36,7 @@
   --color-canvas: #ffffff;
   --color-surface: #f7f8fa;
   --color-hairline: #e5e7eb;
+  --color-hairline-hover: #d1d5db;
 
   /* Brand */
   --color-brand-coral: #ff5530;
@@ -75,7 +76,7 @@
   /* Sidebar */
   --sidebar-bg-start: #0a0a0a;
   --sidebar-bg-end: #1a1a2e;
-  --sidebar-width: 72px;
+  --sidebar-width: 60px;
   --sidebar-icon-color: rgba(255, 255, 255, 0.55);
   --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
   --sidebar-icon-active-color: #ffffff;

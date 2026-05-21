@@ -608,7 +608,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  background: var(--color-agent-blue-bg);
+  background: var(--color-surface);
 }
 
 /* Skill Card */

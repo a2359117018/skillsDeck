@@ -11,7 +11,7 @@
 }
 
 .card-base:hover {
-  border-color: var(--color-muted);
+  border-color: var(--color-hairline-hover);
   box-shadow: var(--shadow-3);
 }
 
