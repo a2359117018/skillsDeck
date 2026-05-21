@@ -129,7 +129,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 
 .panel-slide-enter-active,
 .panel-slide-leave-active {
-  transition: all var(--transition-base);
+  transition: opacity var(--transition-base);
 }
 
 .panel-slide-enter-from,
@@ -149,7 +149,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
   font-size: var(--text-body-sm);
   font-weight: var(--weight-medium);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
   font-family: inherit;
   line-height: var(--leading-normal);
 }

@@ -322,7 +322,7 @@ function handleFilterAgent(agentFlag: string): void {
 /* List Transitions */
 .list-enter-active,
 .list-leave-active {
-  transition: all var(--transition-base);
+  transition: opacity var(--transition-base), transform var(--transition-base);
 }
 
 .list-enter-from,

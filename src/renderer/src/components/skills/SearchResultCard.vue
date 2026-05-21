@@ -43,7 +43,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .result-card:hover {

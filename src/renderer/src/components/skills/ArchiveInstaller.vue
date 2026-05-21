@@ -278,7 +278,7 @@ onUnmounted(() => {
   padding: var(--space-md) var(--space-lg);
   text-align: center;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), background var(--transition-base);
   background: var(--color-canvas);
   flex-shrink: 0;
 }

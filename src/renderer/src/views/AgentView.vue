@@ -410,7 +410,7 @@ onUnmounted(() => {
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   border: 1px solid;
-  transition: all var(--transition-base);
+  transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -508,7 +508,7 @@ onUnmounted(() => {
 }
 
 .agent-card-name :deep(.n-text) {
-  color: var(--color-ink) !important;
+  color: var(--color-ink);
 }
 
 /* Card Info Row */
@@ -589,15 +589,15 @@ onUnmounted(() => {
   gap: var(--space-xxs);
 }
 
-.header-icon-btn {
-  width: 34px !important;
-  height: 34px !important;
-  color: var(--color-stone) !important;
+:deep(.n-button.header-icon-btn) {
+  width: 34px;
+  height: 34px;
+  color: var(--color-stone);
 }
 
-.header-icon-btn:hover {
-  background: var(--color-brand-blue-tint) !important;
-  color: var(--color-brand-blue-600) !important;
+:deep(.n-button.header-icon-btn:hover) {
+  background: var(--color-brand-blue-tint);
+  color: var(--color-brand-blue-600);
 }
 
 /* Drawer Body - 卡片列表 */
@@ -620,7 +620,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .skill-card:hover {
@@ -666,27 +666,27 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.action-btn {
-  width: 32px !important;
-  height: 32px !important;
-  color: var(--color-stone) !important;
+:deep(.n-button.action-btn) {
+  width: 32px;
+  height: 32px;
+  color: var(--color-stone);
 }
 
-.action-btn.update:hover {
-  background: var(--color-brand-blue-tint) !important;
-  color: var(--color-brand-blue-600) !important;
+:deep(.n-button.action-btn.update:hover) {
+  background: var(--color-brand-blue-tint);
+  color: var(--color-brand-blue-600);
 }
 
-.action-btn.delete:hover {
-  background: var(--color-error-bg) !important;
-  color: var(--color-error) !important;
+:deep(.n-button.action-btn.delete:hover) {
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }
 </style>
 
 <style>
 /* NDrawer teleports to body, so scoped styles can't reach it */
-.n-drawer {
-  background-color: transparent !important;
-  border-radius: 0 !important;
+.n-drawer.n-drawer {
+  background-color: transparent;
+  border-radius: 0;
 }
 </style>

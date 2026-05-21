@@ -761,7 +761,7 @@ async function handleUpdateAll(): Promise<void> {
 /* Expand Transition */
 .expand-enter-active,
 .expand-leave-active {
-  transition: all var(--transition-base);
+  transition: opacity var(--transition-base), max-height var(--transition-base);
 }
 
 .expand-enter-from,
@@ -804,7 +804,7 @@ async function handleUpdateAll(): Promise<void> {
   justify-content: center;
   border-radius: var(--radius-md);
   flex-shrink: 0;
-  transition: all var(--transition-base);
+  transition: background var(--transition-base), color var(--transition-base);
 }
 
 .env-check-icon.success {
@@ -879,23 +879,6 @@ async function handleUpdateAll(): Promise<void> {
   font-size: var(--text-caption);
   font-weight: var(--weight-semibold);
   color: var(--color-ink);
-}
-
-.env-hint {
-  font-size: var(--text-caption);
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  color: var(--color-stone);
-}
-
-.env-hint code {
-  background: var(--color-surface);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-family: 'SF Mono', monospace;
-  font-size: var(--text-caption);
-  border: 1px solid var(--color-hairline);
 }
 
 .unsaved-banner {

@@ -85,7 +85,7 @@ const emit = defineEmits<{
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
   background: var(--color-canvas);
-  transition: all var(--transition-base);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
 .skill-card:hover {
@@ -114,7 +114,7 @@ const emit = defineEmits<{
 
 .action-btn {
   border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast);
 }
 
 .action-btn:hover {
@@ -138,7 +138,7 @@ const emit = defineEmits<{
   background: var(--color-surface);
   color: var(--color-stone);
   border: 1px solid var(--color-hairline);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .agent-tag--clickable {
