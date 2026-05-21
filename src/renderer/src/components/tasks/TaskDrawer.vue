@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { NDrawer, NDrawerContent, NButton, NIcon, NEmpty } from 'naive-ui'
 import { TrashOutline } from '@vicons/ionicons5'
 import TaskItem from './TaskItem.vue'
@@ -14,6 +14,22 @@ const emit = defineEmits<{
 }>()
 
 const taskStore = useTaskStore()
+const windowWidth = ref(1200)
+
+function handleResize(): void {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  windowWidth.value = window.innerWidth
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+const drawerWidth = computed(() => Math.min(480, windowWidth.value * 0.4))
 
 /** 按时间倒序排列的任务列表 */
 const sortedTasks = computed(() => [...taskStore.tasks].sort((a, b) => b.createdAt - a.createdAt))
@@ -44,7 +60,7 @@ const hasCompletedTasks = computed(() =>
 <template>
   <NDrawer
     :show="show"
-    :width="480"
+    :width="drawerWidth"
     placement="right"
     :mask-closable="true"
     @update:show="emit('update:show', $event)"

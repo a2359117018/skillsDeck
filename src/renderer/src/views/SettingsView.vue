@@ -748,6 +748,11 @@ async function handleUpdateAll(): Promise<void> {
 }
 
 .custom-input-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.custom-input-wrapper > * {
   overflow: hidden;
 }
 
@@ -790,22 +795,22 @@ async function handleUpdateAll(): Promise<void> {
   transform: translateY(0);
 }
 
-/* Expand Transition */
+/* Expand Transition — grid-template-rows avoids layout thrash from max-height */
 .expand-enter-active,
 .expand-leave-active {
-  transition: opacity var(--transition-base), max-height var(--transition-base);
+  transition: grid-template-rows var(--transition-base), opacity var(--transition-base);
 }
 
 .expand-enter-from,
 .expand-leave-to {
+  grid-template-rows: 0fr;
   opacity: 0;
-  max-height: 0;
 }
 
 .expand-enter-to,
 .expand-leave-from {
+  grid-template-rows: 1fr;
   opacity: 1;
-  max-height: 200px;
 }
 
 /* Environment Checks */
