@@ -82,12 +82,12 @@ Agent card hover glow shadows removed (now uses `box-shadow: var(--shadow-3)` on
 1. ~~Unused components~~ `RESOLVED` — Versions.vue, CommandOutput.vue, LocalInstallPanel.vue removed.
 2. ~~Duplicate routes~~ `RESOLVED` — /env removed, only /settings remains.
 3. ~~Page transition flash~~ `RESOLVED` — out-in fade adjusted.
-4. "搜索耗时 X 秒" is a developer metric that escaped to production
+4. ~~"搜索耗时 X 秒"~~ `RESOLVED` — `_searchDuration` ref/computed removed from skills store; no UI referenced it.
 5. ~~Search button is redundant~~ `RESOLVED` — redundant button removed.
 6. ~~Drawer body uses blue tint~~ `RESOLVED` — neutralized.
-7. AgentSelector max-height inconsistency: 280px vs 180px in different contexts
-8. Hardcoded colors in SkillInstallDialog.vue (#18a058, #d03050, #f0a020, #1e1e1e) bypass tokens
-9. .env-hint styles in SettingsView.vue defined but unused
+7. ~~AgentSelector max-height inconsistency~~ `RESOLVED` — unified to 280px across all 3 usages (SkillInstallDialog, ArchiveInstaller, GitHubInstaller).
+8. ~~Hardcoded colors in SkillInstallDialog.vue~~ `RESOLVED` — `#1e1e1e` → `var(--color-ink)` (×2), `#d4d4d4` → `var(--color-muted)`. Colors #18a058, #d03050, #f0a020 were already using correct tokens.
+9. ~~.env-hint styles~~ `STALE` — no `.env-hint` rules exist in the codebase.
 10. ~~Sidebar width is 72px~~ `RESOLVED` — now 60px as specified.
 
 ## Questions to Consider
