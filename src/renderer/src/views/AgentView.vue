@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   NDrawer,
   NTooltip,
-  NEmpty,
   NText,
   NButton,
   NIcon,
@@ -16,16 +16,19 @@ import {
   RefreshOutline,
   TrashOutline,
   SearchOutline,
-  CloseOutline
+  CloseOutline,
+  GitMergeOutline
 } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
 import { useConfirm } from '@renderer/composables/useConfirm'
+import EmptyState from '@renderer/components/common/EmptyState.vue'
 import type { AgentScanResult } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
 const message = useMessage()
+const router = useRouter()
 const { confirmUpdate, confirmRemove } = useConfirm()
 
 skillsStore.setMessageHandler((msg, type) => {
@@ -206,7 +209,18 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-      <NEmpty v-else description="暂无已安装的 Agent" class="empty-state" />
+      <EmptyState
+        v-else
+        :icon="GitMergeOutline"
+        title="暂无已安装的 Agent"
+        description="安装技能后，对应的 AI 编程工具会自动出现在这里"
+      >
+        <template #actions>
+          <NButton type="primary" size="small" round @click="router.push({ name: 'search' })">
+            搜索技能
+          </NButton>
+        </template>
+      </EmptyState>
     </div>
 
     <!-- Drawer -->

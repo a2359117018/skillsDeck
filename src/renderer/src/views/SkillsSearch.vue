@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NSpin, NEmpty, NText, NTabs, NTabPane } from 'naive-ui'
+import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
+import { SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
 import SkillInstallDialog from '@renderer/components/skills/SkillInstallDialog.vue'
 import GitHubInstaller from '@renderer/components/skills/GitHubInstaller.vue'
 import ArchiveInstaller from '@renderer/components/skills/ArchiveInstaller.vue'
+import EmptyState from '@renderer/components/common/EmptyState.vue'
 
 const skillsStore = useSkillsStore()
 const showInstallDialog = ref(false)
 const selectedSource = ref('')
 const hasSearched = ref(false)
 const activeTab = ref('search')
+
+const SUGGESTIONS = ['code-review', 'testing', 'debug', 'docs']
 
 function handleSearch(keyword: string): void {
   hasSearched.value = true
@@ -60,14 +64,35 @@ function handleLocalInstallComplete(): void {
                     @install="handleInstall"
                   />
                 </div>
-                <NEmpty
+                <EmptyState
                   v-if="skillsStore.searchResults.length === 0"
-                  description="无搜索结果"
-                  class="search-empty"
+                  :icon="SearchOutline"
+                  title="无搜索结果"
+                  description="尝试使用不同的关键词，或缩短搜索词"
                 />
               </div>
             </template>
-            <NEmpty v-else description="输入关键词搜索技能" class="search-empty" />
+            <EmptyState
+              v-else
+              :icon="SearchOutline"
+              title="搜索技能"
+              description="输入关键词查找 AI 编程技能，如代码审查、测试生成、文档编写"
+            >
+              <template #actions>
+                <div class="search-suggestions">
+                  <NButton
+                    v-for="term in SUGGESTIONS"
+                    :key="term"
+                    size="small"
+                    round
+                    secondary
+                    @click="handleSearch(term)"
+                  >
+                    {{ term }}
+                  </NButton>
+                </div>
+              </template>
+            </EmptyState>
           </div>
         </div>
       </NTabPane>
@@ -162,5 +187,12 @@ function handleLocalInstallComplete(): void {
 
 .search-empty {
   margin-top: var(--space-xxxl);
+}
+
+.search-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: center;
 }
 </style>

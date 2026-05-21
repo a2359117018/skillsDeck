@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { NEmpty, NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
+import { useRouter } from 'vue-router'
+import { NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
 import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '../stores/skills'
 import { useTaskStore } from '../stores/tasks'
@@ -8,11 +9,13 @@ import { useConfirm } from '../composables/useConfirm'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
 import SkillRemoveDialog from '../components/skills/SkillRemoveDialog.vue'
+import EmptyState from '../components/common/EmptyState.vue'
 import type { InstalledSkillAgent } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
 const message = useMessage()
+const router = useRouter()
 const { confirmUpdate, confirmRemove, confirmUpdateAll } = useConfirm()
 
 const removeDialogState = ref<{
@@ -212,7 +215,18 @@ function handleFilterAgent(agentFlag: string): void {
           />
         </TransitionGroup>
       </div>
-      <NEmpty v-else description="暂无已安装的技能" class="empty-state" />
+      <EmptyState
+        v-else
+        :icon="SearchOutline"
+        title="暂无已安装的技能"
+        description="从技能库中搜索并安装技能，管理你的 AI 编程助手能力"
+      >
+        <template #actions>
+          <NButton type="primary" size="small" round @click="router.push({ name: 'search' })">
+            搜索技能
+          </NButton>
+        </template>
+      </EmptyState>
 
       <!-- Remove Dialog -->
       <SkillRemoveDialog
