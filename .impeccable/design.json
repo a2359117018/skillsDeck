@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-21T12:00:00Z",
+  "title": "Design System: NPX Skills UI",
+  "extensions": {
+    "colorMeta": {
+      "carbon-ink": {
+        "role": "neutral",
+        "displayName": "Carbon Ink",
+        "canonical": "oklch(20% 0.01 260)",
+        "tonalRamp": [
+          "oklch(10% 0.01 260)",
+          "oklch(15% 0.01 260)",
+          "oklch(20% 0.01 260)",
+          "oklch(25% 0.01 260)",
+          "oklch(30% 0.01 260)",
+          "oklch(40% 0.01 260)",
+          "oklch(50% 0.01 260)",
+          "oklch(60% 0.01 260)"
+        ]
+      },
+      "ember-coral": {
+        "role": "primary",
+        "displayName": "Ember Coral",
+        "canonical": "oklch(63% 0.22 30)",
+        "tonalRamp": [
+          "oklch(25% 0.12 30)",
+          "oklch(35% 0.16 30)",
+          "oklch(45% 0.19 30)",
+          "oklch(55% 0.21 30)",
+          "oklch(63% 0.22 30)",
+          "oklch(72% 0.18 30)",
+          "oklch(82% 0.12 30)",
+          "oklch(92% 0.06 30)"
+        ]
+      },
+      "steel-blue": {
+        "role": "secondary",
+        "displayName": "Steel Blue",
+        "canonical": "oklch(50% 0.18 260)",
+        "tonalRamp": [
+          "oklch(20% 0.10 260)",
+          "oklch(28% 0.13 260)",
+          "oklch(36% 0.16 260)",
+          "oklch(43% 0.17 260)",
+          "oklch(50% 0.18 260)",
+          "oklch(60% 0.14 260)",
+          "oklch(75% 0.08 260)",
+          "oklch(90% 0.04 260)"
+        ]
+      },
+      "neon-magenta": {
+        "role": "tertiary",
+        "displayName": "Neon Magenta",
+        "canonical": "oklch(62% 0.22 330)",
+        "tonalRamp": [
+          "oklch(25% 0.12 330)",
+          "oklch(35% 0.16 330)",
+          "oklch(45% 0.19 330)",
+          "oklch(55% 0.21 330)",
+          "oklch(62% 0.22 330)",
+          "oklch(72% 0.18 330)",
+          "oklch(82% 0.12 330)",
+          "oklch(92% 0.06 330)"
+        ]
+      },
+      "ion-purple": {
+        "role": "tertiary",
+        "displayName": "Ion Purple",
+        "canonical": "oklch(55% 0.22 295)",
+        "tonalRamp": [
+          "oklch(22% 0.12 295)",
+          "oklch(30% 0.16 295)",
+          "oklch(38% 0.19 295)",
+          "oklch(47% 0.21 295)",
+          "oklch(55% 0.22 295)",
+          "oklch(65% 0.18 295)",
+          "oklch(78% 0.12 295)",
+          "oklch(90% 0.06 295)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "canonical": "oklch(100% 0.001 260)",
+        "tonalRamp": [
+          "oklch(96% 0.003 260)",
+          "oklch(97% 0.003 260)",
+          "oklch(98% 0.002 260)",
+          "oklch(99% 0.001 260)",
+          "oklch(100% 0.001 260)",
+          "oklch(100% 0 260)",
+          "oklch(100% 0 260)",
+          "oklch(100% 0 260)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "oklch(97% 0.004 260)",
+        "tonalRamp": [
+          "oklch(85% 0.006 260)",
+          "oklch(88% 0.006 260)",
+          "oklch(91% 0.005 260)",
+          "oklch(94% 0.005 260)",
+          "oklch(97% 0.004 260)",
+          "oklch(99% 0.002 260)",
+          "oklch(100% 0.001 260)",
+          "oklch(100% 0 260)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page-level hero text. Reserved for the largest title on any screen." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles. The typographic anchor of each page." },
+      "title": { "displayName": "Title", "purpose": "Section titles and card names." },
+      "body": { "displayName": "Body", "purpose": "Default text for all readable content." },
+      "label": { "displayName": "Label", "purpose": "Section markers in settings. Uppercase with letter-spacing." }
+    },
+    "shadows": [
+      { "name": "ambient-low", "value": "0 1px 2px rgba(36,36,36,0.06)", "purpose": "Card rest state. Nearly invisible separation." },
+      { "name": "ambient-medium", "value": "rgba(36,36,36,0.06) 0 2px 6px -2px", "purpose": "Skill row hover state." },
+      { "name": "ambient-high", "value": "rgba(36,36,36,0.08) 0 4px 12px -2px", "purpose": "Card hover and settings card rest." },
+      { "name": "ambient-max", "value": "rgba(36,36,36,0.08) 0 12px 16px -4px", "purpose": "FAB and elevated modals." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "100ms ease", "purpose": "Micro-interactions: icon hover, tag click." },
+      { "name": "standard", "value": "150ms ease", "purpose": "Default state transitions: button hover, card hover, sidebar active." },
+      { "name": "slow", "value": "200ms ease", "purpose": "Route transitions, panel expand/collapse." }
+    ],
+    "breakpoints": [
+      { "name": "sidebar", "value": "60px", "purpose": "Fixed sidebar width." },
+      { "name": "min-window", "value": "1200px", "purpose": "Minimum window width enforced by Electron." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action button. Carbon Ink pill on Canvas.",
+      "html": "<button class=\"ds-btn-primary\">安装到...</button>",
+      "css": ".ds-btn-primary { background: #0a0a0a; color: #ffffff; padding: 8px 20px; font-weight: 500; border: none; border-radius: 9999px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: background 150ms ease, transform 150ms ease; } .ds-btn-primary:hover { background: #1a1a1a; } .ds-btn-primary:focus-visible { outline: 2px solid #ff5530; outline-offset: 2px; } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Toolbar and secondary action button. Outlined pill.",
+      "html": "<button class=\"ds-btn-secondary\">刷新</button>",
+      "css": ".ds-btn-secondary { background: transparent; color: #1a1a1a; padding: 6px 16px; font-weight: 500; border: 1px solid #e5e7eb; border-radius: 9999px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; transition: all 150ms ease; } .ds-btn-secondary:hover { background: #f7f8fa; border-color: #9ca3af; } .ds-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Agent Tag Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filterable agent pill. Clickable tag for filtering skills by agent.",
+      "html": "<button class=\"ds-chip ds-chip--active\">Claude Code</button>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 9999px; border: 1px solid #e5e7eb; background: #ffffff; color: #6b7280; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 150ms ease; } .ds-chip:hover { border-color: #1a1a1a; color: #1a1a1a; } .ds-chip--active { background: #0a0a0a; color: #ffffff; border-color: #0a0a0a; } .ds-chip--active:hover { background: #1a1a1a; border-color: #1a1a1a; }"
+    },
+    {
+      "name": "Skill Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Installed skill row. Compact card with name, agent tags, and action buttons.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-main\"><span class=\"ds-card-name\">my-skill</span><div class=\"ds-card-actions\"><button class=\"ds-card-action\" title=\"Open\">⊙</button></div></div><div class=\"ds-card-tags\"><span class=\"ds-chip\">Claude Code</span></div></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; border: 1px solid #e5e7eb; background: #ffffff; transition: all 150ms ease; } .ds-card:hover { border-color: #9ca3af; box-shadow: rgba(36,36,36,0.06) 0 2px 6px -2px; } .ds-card-main { display: flex; justify-content: space-between; align-items: center; gap: 16px; } .ds-card-name { font-weight: 600; font-size: 16px; color: #1a1a1a; flex: 1; } .ds-card-actions { display: flex; gap: 4px; } .ds-card-action { width: 28px; height: 28px; border-radius: 9999px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; transition: all 100ms ease; } .ds-card-action:hover { background: #f7f8fa; } .ds-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Primary search field. Pill-shaped with prefix icon.",
+      "html": "<div class=\"ds-input-wrap\"><span class=\"ds-input-icon\">⊘</span><input class=\"ds-input\" type=\"text\" placeholder=\"搜索技能...\" /></div>",
+      "css": ".ds-input-wrap { display: flex; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; height: 40px; padding: 0 12px; transition: border-color 150ms ease; } .ds-input-wrap:focus-within { border-color: #1456f0; } .ds-input-icon { color: #9ca3af; font-size: 16px; margin-right: 8px; } .ds-input { border: none; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a1a1a; flex: 1; } .ds-input::placeholder { color: #9ca3af; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-sidebar",
+      "description": "Dark icon-only sidebar with active indicator.",
+      "html": "<nav class=\"ds-sidebar\"><button class=\"ds-sidebar-item ds-sidebar-item--active\" aria-current=\"page\" title=\"已安装\"><span class=\"ds-sidebar-bar\"></span>▩</button><button class=\"ds-sidebar-item\" title=\"搜索\">◎</button></nav>",
+      "css": ".ds-sidebar { width: 60px; height: 100vh; background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; } .ds-sidebar-item { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; border-radius: 12px; color: rgba(255,255,255,0.55); font-size: 20px; transition: color 150ms ease, background 150ms ease; } .ds-sidebar-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); } .ds-sidebar-item--active { color: #ffffff; background: rgba(255,255,255,0.08); } .ds-sidebar-item:focus-visible { outline: 2px solid #ff5530; outline-offset: 2px; } .ds-sidebar-bar { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; border-radius: 0 3px 3px 0; background: #ff5530; }"
+    },
+    {
+      "name": "Toolbar Badge",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Count indicator next to page titles.",
+      "html": "<span class=\"ds-badge\">12</span>",
+      "css": ".ds-badge { background: #1456f0; color: #ffffff; padding: 2px 10px; border-radius: 9999px; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; }"
+    },
+    {
+      "name": "Env Check Chip",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Status indicator for environment checks. Shows pass/fail state.",
+      "html": "<div class=\"ds-env-chip ds-env-chip--success\"><span class=\"ds-env-icon\">✓</span><div class=\"ds-env-body\"><span class=\"ds-env-name\">Node.js</span><span class=\"ds-env-version\">v20.11.0</span></div></div>",
+      "css": ".ds-env-chip { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; background: #f7f8fa; border: 1px solid #e5e7eb; } .ds-env-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; flex-shrink: 0; } .ds-env-chip--success .ds-env-icon { background: #dcfce7; color: #166534; } .ds-env-chip--error .ds-env-icon { background: #fef2f2; color: #d45656; } .ds-env-body { display: flex; flex-direction: column; gap: 2px; } .ds-env-name { font-size: 14px; font-weight: 500; color: #1a1a1a; } .ds-env-version { font-size: 13px; color: #6b7280; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Operator's Console",
+    "overview": "A dark command strip on the left. A bright, dense work surface on the right. Every element is a control, every glance yields information. This is not a place for exploration or discovery. It is a place for execution.\n\nThe design system serves a single posture: a developer opens the app to do one specific thing (install a skill, check an agent, update everything), does it in seconds, and closes it. The interface earns trust by being fast, predictable, and visually decisive. No decorative gradients, no loading animations, no celebration states. When an action completes, the list updates. That is the feedback.\n\nThe dark sidebar is the constant: it anchors navigation and signals 'this is a tool, not a website.' The content area is clean canvas where information density wins over whitespace. Agent cards use saturated color to make the multi-agent landscape scannable at a glance.",
+    "keyCharacteristics": [
+      "Dark sidebar + light canvas: two-zone architecture with distinct purposes",
+      "Pill-shaped controls: every button is a rounded pill (9999px radius), forming a consistent tactile vocabulary",
+      "Tonal layering over shadows: surfaces differentiate by background color value, not by drop shadows",
+      "Single font family: DM Sans carries every role from page titles to button labels",
+      "Four-brand-color agent system: coral, blue, magenta, purple distinguish agents visually"
+    ],
+    "rules": [
+      { "name": "The One Signal Rule", "body": "Ember Coral appears on exactly one element per screen (the active sidebar indicator, or a FAB). It is never used for cards, badges, or decorative fills. When you see coral, it means 'you are here.'", "section": "colors" },
+      { "name": "The Four-Color Agent Rule", "body": "Steel Blue, Neon Magenta, Ion Purple, and Ember Coral are assigned to agent cards by index (modulo 4). These colors serve a structural purpose: making the agent grid scannable. They are never used for status, priority, or data encoding.", "section": "colors" },
+      { "name": "The Single Family Rule", "body": "DM Sans handles every typographic role. No secondary font is introduced for emphasis. Hierarchy is achieved exclusively through size (0.75rem to 2rem, a 2.67x range) and weight (400 to 700, three steps).", "section": "typography" },
+      { "name": "The Flat-by-Default Rule", "body": "At rest, surfaces are flat. Shadows appear only as a hover response. A card at rest has a hairline border and canvas background; on hover it gains shadow-2 and a muted border. The target system replaces shadows entirely with tonal shifts.", "section": "elevation" },
+      { "name": "The No Nested Cards Rule", "body": "Nested cards (a card inside a card) are always wrong. If two levels of grouping are needed, the inner level uses surface background with a hairline border, never a full card with its own shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use the pill shape (9999px radius) for every button and chip. Shape consistency is an affordance.",
+      "Do use background color value to differentiate surfaces (canvas at base, surface one step up). Shadows are secondary, used only on hover.",
+      "Do assign the four brand colors (Ember Coral, Steel Blue, Neon Magenta, Ion Purple) to agent cards by modulo index.",
+      "Do keep the sidebar dark and minimal. Four icons, no text labels, one active indicator.",
+      "Do use DM Sans weight 700 for headlines and 600 for titles. The weight jump from 400 body to 700 headline creates clear hierarchy.",
+      "Do ensure all text meets WCAG AA contrast (4.5:1 for normal text).",
+      "Do make interactive elements keyboard accessible with focus-visible styles."
+    ],
+    "donts": [
+      "Don't use generic SaaS dashboard patterns: hero metrics, gradient accents, card grids with identical tiles, or blue-and-white everything.",
+      "Don't use #000 or #fff directly. Carbon Ink and Canvas are the system's darkest and lightest values.",
+      "Don't add decorative motion. Transitions are 100-200ms ease for state changes only.",
+      "Don't nest cards. A card inside a card is always wrong.",
+      "Don't use border-left or border-right greater than 1px as a colored accent stripe on cards or list items.",
+      "Don't use gradient text (background-clip: text with a gradient).",
+      "Don't hard-code colors outside of tokens.css.",
+      "Don't hide scrollbars globally. Use thin overlay scrollbars or NScrollbar instead.",
+      "Don't use modals as the first solution for progressive flows."
+    ]
+  }
+}

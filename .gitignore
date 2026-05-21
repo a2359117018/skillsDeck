@@ -11,3 +11,4 @@ build
 .worktrees/
 bun.lock
 debug-*.png
+*.tsbuildinfo

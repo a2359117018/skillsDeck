@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运行环境区域重设计</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .page-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #111; }
+    .page-subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 1000px) { .split { grid-template-columns: 1fr; } }
+
+    .mockup { border: 1px solid #e5e5e5; border-radius: 10px; background: white; overflow: hidden; }
+    .mockup-header {
+      padding: 12px 16px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 13px;
+      color: #666;
+      font-weight: 600;
+    }
+    .mockup-body { padding: 24px; }
+
+    /* 通用样式 */
+    .card-shell {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: #e5e5e5;
+    }
+
+    .form-label {
+      width: 120px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .pill-btn {
+      padding: 6px 16px;
+      background: #f3f4f6;
+      border: 1px solid #e5e5e5;
+      border-radius: 9999px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pill-btn-primary {
+      padding: 8px 18px;
+      background: #3a4a5c;
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .text-btn {
+      padding: 4px 10px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #6b7280;
+      cursor: pointer;
+    }
+    .text-btn:hover { background: #f3f4f6; }
+
+    /* 方案A: 水平并排 */
+    .env-row-a {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .env-chip-a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      min-width: 140px;
+      flex: 1;
+    }
+    .env-chip-a .icon {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    .env-chip-a .icon.ok { background: #dcfce7; color: #16a34a; }
+    .env-chip-a .icon.fail { background: #fef2f2; color: #dc2626; }
+    .env-chip-a .name { font-size: 14px; font-weight: 500; }
+    .env-chip-a .ver { font-size: 12px; color: #888; }
+
+    /* 方案B: 左侧标签+右侧内容 */
+    .env-form-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .env-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #f9fafb;
+      border: 1px solid #e5e5e5;
+    }
+    .env-status-badge .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .env-status-badge .dot.ok { background: #22c55e; }
+    .env-status-badge .dot.fail { background: #dc2626; }
+
+    /* 方案C: 统一卡片+顶部操作 */
+    .env-card-c {
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+    }
+    .env-list-c {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .env-item-c {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 8px;
+    }
+    .env-item-c .icon {
+      width: 22px; height: 22px;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .env-item-c .icon.ok { background: #dcfce7; color: #16a34a; }
+    .env-item-c .icon.fail { background: #fef2f2; color: #dc2626; }
+    .env-toolbar-c {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .problem-text {
+      margin-top: 20px;
+      padding: 16px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      font-size: 13px;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-title">运行环境区域重设计</div>
+  <div class="page-subtitle">三个方向，让运行环境和其他 section 风格统一</div>
+
+  <div class="split">
+
+    <!-- 方案 A -->
+    <div class="mockup">
+      <div class="mockup-header">方案 A：水平并排芯片</div>
+      <div class="mockup-body">
+        <div class="card-shell" style="padding: 20px;">
+          <div class="section-header">
+            <span class="section-title">运行环境</span>
+            <span class="section-line"></span>
+          </div>
+
+          <div class="env-row-a">
+            <div class="env-chip-a">
+              <div class="icon fail">✕</div>
+              <div>
+                <div class="name">Node.js</div>
+                <div class="ver">未安装</div>
+              </div>
+            </div>
+            <div class="env-chip-a">
+              <div class="icon fail">✕</div>
+              <div>
+                <div class="name">npm</div>
+                <div class="ver">未安装</div>
+              </div>
+            </div>
+            <div class="env-chip-a">
+              <div class="icon fail">✕</div>
+              <div>
+                <div class="name">skills</div>
+                <div class="ver">未安装</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <button class="pill-btn-primary">⬇ 下载并安装 Node.js</button>
+            <button class="text-btn">🔄 重新检测</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 方案 B -->
+    <div class="mockup">
+      <div class="mockup-header">方案 B：Label + Status Badge（和表单统一）</div>
+      <div class="mockup-body">
+        <div class="card-shell" style="padding: 20px;">
+          <div class="section-header">
+            <span class="section-title">运行环境</span>
+            <span class="section-line"></span>
+          </div>
+
+          <div class="env-form-row">
+            <label class="form-label">Node.js</label>
+            <div class="env-status-badge">
+              <span class="dot fail"></span>
+              未安装
+            </div>
+          </div>
+          <div class="env-form-row">
+            <label class="form-label">npm</label>
+            <div class="env-status-badge">
+              <span class="dot fail"></span>
+              未安装
+            </div>
+          </div>
+          <div class="env-form-row">
+            <label class="form-label">skills</label>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="env-status-badge">
+                <span class="dot fail"></span>
+                未安装
+              </div>
+              <button class="pill-btn">🔄 更新</button>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e5e5e5; display: flex; justify-content: space-between; align-items: center;">
+            <button class="pill-btn-primary">⬇ 下载并安装 Node.js</button>
+            <button class="text-btn">🔄 重新检测</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 第二行：方案C -->
+  <div style="margin-top: 24px;">
+    <div class="mockup">
+      <div class="mockup-header">方案 C：统一卡片容器（推荐）</div>
+      <div class="mockup-body">
+        <div class="card-shell" style="padding: 20px;">
+          <div class="section-header">
+            <span class="section-title">运行环境</span>
+            <span class="section-line"></span>
+          </div>
+
+          <div class="env-card-c">
+            <div class="env-list-c">
+              <div class="env-item-c">
+                <div class="icon fail">✕</div>
+                <div style="flex:1;">
+                  <div style="font-size: 14px; font-weight: 500;">Node.js</div>
+                  <div style="font-size: 12px; color: #888;">未安装</div>
+                </div>
+              </div>
+              <div class="env-item-c">
+                <div class="icon fail">✕</div>
+                <div style="flex:1;">
+                  <div style="font-size: 14px; font-weight: 500;">npm</div>
+                  <div style="font-size: 12px; color: #888;">未安装</div>
+                </div>
+              </div>
+              <div class="env-item-c">
+                <div class="icon fail">✕</div>
+                <div style="flex:1;">
+                  <div style="font-size: 14px; font-weight: 500;">skills</div>
+                  <div style="font-size: 12px; color: #888;">未安装</div>
+                </div>
+              </div>
+            </div>
+            <div class="env-toolbar-c">
+              <button class="pill-btn-primary">⬇ 下载并安装 Node.js</button>
+              <button class="text-btn">🔄 重新检测</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="problem-text">
+    <strong>当前问题：</strong>运行环境区域使用了和其他 section 完全不同的布局语言。其他 section 是 label-left + 紧凑控件，运行环境是大卡片 + 散落按钮，视觉上割裂。
+  </div>
+</body>
+</html>

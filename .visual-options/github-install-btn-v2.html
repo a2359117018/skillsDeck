@@ -1,0 +1,1092 @@
+<div class="page-title">方案 C 迭代 — 安装按钮尺寸调整</div>
+<div class="page-subtitle">三个变体：按钮从「全宽大按钮」逐步缩小，请选择最舒适的程度</div>
+
+<!-- Variation 1: Moderate shrink -->
+<div class="option-shell" data-choice="moderate">
+  <h3 style="font-size: 16px; margin-bottom: 4px; color: #111">变体 1 — 适度缩小</h3>
+  <p style="font-size: 13px; color: #888; margin-bottom: 16px">
+    去掉 block 全宽，改为右对齐的紧凑按钮，padding 和字号略微减小
+  </p>
+
+  <div
+    style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #f8fafc"
+  >
+    <div style="display: flex; border-bottom: 1px solid #e2e8f0; background: #fff">
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">搜索安装</div>
+      <div
+        style="
+          padding: 10px 20px;
+          font-size: 13px;
+          color: #2563eb;
+          border-bottom: 2px solid #2563eb;
+          font-weight: 600;
+        "
+      >
+        GitHub链接
+      </div>
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">压缩包</div>
+    </div>
+    <div
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 20px;
+        min-height: 400px;
+      "
+    >
+      <!-- Left column (same as C) -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div
+          style="
+            border-radius: 12px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="#1e293b">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b"
+              >从 GitHub 安装技能</span
+            >
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px">
+            <input
+              type="text"
+              placeholder="https://github.com/owner/repo"
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 13px;
+                background: #f8fafc;
+                outline: none;
+                color: #64748b;
+              "
+            />
+            <button
+              style="
+                padding: 8px 18px;
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              解析
+            </button>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; line-height: 1.6">
+            支持
+            <span
+              style="
+                color: #64748b;
+                background: #f1f5f9;
+                padding: 1px 4px;
+                border-radius: 3px;
+                font-family: monospace;
+              "
+              >github.com/owner/repo</span
+            >
+            <span style="color: #94a3b8; margin: 0 4px">·</span>可指定子目录和分支
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+          <span
+            style="
+              background: #2563eb;
+              color: white;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            "
+            >1</span
+          >
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择技能</span>
+        </div>
+        <div
+          style="
+            flex: 1;
+            min-height: 120px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <span style="font-size: 13px; color: #94a3b8">解析仓库后显示技能列表</span>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+          <span
+            style="
+              background: #2563eb;
+              color: white;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            "
+            >2</span
+          >
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择目标</span>
+        </div>
+        <div
+          style="
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+              padding-bottom: 8px;
+              border-bottom: 1px solid #f1f5f9;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #475569;
+                cursor: pointer;
+              "
+            >
+              <span
+                style="
+                  width: 16px;
+                  height: 16px;
+                  border: 2px solid #cbd5e1;
+                  border-radius: 4px;
+                  display: inline-block;
+                "
+              ></span>
+              全局安装
+            </label>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">常见 Agent</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px">
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Claude Code</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Cursor</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Codex</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Windsurf</span
+            >
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">全部 Agent</div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Augment
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Cline
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Copilot
+            </label>
+          </div>
+        </div>
+
+        <!-- CHANGED: right-aligned, not full-width -->
+        <div style="display: flex; justify-content: flex-end; flex-shrink: 0">
+          <button
+            style="
+              padding: 6px 20px;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 9999px;
+              font-size: 13px;
+              font-weight: 500;
+              cursor: pointer;
+              opacity: 0.5;
+            "
+          >
+            安装选中技能 (0)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    style="
+      margin-top: 8px;
+      font-size: 12px;
+      color: #64748b;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    "
+  >
+    <strong>变化：</strong>padding 10px→6px, font-size 14→13px, 去掉 block
+    全宽改为右对齐。按钮高度约 32px。
+  </div>
+</div>
+
+<!-- Variation 2: Inline with step header -->
+<div class="option-shell" data-choice="inline">
+  <h3 style="font-size: 16px; margin-bottom: 4px; color: #111">变体 2 — 按钮融入步骤标题行</h3>
+  <p style="font-size: 13px; color: #888; margin-bottom: 16px">
+    将安装按钮移到右栏步骤标题行的右侧，与"选择目标"同行，极致节省空间
+  </p>
+
+  <div
+    style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #f8fafc"
+  >
+    <div style="display: flex; border-bottom: 1px solid #e2e8f0; background: #fff">
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">搜索安装</div>
+      <div
+        style="
+          padding: 10px 20px;
+          font-size: 13px;
+          color: #2563eb;
+          border-bottom: 2px solid #2563eb;
+          font-weight: 600;
+        "
+      >
+        GitHub链接
+      </div>
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">压缩包</div>
+    </div>
+    <div
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 20px;
+        min-height: 400px;
+      "
+    >
+      <!-- Left column (same) -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div
+          style="
+            border-radius: 12px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="#1e293b">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b"
+              >从 GitHub 安装技能</span
+            >
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px">
+            <input
+              type="text"
+              placeholder="https://github.com/owner/repo"
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 13px;
+                background: #f8fafc;
+                outline: none;
+                color: #64748b;
+              "
+            />
+            <button
+              style="
+                padding: 8px 18px;
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              解析
+            </button>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; line-height: 1.6">
+            支持
+            <span
+              style="
+                color: #64748b;
+                background: #f1f5f9;
+                padding: 1px 4px;
+                border-radius: 3px;
+                font-family: monospace;
+              "
+              >github.com/owner/repo</span
+            >
+            <span style="color: #94a3b8; margin: 0 4px">·</span>可指定子目录和分支
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+          <span
+            style="
+              background: #2563eb;
+              color: white;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            "
+            >1</span
+          >
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择技能</span>
+        </div>
+        <div
+          style="
+            flex: 1;
+            min-height: 120px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <span style="font-size: 13px; color: #94a3b8">解析仓库后显示技能列表</span>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <!-- CHANGED: button inline with step header -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            justify-content: space-between;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span
+              style="
+                background: #2563eb;
+                color: white;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: 600;
+              "
+              >2</span
+            >
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择目标</span>
+          </div>
+          <button
+            style="
+              padding: 4px 14px;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 9999px;
+              font-size: 12px;
+              font-weight: 500;
+              cursor: pointer;
+              opacity: 0.5;
+              height: 26px;
+            "
+          >
+            安装 (0)
+          </button>
+        </div>
+        <div
+          style="
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+              padding-bottom: 8px;
+              border-bottom: 1px solid #f1f5f9;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #475569;
+                cursor: pointer;
+              "
+            >
+              <span
+                style="
+                  width: 16px;
+                  height: 16px;
+                  border: 2px solid #cbd5e1;
+                  border-radius: 4px;
+                  display: inline-block;
+                "
+              ></span>
+              全局安装
+            </label>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">常见 Agent</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px">
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Claude Code</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Cursor</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Codex</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Windsurf</span
+            >
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">全部 Agent</div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Augment
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Cline
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Copilot
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    style="
+      margin-top: 8px;
+      font-size: 12px;
+      color: #64748b;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    "
+  >
+    <strong>变化：</strong>按钮移至步骤标题行右侧，高度 26px，文案精简为"安装
+    (0)"。完全不占额外纵向空间。
+  </div>
+</div>
+
+<!-- Variation 3: Compact bar at bottom -->
+<div class="option-shell" data-choice="bar">
+  <h3 style="font-size: 16px; margin-bottom: 4px; color: #111">变体 3 — 底部紧凑操作条</h3>
+  <p style="font-size: 13px; color: #888; margin-bottom: 16px">
+    底部用一条窄的操作栏，左侧显示选中数量，右侧放小按钮。类似工具栏风格。
+  </p>
+
+  <div
+    style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #f8fafc"
+  >
+    <div style="display: flex; border-bottom: 1px solid #e2e8f0; background: #fff">
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">搜索安装</div>
+      <div
+        style="
+          padding: 10px 20px;
+          font-size: 13px;
+          color: #2563eb;
+          border-bottom: 2px solid #2563eb;
+          font-weight: 600;
+        "
+      >
+        GitHub链接
+      </div>
+      <div style="padding: 10px 20px; font-size: 13px; color: #94a3b8">压缩包</div>
+    </div>
+    <div
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 20px;
+        min-height: 400px;
+      "
+    >
+      <!-- Left column (same) -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div
+          style="
+            border-radius: 12px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="#1e293b">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b"
+              >从 GitHub 安装技能</span
+            >
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px">
+            <input
+              type="text"
+              placeholder="https://github.com/owner/repo"
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 13px;
+                background: #f8fafc;
+                outline: none;
+                color: #64748b;
+              "
+            />
+            <button
+              style="
+                padding: 8px 18px;
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              解析
+            </button>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; line-height: 1.6">
+            支持
+            <span
+              style="
+                color: #64748b;
+                background: #f1f5f9;
+                padding: 1px 4px;
+                border-radius: 3px;
+                font-family: monospace;
+              "
+              >github.com/owner/repo</span
+            >
+            <span style="color: #94a3b8; margin: 0 4px">·</span>可指定子目录和分支
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+          <span
+            style="
+              background: #2563eb;
+              color: white;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            "
+            >1</span
+          >
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择技能</span>
+        </div>
+        <div
+          style="
+            flex: 1;
+            min-height: 120px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <span style="font-size: 13px; color: #94a3b8">解析仓库后显示技能列表</span>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+          <span
+            style="
+              background: #2563eb;
+              color: white;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+            "
+            >2</span
+          >
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b">选择目标</span>
+        </div>
+        <div
+          style="
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+              padding-bottom: 8px;
+              border-bottom: 1px solid #f1f5f9;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #475569;
+                cursor: pointer;
+              "
+            >
+              <span
+                style="
+                  width: 16px;
+                  height: 16px;
+                  border: 2px solid #cbd5e1;
+                  border-radius: 4px;
+                  display: inline-block;
+                "
+              ></span>
+              全局安装
+            </label>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">常见 Agent</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px">
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Claude Code</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Cursor</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Codex</span
+            >
+            <span
+              style="
+                padding: 4px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                color: #64748b;
+                background: #f8fafc;
+              "
+              >Windsurf</span
+            >
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px">全部 Agent</div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Augment
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Cline
+            </label>
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #64748b;
+                padding: 4px 0;
+              "
+            >
+              <span
+                style="
+                  width: 14px;
+                  height: 14px;
+                  border: 1.5px solid #cbd5e1;
+                  border-radius: 3px;
+                  display: inline-block;
+                "
+              ></span>
+              Copilot
+            </label>
+          </div>
+        </div>
+
+        <!-- CHANGED: compact bar style -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            flex-shrink: 0;
+          "
+        >
+          <span style="font-size: 12px; color: #94a3b8"
+            >已选 <span style="color: #1e293b; font-weight: 600">0</span> 个技能</span
+          >
+          <button
+            style="
+              padding: 4px 14px;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 9999px;
+              font-size: 12px;
+              font-weight: 500;
+              cursor: pointer;
+              opacity: 0.5;
+              height: 26px;
+            "
+          >
+            安装
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    style="
+      margin-top: 8px;
+      font-size: 12px;
+      color: #64748b;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    "
+  >
+    <strong>变化：</strong>底部替换为窄操作条（~38px），左侧选中计数 + 右侧小按钮。按钮高度
+    26px，文案精简为"安装"。
+  </div>
+</div>
+
+<!-- v2 adjustment notes -->
+<div
+  style="
+    margin-top: 24px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e8e8e8;
+  "
+>
+  <div style="font-size: 14px; font-weight: 600; color: #3a4a5c; margin-bottom: 12px">
+    v2 调整说明
+  </div>
+  <ul style="font-size: 13px; color: #5a5a5a; padding-left: 18px; line-height: 1.8">
+    <li><strong>基础方案：</strong>保持方案 C 的 GitHub 品牌化卡片 + 左右双列结构不变</li>
+    <li><strong>聚焦调整：</strong>仅变更安装按钮的尺寸、位置和表现形式</li>
+    <li><strong>三个梯度：</strong>适度缩小 → 融入标题行 → 底部紧凑条，占用空间依次递减</li>
+  </ul>
+</div>
