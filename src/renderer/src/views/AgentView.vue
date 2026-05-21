@@ -273,9 +273,8 @@ onUnmounted(() => {
           </div>
         </div>
         <div class="drawer-body">
-          <div v-for="(skillName, idx) in selectedAgent.skills" :key="skillName" class="skill-card">
+          <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-card">
             <div class="skill-left">
-              <div class="skill-index">{{ String(idx + 1).padStart(2, '0') }}</div>
               <div class="skill-name">{{ skillName }}</div>
             </div>
             <div class="skill-actions">
@@ -426,11 +425,6 @@ onUnmounted(() => {
   background: var(--color-agent-coral-bg);
   border-color: var(--color-agent-coral-border);
 }
-.agent-card.color-0:hover {
-  box-shadow:
-    var(--shadow-3),
-    0 0 20px rgba(255, 85, 48, 0.12);
-}
 .agent-card.color-0 .agent-card-avatar {
   background: var(--color-brand-coral);
 }
@@ -441,11 +435,6 @@ onUnmounted(() => {
 .agent-card.color-1 {
   background: var(--color-agent-blue-bg);
   border-color: var(--color-agent-blue-border);
-}
-.agent-card.color-1:hover {
-  box-shadow:
-    var(--shadow-3),
-    0 0 20px rgba(20, 86, 240, 0.12);
 }
 .agent-card.color-1 .agent-card-avatar {
   background: var(--color-brand-blue);
@@ -458,11 +447,6 @@ onUnmounted(() => {
   background: var(--color-agent-magenta-bg);
   border-color: var(--color-agent-magenta-border);
 }
-.agent-card.color-2:hover {
-  box-shadow:
-    var(--shadow-3),
-    0 0 20px rgba(234, 94, 193, 0.12);
-}
 .agent-card.color-2 .agent-card-avatar {
   background: var(--color-brand-magenta);
 }
@@ -473,11 +457,6 @@ onUnmounted(() => {
 .agent-card.color-3 {
   background: var(--color-agent-purple-bg);
   border-color: var(--color-agent-purple-border);
-}
-.agent-card.color-3:hover {
-  box-shadow:
-    var(--shadow-3),
-    0 0 20px rgba(168, 85, 247, 0.12);
 }
 .agent-card.color-3 .agent-card-avatar {
   background: var(--color-brand-purple);
@@ -552,7 +531,7 @@ onUnmounted(() => {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--color-brand-blue-600), #06b6d4);
+  background: var(--color-brand-blue);
   color: var(--color-canvas);
   display: flex;
   align-items: center;
@@ -634,20 +613,6 @@ onUnmounted(() => {
   gap: var(--space-sm);
   min-width: 0;
   flex: 1;
-}
-
-.skill-index {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--color-brand-blue-tint);
-  color: var(--color-brand-blue-600);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-micro);
-  font-weight: var(--weight-bold);
-  flex-shrink: 0;
 }
 
 .skill-name {
