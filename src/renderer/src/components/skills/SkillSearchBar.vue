@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NInput, NButton, NIcon } from 'naive-ui'
+import { NInput, NIcon } from 'naive-ui'
 import { SearchOutline } from '@vicons/ionicons5'
 
 const keyword = ref('')
@@ -31,12 +31,6 @@ function handleKeydown(e: KeyboardEvent): void {
           <NIcon :size="18" :color="'var(--color-muted)'"><SearchOutline /></NIcon>
         </template>
       </NInput>
-      <NButton type="primary" size="large" round class="search-btn" @click="handleSearch">
-        <template #icon>
-          <NIcon :size="18"><SearchOutline /></NIcon>
-        </template>
-        搜索
-      </NButton>
     </div>
   </div>
 </template>
@@ -48,7 +42,6 @@ function handleKeydown(e: KeyboardEvent): void {
 
 .search-bar-container {
   display: flex;
-  gap: var(--space-md);
   width: 100%;
   align-items: center;
 }
@@ -59,19 +52,5 @@ function handleKeydown(e: KeyboardEvent): void {
 
 .search-input :deep(.n-input__input-el) {
   height: 40px;
-}
-
-.search-btn {
-  flex-shrink: 0;
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-canvas);
-  font-weight: var(--weight-medium);
-  transition: all var(--transition-base);
-}
-
-.search-btn:hover {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
 }
 </style>

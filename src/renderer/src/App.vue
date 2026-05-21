@@ -96,7 +96,7 @@ const themeOverrides: GlobalThemeOverrides = {
                 </div>
               </NAlert>
               <router-view v-slot="{ Component }">
-                <Transition name="fade" mode="out-in">
+                <Transition name="fade">
                   <component :is="Component" />
                 </Transition>
               </router-view>
