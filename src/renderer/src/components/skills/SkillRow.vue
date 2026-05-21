@@ -24,6 +24,7 @@ const emit = defineEmits<{
           size="tiny"
           class="action-btn"
           title="打开位置"
+          aria-label="打开位置"
           @click="emit('openLocation', props.skill.agents[0]?.path || '')"
         >
           <template #icon>
@@ -36,6 +37,7 @@ const emit = defineEmits<{
           size="tiny"
           class="action-btn"
           title="更新"
+          aria-label="更新"
           @click="emit('update', props.skill.name)"
         >
           <template #icon>
@@ -49,6 +51,7 @@ const emit = defineEmits<{
           type="error"
           class="action-btn action-btn--danger"
           title="删除"
+          aria-label="删除"
           @click="emit('remove', props.skill.name)"
         >
           <template #icon>

@@ -43,7 +43,7 @@ function handleCancel(): void {
 </script>
 
 <template>
-  <NModal v-model:show="visible" :mask-closable="false" @mask-click="handleCancel">
+  <NModal v-model:show="visible" :mask-closable="false" :trap-focus="true" @mask-click="handleCancel">
     <NCard
       style="width: 420px"
       :bordered="false"

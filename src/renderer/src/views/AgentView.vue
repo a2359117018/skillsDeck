@@ -176,6 +176,7 @@ onUnmounted(() => {
           :key="agent.agentFlag"
           class="agent-card"
           :class="['color-' + getAgentColorIndex(index)]"
+          :aria-label="agent.agentName + '，' + agent.count + '个技能'"
           @click="openAgentCard(agent)"
         >
           <div class="agent-card-avatar">

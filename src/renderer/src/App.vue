@@ -85,8 +85,9 @@ const themeOverrides: GlobalThemeOverrides = {
       <NNotificationProvider placement="top-right" :max="5">
         <NMessageProvider>
           <div v-if="windowType === 'main'" class="app-shell">
+            <a href="#main-content" class="skip-link">跳转到主内容</a>
             <AppSidebar @open-tasks="openTaskDrawer" />
-            <main class="content-area">
+            <main id="main-content" class="content-area">
               <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
                 <div class="env-banner-inner">
                   <span>缺少必要的运行组件，部分功能可能无法使用</span>
@@ -133,5 +134,25 @@ const themeOverrides: GlobalThemeOverrides = {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  z-index: 10000;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  box-shadow: var(--shadow-3);
+}
+
+.skip-link:focus {
+  left: var(--space-md);
+  top: var(--space-md);
 }
 </style>

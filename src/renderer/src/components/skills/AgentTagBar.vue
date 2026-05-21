@@ -43,6 +43,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
         <button
           class="agent-tag-pill"
           :class="{ 'agent-tag-pill--active': skillsStore.selectedAgents.length === 0 }"
+          :aria-pressed="skillsStore.selectedAgents.length === 0"
           @click="skillsStore.clearAgentFilter()"
         >
           全部
@@ -52,6 +53,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
           :key="agent.agentFlag"
           class="agent-tag-pill"
           :class="{ 'agent-tag-pill--active': isActive(agent.agentFlag) }"
+          :aria-pressed="isActive(agent.agentFlag)"
           @click="handleClick(agent.agentFlag)"
         >
           {{ agent.agentName }}

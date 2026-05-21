@@ -161,6 +161,7 @@ const failedLogLines = computed(() => {
   <NModal
     :show="show"
     :mask-closable="!installing"
+    :trap-focus="true"
     :on-after-leave="resetState"
     @update:show="handleClose"
   >
