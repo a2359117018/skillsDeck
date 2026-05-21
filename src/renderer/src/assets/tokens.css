@@ -3,13 +3,28 @@
    Single source of truth for all visual decisions.
    ============================================ */
 
-/* Hide scrollbars globally (keep scroll functionality) */
+/* Thin overlay scrollbar — visible but unobtrusive */
 * {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.4) transparent;
 }
 
 *::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.4);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.6);
 }
 
 :root {
@@ -52,6 +67,8 @@
   /* Semantic */
   --color-success-bg: #dcfce7;
   --color-success-text: #166534;
+  --color-warning: #f0a020;
+  --color-warning-bg: #fffbeb;
   --color-error: #d45656;
   --color-error-bg: #fef2f2;
 

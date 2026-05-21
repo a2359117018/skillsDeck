@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { NCheckbox, NButton, NInput, NSpace, NText } from 'naive-ui'
+import { ref, computed } from 'vue'
+import { NCheckbox, NButton, NInput, NSpace, NText, NIcon } from 'naive-ui'
+import { ChevronDownOutline } from '@vicons/ionicons5'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 
 const props = defineProps<{
@@ -14,29 +15,20 @@ const emit = defineEmits<{
 }>()
 
 const filterText = ref('')
-
-watch(
-  () => props.isGlobal,
-  (global) => {
-    if (global) emit('update:modelValue', [])
-  }
-)
+const expanded = ref(false)
 
 const commonAgents = getCommonAgents()
+const commonFlags = new Set(commonAgents.map((a) => a.agentFlag))
 
-const filteredAgents = computed(() => {
+const otherAgents = computed(() => AGENTS.filter((a) => !commonFlags.has(a.agentFlag)))
+
+const filteredOtherAgents = computed(() => {
   const text = filterText.value.toLowerCase()
-  if (!text) return AGENTS
-  return AGENTS.filter(
+  if (!text) return otherAgents.value
+  return otherAgents.value.filter(
     (a) => a.name.toLowerCase().includes(text) || a.agentFlag.toLowerCase().includes(text)
   )
 })
-
-const allFilteredSelected = computed(
-  () =>
-    filteredAgents.value.length > 0 &&
-    filteredAgents.value.every((a) => props.modelValue.includes(a.agentFlag))
-)
 
 function toggleAgent(agentFlag: string): void {
   if (props.isGlobal) return
@@ -50,26 +42,17 @@ function toggleAgent(agentFlag: string): void {
   emit('update:modelValue', current)
 }
 
-function toggleSelectAll(): void {
-  const flags = filteredAgents.value.map((a) => a.agentFlag)
-  if (allFilteredSelected.value) {
-    emit(
-      'update:modelValue',
-      props.modelValue.filter((s) => !flags.includes(s))
-    )
-  } else {
-    emit('update:modelValue', [...new Set([...props.modelValue, ...flags])])
-  }
-}
-
 function toggleGlobal(val: boolean): void {
   emit('update:isGlobal', val)
+  if (val) {
+    emit('update:modelValue', [])
+  }
 }
 </script>
 
 <template>
   <div class="agent-selector">
-    <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
+    <NCheckbox :checked="isGlobal" class="global-checkbox" @update:checked="toggleGlobal">
       全局安装（适用于所有 AI 工具）
     </NCheckbox>
 
@@ -88,37 +71,37 @@ function toggleGlobal(val: boolean): void {
         </NButton>
       </NSpace>
 
-      <NText depth="3" class="section-label">筛选 AI 工具</NText>
-      <NInput
-        v-model:value="filterText"
-        placeholder="搜索 AI 工具名称..."
-        clearable
-        size="small"
-        class="filter-input"
-      />
+      <div class="expand-bar" @click="expanded = !expanded">
+        <NText depth="3" class="expand-text">
+          {{ expanded ? '收起' : '安装到其他 agent...' }}
+        </NText>
+        <NIcon
+          :size="14"
+          :class="['expand-icon', { rotated: expanded }]"
+          :component="ChevronDownOutline"
+        />
+      </div>
 
-      <NCheckbox
-        :checked="allFilteredSelected"
-        :indeterminate="
-          modelValue.some((s) => filteredAgents.some((a) => a.agentFlag === s)) &&
-          !allFilteredSelected
-        "
-        class="select-all-checkbox"
-        @update:checked="toggleSelectAll"
-      >
-        全选当前筛选
-      </NCheckbox>
-      <div class="agent-list-scroll">
-        <NSpace vertical :size="4">
-          <NCheckbox
-            v-for="agent in filteredAgents"
-            :key="agent.agentFlag"
-            :checked="modelValue.includes(agent.agentFlag)"
-            @update:checked="() => toggleAgent(agent.agentFlag)"
-          >
-            {{ agent.name }}
-          </NCheckbox>
-        </NSpace>
+      <div v-if="expanded" class="other-agents">
+        <NInput
+          v-model:value="filterText"
+          placeholder="搜索 AI 工具名称..."
+          clearable
+          size="small"
+          class="filter-input"
+        />
+        <div class="agent-list-scroll">
+          <NSpace vertical :size="4">
+            <NCheckbox
+              v-for="agent in filteredOtherAgents"
+              :key="agent.agentFlag"
+              :checked="modelValue.includes(agent.agentFlag)"
+              @update:checked="() => toggleAgent(agent.agentFlag)"
+            >
+              {{ agent.name }}
+            </NCheckbox>
+          </NSpace>
+        </div>
       </div>
 
       <NText depth="3" class="selected-count"> 已选: {{ modelValue.length }} 个 agent </NText>
@@ -129,6 +112,11 @@ function toggleGlobal(val: boolean): void {
 <style scoped>
 .agent-selector {
   width: 100%;
+}
+
+.global-checkbox {
+  display: block;
+  margin-bottom: var(--space-sm);
 }
 
 .agent-section {
@@ -152,16 +140,39 @@ function toggleGlobal(val: boolean): void {
   margin-bottom: var(--space-md);
 }
 
+.expand-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  padding: var(--space-xs) 0;
+  margin-bottom: var(--space-sm);
+  user-select: none;
+}
+
+.expand-text {
+  font-size: 13px;
+}
+
+.expand-icon {
+  transition: transform 0.2s ease;
+  color: var(--color-muted);
+}
+
+.expand-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.other-agents {
+  margin-bottom: var(--space-md);
+}
+
 .filter-input {
   margin-bottom: var(--space-sm);
 }
 
-.select-all-checkbox {
-  margin-bottom: var(--space-sm);
-}
-
 .agent-list-scroll {
-  max-height: 280px;
+  max-height: 200px;
   overflow-y: auto;
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);

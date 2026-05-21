@@ -188,7 +188,7 @@ const emit = defineEmits<{
 }
 
 .sidebar-label {
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.2;
   color: inherit;
   text-align: center;

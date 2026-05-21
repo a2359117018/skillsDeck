@@ -475,6 +475,9 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-title">运行环境</span>
           <span class="section-line" />
         </div>
+        <NText depth="3" style="display: block; margin-bottom: var(--space-md); font-size: var(--text-body-sm)">
+          NPX Skills UI 依赖 Node.js 和 npx skills CLI 来安装、更新和管理技能。
+        </NText>
         <div class="env-checks">
           <div class="env-check-item">
             <div

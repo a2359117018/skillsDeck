@@ -28,20 +28,18 @@ const TASK_LABELS: Record<string, string> = {
 }
 
 /** 任务状态配置 */
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; color: string; icon: typeof ReloadOutline }
-> = {
-  pending: { label: '等待中', color: 'var(--color-muted)', icon: TimeOutline },
-  running: { label: '运行中', color: 'var(--color-brand-blue)', icon: ReloadOutline },
-  success: {
-    label: '已完成',
-    color: 'var(--color-success-text)',
-    icon: CheckmarkCircleOutline
-  },
-  error: { label: '执行失败', color: 'var(--color-error)', icon: CloseCircleOutline },
-  cancelled: { label: '已取消', color: 'var(--color-muted)', icon: StopCircleOutline }
-}
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof ReloadOutline }> =
+  {
+    pending: { label: '等待中', color: 'var(--color-muted)', icon: TimeOutline },
+    running: { label: '运行中', color: 'var(--color-brand-blue)', icon: ReloadOutline },
+    success: {
+      label: '已完成',
+      color: 'var(--color-success-text)',
+      icon: CheckmarkCircleOutline
+    },
+    error: { label: '执行失败', color: 'var(--color-error)', icon: CloseCircleOutline },
+    cancelled: { label: '已取消', color: 'var(--color-muted)', icon: StopCircleOutline }
+  }
 
 const taskLabel = computed(() => TASK_LABELS[props.task.type] || props.task.type)
 const statusConfig = computed(() => STATUS_CONFIG[props.task.status] || STATUS_CONFIG.pending)

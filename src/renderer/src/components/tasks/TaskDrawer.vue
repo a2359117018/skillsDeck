@@ -16,9 +16,7 @@ const emit = defineEmits<{
 const taskStore = useTaskStore()
 
 /** 按时间倒序排列的任务列表 */
-const sortedTasks = computed(() =>
-  [...taskStore.tasks].sort((a, b) => b.createdAt - a.createdAt)
-)
+const sortedTasks = computed(() => [...taskStore.tasks].sort((a, b) => b.createdAt - a.createdAt))
 
 const activeCount = computed(() => taskStore.activeTasks.length)
 
@@ -76,12 +74,7 @@ const hasCompletedTasks = computed(() =>
       </div>
 
       <div v-else class="task-list">
-        <TaskItem
-          v-for="task in sortedTasks"
-          :key="task.id"
-          :task="task"
-          @cancel="handleCancel"
-        />
+        <TaskItem v-for="task in sortedTasks" :key="task.id" :task="task" @cancel="handleCancel" />
       </div>
     </NDrawerContent>
   </NDrawer>

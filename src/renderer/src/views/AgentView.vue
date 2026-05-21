@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  NDrawer,
-  NTooltip,
-  NText,
-  NButton,
-  NIcon,
-  NInput,
-  NSpin,
-  useMessage
-} from 'naive-ui'
+import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
 import {
   FolderOpenOutline,
   RefreshOutline,
@@ -149,6 +140,7 @@ onUnmounted(() => {
           AI 工具管理
           <span class="toolbar-badge">{{ agentCount }}</span>
         </h1>
+        <p class="toolbar-subtitle">管理已安装技能对应的 AI 编程工具，如 Claude Code、Cursor 等</p>
         <div class="toolbar-search">
           <NInput
             v-model:value="agentSearchKeyword"
@@ -366,6 +358,13 @@ onUnmounted(() => {
   border-radius: var(--radius-full);
   font-size: var(--text-body-sm);
   font-weight: var(--weight-semibold);
+}
+
+.toolbar-subtitle {
+  font-size: var(--text-body-sm);
+  color: var(--color-stone);
+  margin: 0;
+  width: 100%;
 }
 
 .toolbar-search {

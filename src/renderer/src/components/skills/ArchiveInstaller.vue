@@ -25,8 +25,6 @@ const {
   cleanup
 } = useSkillInstall()
 
-isGlobal.value = false
-
 const selectedFile = ref('')
 const extracting = ref(false)
 const scannedSkills = ref<ScannedSkill[]>([])
@@ -116,7 +114,6 @@ async function extractArchive(): Promise<void> {
     }
     scannedSkills.value = result.data.skills
     setSkills(result.data.skills)
-    isGlobal.value = false
     setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
       notification.info({

@@ -24,8 +24,6 @@ const {
   cleanup
 } = useSkillInstall()
 
-isGlobal.value = false
-
 const url = ref('')
 const parsing = ref(false)
 const downloadProgress = ref(0)
@@ -66,7 +64,6 @@ async function handleParse(): Promise<void> {
     scanResult.value = result.data
     parsedUrl.value = result.data.parsedUrl
     setSkills(result.data.skills)
-    isGlobal.value = false
     setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
       notification.info({
