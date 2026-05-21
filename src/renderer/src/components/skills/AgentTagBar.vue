@@ -28,7 +28,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
   <div v-if="agentTags.length > 0" class="agent-filter-panel">
     <button class="panel-header" @click="toggleExpand">
       <span class="panel-header-label">
-        筛选 Agent
+        筛选 AI 工具
         <span v-if="hasActiveFilter" class="panel-header-badge">
           {{ skillsStore.selectedAgents.length }}
         </span>

@@ -53,9 +53,9 @@ function handleCancel(): void {
       aria-modal="true"
     >
       <div class="remove-dialog-body">
-        <NText depth="3" class="remove-dialog-hint">选择删除范围：</NText>
+        <NText depth="3" class="remove-dialog-hint">选择删除范围</NText>
         <NRadioGroup v-model:value="selectedTarget" class="remove-dialog-radios">
-          <NRadio value="__all__">全部删除（{{ props.agents.length }} 个 agent）</NRadio>
+          <NRadio value="__all__">从所有 AI 工具中删除（共 {{ props.agents.length }} 个）</NRadio>
           <NRadio v-for="agent in props.agents" :key="agent.name" :value="agent.name">
             {{ getAgentLabel(agent.name) }}
           </NRadio>
@@ -63,12 +63,12 @@ function handleCancel(): void {
       </div>
       <template #footer>
         <div class="remove-dialog-footer">
-          <NButton round @click="handleCancel">取消</NButton>
+          <NButton round @click="handleCancel">保留技能</NButton>
           <NButton type="error" round @click="handleConfirm">
             <template #icon>
               <NIcon :size="14"><TrashOutline /></NIcon>
             </template>
-            确认删除
+            删除
           </NButton>
         </div>
       </template>

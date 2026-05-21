@@ -208,23 +208,21 @@ const failedLogLines = computed(() => {
     @update:show="handleClose"
   >
     <NCard title="安装技能" style="width: 620px">
-      <NText
-        >安装: <strong>{{ source }}</strong></NText
-      >
+      <NText>即将安装：{{ source }}</NText>
 
       <NSteps :current="currentStep" style="margin-top: var(--space-md)" size="small">
-        <NStep title="选择目标" />
-        <NStep title="确认安装" />
+        <NStep title="选择安装目标" />
+        <NStep title="确认并安装" />
       </NSteps>
 
       <!-- Step 1: Agent selection (unchanged) -->
       <div v-if="currentStep === 1" style="margin-top: var(--space-md)">
         <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
-          全局安装（不指定 agent）
+          全局安装（适用于所有 AI 工具）
         </NCheckbox>
 
         <div v-if="!isGlobal" class="agent-section">
-          <NText depth="3" class="section-label">常用 Agent</NText>
+          <NText depth="3" class="section-label">常用 AI 工具</NText>
           <NSpace :size="8" :wrap="true" class="common-agents">
             <NButton
               v-for="agent in commonAgents"
@@ -238,10 +236,10 @@ const failedLogLines = computed(() => {
             </NButton>
           </NSpace>
 
-          <NText depth="3" class="section-label">筛选 Agent</NText>
+          <NText depth="3" class="section-label">筛选 AI 工具</NText>
           <NInput
             v-model:value="filterText"
-            placeholder="搜索 agent..."
+            placeholder="搜索 AI 工具..."
             clearable
             size="small"
             class="filter-input"
@@ -272,7 +270,7 @@ const failedLogLines = computed(() => {
           </div>
 
           <NText depth="3" class="selected-count">
-            已选: {{ selectedAgents.length }} 个 agent
+            已选择 {{ selectedAgents.length }} 个 AI 工具
           </NText>
         </div>
       </div>
@@ -280,11 +278,11 @@ const failedLogLines = computed(() => {
       <!-- Step 2: Confirm and progress -->
       <div v-if="currentStep === 2" style="margin-top: var(--space-md)">
         <div class="confirm-row">
-          <NText depth="3">安装模式: </NText>
-          <NText>{{ isGlobal ? '全局安装' : '指定 Agent' }}</NText>
+          <NText depth="3">安装方式：</NText>
+          <NText>{{ isGlobal ? '所有 AI 工具' : '指定的 AI 工具' }}</NText>
         </div>
         <div v-if="!isGlobal && selectedAgents.length > 0" class="confirm-row">
-          <NText depth="3">选中 Agent: </NText>
+          <NText depth="3">选中的 AI 工具：</NText>
           <NSpace :size="4" :wrap="true" inline style="display: inline-flex">
             <NTag v-for="flag in selectedAgents" :key="flag" size="small" round type="info">
               {{ AGENTS.find((a) => a.agentFlag === flag)?.name || flag }}
@@ -354,7 +352,7 @@ const failedLogLines = computed(() => {
             <template #icon>
               <NIcon :size="16"><DownloadOutline /></NIcon>
             </template>
-            确认安装
+            开始安装
           </NButton>
           <NButton v-if="installStatus === 'failed'" type="primary" @click="handleRetry">
             重试

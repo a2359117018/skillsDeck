@@ -149,7 +149,7 @@ const activeRegistryDisplay = computed(() => {
     return customRegistryUrl.value.trim() || '未填写'
   }
   if (selectedRegistry.value === '') {
-    return '默认源'
+    return '官方源'
   }
   const preset = registryOptions.find((o) => o.value === selectedRegistry.value)
   return preset?.label || selectedRegistry.value
@@ -164,10 +164,10 @@ const effectiveProxyUrl = computed(() => {
 
 const activeProxyDisplay = computed(() => {
   if (selectedProxy.value === CUSTOM_PROXY_VALUE) {
-    return customProxyUrl.value.trim() || '未填写'
+    return customProxyUrl.value.trim() || '未设置'
   }
   if (selectedProxy.value === '') {
-    return '直接连接'
+    return '不使用代理'
   }
   const preset = proxyOptions.find((o) => o.value === selectedProxy.value)
   return preset?.label || selectedProxy.value
@@ -251,7 +251,7 @@ async function handleInstallNode(): Promise<void> {
     if (e instanceof Error && e.message === '下载已取消') {
       message.info('下载已取消')
     } else {
-      message.error(e instanceof Error ? e.message : '安装失败')
+      message.error(e instanceof Error ? e.message : 'Node.js 安装失败')
     }
   } finally {
     envDownloading.value = false
@@ -273,7 +273,7 @@ async function handleInstallSkills(): Promise<void> {
     message.success('skills CLI 安装成功')
     await envStore.check()
   } catch (e) {
-    message.error(e instanceof Error ? e.message : '安装失败')
+    message.error(e instanceof Error ? e.message : 'skills CLI 安装失败')
   } finally {
     skillsInstalling.value = false
   }
@@ -294,11 +294,11 @@ async function handleUpdateSkills(): Promise<void> {
   taskStore
     .start('update-skills', {
       onSuccess: () => {
-        message.success('skills 更新成功')
+        message.success('skills CLI 已更新')
         envStore.check()
       },
       onError: (err) => {
-        message.error(`skills 更新失败: ${err}`)
+        message.error(`skills CLI 更新失败: ${err}`)
       }
     })
     .catch((e) => {
@@ -339,13 +339,13 @@ async function handleUpdateAll(): Promise<void> {
       </NIcon>
       <div class="page-header-text">
         <h1 class="page-title">设置</h1>
-        <NText depth="3" class="page-desc">管理应用偏好、网络代理和技能更新</NText>
+        <NText depth="3" class="page-desc">调整应用设置、配置网络代理并管理技能更新</NText>
       </div>
     </div>
 
     <NCard class="settings-card">
       <NAlert v-if="hasUnsavedChanges" type="warning" :show-icon="false" class="unsaved-banner">
-        有未保存的改动
+        您有未保存的更改
       </NAlert>
 
       <!-- 通用设置 -->
@@ -355,7 +355,7 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-line" />
         </div>
         <NForm label-placement="left" label-width="140" class="settings-form">
-          <NFormItem label="默认安装目标">
+          <NFormItem label="默认安装的 AI 工具">
             <NSelect
               v-model:value="settingsStore.defaultAgent"
               :options="agentOptions"
@@ -363,7 +363,7 @@ async function handleUpdateAll(): Promise<void> {
               class="settings-select"
             />
           </NFormItem>
-          <NFormItem label="启动时检查环境">
+          <NFormItem label="启动时检查运行环境">
             <NSwitch v-model:value="settingsStore.autoCheckEnv" />
           </NFormItem>
         </NForm>
@@ -376,7 +376,7 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-line" />
         </div>
         <NForm label-placement="left" label-width="140" class="settings-form">
-          <NFormItem label="GitHub 代理">
+          <NFormItem label="GitHub 下载代理">
             <div class="proxy-field">
               <NSelect
                 v-model:value="selectedProxy"
@@ -405,12 +405,12 @@ async function handleUpdateAll(): Promise<void> {
                   <CheckmarkCircleOutline />
                 </NIcon>
                 <NText depth="3" class="proxy-active-text">
-                  当前生效：{{ activeProxyDisplay }}
+                  当前使用：{{ activeProxyDisplay }}
                 </NText>
               </div>
             </div>
           </NFormItem>
-          <NFormItem label="npm 镜像">
+          <NFormItem label="npm 镜像源（加速包下载）">
             <div class="proxy-field">
               <NSelect
                 v-model:value="selectedRegistry"
@@ -439,7 +439,7 @@ async function handleUpdateAll(): Promise<void> {
                   <CheckmarkCircleOutline />
                 </NIcon>
                 <NText depth="3" class="proxy-active-text">
-                  当前生效：{{ activeRegistryDisplay }}
+                  当前使用：{{ activeRegistryDisplay }}
                 </NText>
               </div>
             </div>
@@ -454,7 +454,7 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-line" />
         </div>
         <NForm label-placement="left" label-width="140" class="settings-form">
-          <NFormItem label="技能管理">
+          <NFormItem label="技能维护">
             <NButton
               round
               :disabled="skillsStore.installedSkills.length === 0"
@@ -463,7 +463,7 @@ async function handleUpdateAll(): Promise<void> {
               <template #icon>
                 <NIcon :size="14"><RefreshOutline /></NIcon>
               </template>
-              全部更新 ({{ skillsStore.installedSkills.length }})
+              更新全部技能 ({{ skillsStore.installedSkills.length }})
             </NButton>
           </NFormItem>
         </NForm>
@@ -561,7 +561,7 @@ async function handleUpdateAll(): Promise<void> {
               :border-radius="4"
               :fill-border-radius="4"
             />
-            <NButton size="small" round @click="handleCancelInstallNode"> 取消 </NButton>
+            <NButton size="small" round @click="handleCancelInstallNode"> 取消下载 </NButton>
           </div>
         </div>
 
@@ -576,7 +576,7 @@ async function handleUpdateAll(): Promise<void> {
               <template #icon>
                 <NIcon :size="14"><DownloadOutline /></NIcon>
               </template>
-              下载并安装 Node.js
+              下载并安装 Node.js（运行环境）
             </NButton>
             <NButton
               v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
@@ -588,13 +588,13 @@ async function handleUpdateAll(): Promise<void> {
               <template #icon>
                 <NIcon :size="14"><DownloadOutline /></NIcon>
               </template>
-              安装 skills CLI
+              安装 skills CLI（技能管理工具）
             </NButton>
             <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
               <template #icon>
                 <NIcon :size="14"><RefreshOutline /></NIcon>
               </template>
-              重新检测
+              重新检测环境
             </NButton>
           </div>
         </div>

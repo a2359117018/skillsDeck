@@ -60,7 +60,7 @@ export const useTaskStore = defineStore('tasks', () => {
             callbacks.get(t.id)?.onSuccess?.()
             callbacks.delete(t.id)
           } else if (t.status === 'error') {
-            callbacks.get(t.id)?.onError?.(t.error || '未知错误')
+            callbacks.get(t.id)?.onError?.(t.error || '操作失败，请稍后重试')
             callbacks.delete(t.id)
           }
         }

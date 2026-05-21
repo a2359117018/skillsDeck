@@ -16,7 +16,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
     <div class="result-card-header">
       <NText strong class="result-name">{{ result.name }}</NText>
       <div class="result-card-actions">
-        <div class="install-badge">{{ formatInstalls(result.installs) }} 次下载</div>
+        <div class="install-badge">{{ formatInstalls(result.installs) }} 次安装</div>
         <NButton size="small" round @click="emit('install', result.source)">
           <template #icon>
             <NIcon :size="16"><DownloadOutline /></NIcon>
@@ -29,7 +29,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
       <NText depth="3" code class="package-ref">{{ packageRef }}</NText>
     </div>
     <div class="result-card-footer">
-      <a :href="detailUrl" target="_blank" class="result-link">前往技能页面 ↗</a>
+      <a :href="detailUrl" target="_blank" class="result-link">查看详情 ↗</a>
     </div>
   </div>
 </template>

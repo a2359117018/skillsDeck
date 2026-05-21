@@ -120,15 +120,15 @@ async function extractArchive(): Promise<void> {
     setTempDir(result.data.tempDir)
     if (result.data.skills.length === 0) {
       notification.info({
-        title: '未扫描到技能文件',
-        content: '未在压缩包中发现有效的技能文件',
+        title: '未发现技能文件',
+        content: '该压缩包中没有有效的技能文件',
         duration: 5000
       })
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
     notification.error({
-      title: '解压扫描失败',
+      title: '解压或扫描失败',
       content: error.value,
       duration: 0
     })
@@ -175,7 +175,7 @@ onUnmounted(() => {
             </NIcon>
             <div class="drop-zone-text">
               <NText :depth="isDragging ? 1 : 3" style="font-weight: 500">
-                {{ isDragging ? '释放以导入' : '拖拽或点击选择压缩包' }}
+                {{ isDragging ? '松开鼠标以导入文件' : '拖拽或点击选择压缩包' }}
               </NText>
             </div>
           </div>
@@ -187,7 +187,7 @@ onUnmounted(() => {
         <!-- Loading indicator inside left column -->
         <div v-if="extracting" class="archive-loading">
           <NSpin size="large" />
-          <NText depth="3">正在解压扫描...</NText>
+          <NText depth="3">正在解压并扫描文件...</NText>
         </div>
 
         <div class="step-header">
@@ -211,7 +211,7 @@ onUnmounted(() => {
       <div class="column-right">
         <div class="step-header">
           <span class="step-number">2</span>
-          <span class="step-title">选择目标</span>
+          <span class="step-title">选择安装目标</span>
         </div>
 
         <div class="agent-area">

@@ -146,13 +146,13 @@ onUnmounted(() => {
       <!-- Toolbar -->
       <div class="toolbar">
         <h1 class="toolbar-title">
-          Agent 管理
+          AI 工具管理
           <span class="toolbar-badge">{{ agentCount }}</span>
         </h1>
         <div class="toolbar-search">
           <NInput
             v-model:value="agentSearchKeyword"
-            placeholder="搜索 Agent..."
+            placeholder="搜索 AI 工具名称..."
             clearable
             size="large"
             class="toolbar-search-input"

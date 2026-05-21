@@ -52,8 +52,7 @@ function handleLocalInstallComplete(): void {
               <div class="search-results">
                 <div class="search-meta">
                   <NText depth="3" class="search-meta-text">
-                    搜索耗时 {{ (skillsStore.searchDuration / 1000).toFixed(1) }} 秒，共
-                    {{ skillsStore.searchResults.length }} 个结果
+                    找到 {{ skillsStore.searchResults.length }} 个技能
                   </NText>
                 </div>
                 <div class="search-grid">
@@ -67,8 +66,8 @@ function handleLocalInstallComplete(): void {
                 <EmptyState
                   v-if="skillsStore.searchResults.length === 0"
                   :icon="SearchOutline"
-                  title="无搜索结果"
-                  description="尝试使用不同的关键词，或缩短搜索词"
+                  title="未找到相关技能"
+                  description="尝试使用其他关键词重新搜索"
                 />
               </div>
             </template>

@@ -89,9 +89,9 @@ const themeOverrides: GlobalThemeOverrides = {
             <main class="content-area">
               <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
                 <div class="env-banner-inner">
-                  <span>运行环境不完整，部分功能可能无法使用</span>
+                  <span>缺少必要的运行组件，部分功能可能无法使用</span>
                   <NButton size="small" round type="warning" @click="goToSettings">
-                    去安装
+                    前往设置
                   </NButton>
                 </div>
               </NAlert>

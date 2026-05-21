@@ -66,7 +66,7 @@ const hasCompletedTasks = computed(() =>
             <template #icon>
               <NIcon :size="14"><TrashOutline /></NIcon>
             </template>
-            清除已完成
+            清除已完成任务
           </NButton>
         </div>
       </template>

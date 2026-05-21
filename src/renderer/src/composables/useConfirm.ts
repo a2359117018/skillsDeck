@@ -14,8 +14,8 @@ export function useConfirm(): {
     return new Promise((resolve) => {
       dialog.info({
         title: '安装确认',
-        content: `确定要安装「${name}」技能？`,
-        positiveText: '确认安装',
+        content: `要安装「${name}」技能吗？`,
+        positiveText: '安装',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
         onNegativeClick: () => resolve(false),
@@ -29,8 +29,8 @@ export function useConfirm(): {
     return new Promise((resolve) => {
       dialog.info({
         title: '更新确认',
-        content: `确定要更新「${name}」技能？`,
-        positiveText: '确认更新',
+        content: `要更新「${name}」技能吗？`,
+        positiveText: '更新',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
         onNegativeClick: () => resolve(false),
@@ -44,8 +44,8 @@ export function useConfirm(): {
     return new Promise((resolve) => {
       dialog.warning({
         title: '删除确认',
-        content: `确定要删除「${name}」技能？此操作不可撤销。`,
-        positiveText: '确认删除',
+        content: `删除「${name}」技能后无法恢复，确认删除吗？`,
+        positiveText: '删除',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
         onNegativeClick: () => resolve(false),
@@ -62,7 +62,7 @@ export function useConfirm(): {
       names.length > maxShow ? `...等 ${names.length} 个技能` : `共 ${names.length} 个技能`
 
     const contentVNode = h('div', [
-      h('p', { style: 'margin-bottom: 8px' }, '确定要更新以下技能？'),
+      h('p', { style: 'margin-bottom: 8px' }, '要更新以下技能吗？'),
       h('p', { style: 'color: #666; font-size: 13px' }, displayed),
       h('p', { style: 'color: #999; font-size: 12px; margin-top: 8px' }, suffix)
     ])
@@ -71,7 +71,7 @@ export function useConfirm(): {
       dialog.info({
         title: '全部更新确认',
         content: () => contentVNode,
-        positiveText: '确认更新',
+        positiveText: '全部更新',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
         onNegativeClick: () => resolve(false),
@@ -87,7 +87,7 @@ export function useConfirm(): {
         title: `更新 ${name}`,
         content: () =>
           h('div', null, [
-            h('p', null, `确定更新 ${name} 吗？`),
+            h('p', null, `要更新 ${name} 吗？`),
             h(
               'p',
               {
@@ -97,10 +97,10 @@ export function useConfirm(): {
                   marginTop: '8px'
                 }
               },
-              `当前版本 ${version || 'unknown'}，更新期间相关功能可能暂时不可用。`
+              `当前版本 ${version || '未知'}，更新期间相关功能可能暂时不可用。`
             )
           ]),
-        positiveText: '确定更新',
+        positiveText: '更新',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
         onNegativeClick: () => resolve(false),

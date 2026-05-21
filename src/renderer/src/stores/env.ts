@@ -28,7 +28,7 @@ export const useEnvStore = defineStore('env', () => {
       await statusCache.ensure()
       error.value = null
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Environment check failed'
+      error.value = e instanceof Error ? e.message : '环境检测失败，请检查网络连接'
     }
   }
 
@@ -42,7 +42,7 @@ export const useEnvStore = defineStore('env', () => {
       statusCache.invalidate()
       await check()
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Node.js install failed'
+      error.value = e instanceof Error ? e.message : 'Node.js 安装失败，请重试'
     } finally {
       downloading.value = false
     }

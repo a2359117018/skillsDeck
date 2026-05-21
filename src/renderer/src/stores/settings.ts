@@ -29,7 +29,7 @@ export const useSettingsStore = defineStore('settings', () => {
       npmRegistry.value = data.npmRegistry || ''
       error.value = null
     } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Failed to load settings'
+      error.value = e instanceof Error ? e.message : '设置加载失败'
     }
   }
 
@@ -45,7 +45,7 @@ export const useSettingsStore = defineStore('settings', () => {
       await load()
       error.value = null
     } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Failed to save settings'
+      error.value = e instanceof Error ? e.message : '设置保存失败'
       throw e
     }
   }

@@ -70,11 +70,11 @@ function toggleGlobal(val: boolean): void {
 <template>
   <div class="agent-selector">
     <NCheckbox :checked="isGlobal" @update:checked="toggleGlobal">
-      全局安装（不指定 agent）
+      全局安装（适用于所有 AI 工具）
     </NCheckbox>
 
     <div :class="['agent-section', { disabled: isGlobal }]">
-      <NText depth="3" class="section-label">常用 Agent</NText>
+      <NText depth="3" class="section-label">常用 AI 工具</NText>
       <NSpace :size="8" :wrap="true" class="common-agents">
         <NButton
           v-for="agent in commonAgents"
@@ -88,10 +88,10 @@ function toggleGlobal(val: boolean): void {
         </NButton>
       </NSpace>
 
-      <NText depth="3" class="section-label">筛选 Agent</NText>
+      <NText depth="3" class="section-label">筛选 AI 工具</NText>
       <NInput
         v-model:value="filterText"
-        placeholder="搜索 agent..."
+        placeholder="搜索 AI 工具名称..."
         clearable
         size="small"
         class="filter-input"

@@ -20,9 +20,9 @@ const emit = defineEmits<{
 
 /** 任务类型到中文名称的映射 */
 const TASK_LABELS: Record<string, string> = {
-  'update-skills': '更新 skills CLI',
+  'update-skills': '更新 skills 命令行工具',
   'install-node': '安装 Node.js',
-  'install-skills': '安装 skills CLI',
+  'install-skills': '安装 skills 命令行工具',
   'skill-update': '更新技能',
   'skill-update-all': '批量更新技能'
 }
@@ -39,7 +39,7 @@ const STATUS_CONFIG: Record<
     color: 'var(--color-success-text)',
     icon: CheckmarkCircleOutline
   },
-  error: { label: '失败', color: 'var(--color-error)', icon: CloseCircleOutline },
+  error: { label: '执行失败', color: 'var(--color-error)', icon: CloseCircleOutline },
   cancelled: { label: '已取消', color: 'var(--color-muted)', icon: StopCircleOutline }
 }
 

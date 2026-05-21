@@ -156,9 +156,9 @@ onUnmounted(() => {
               :disabled="parsing || !url.trim()"
               @click="handleParse"
             >
-              解析
+              分析仓库
             </NButton>
-            <NButton v-else @click="handleReparse"> 重新解析 </NButton>
+            <NButton v-else @click="handleReparse"> 重新分析 </NButton>
           </div>
         </div>
 
@@ -185,7 +185,7 @@ onUnmounted(() => {
       <div class="column-right">
         <div class="step-header">
           <span class="step-number">2</span>
-          <span class="step-title">选择目标</span>
+          <span class="step-title">选择安装目标</span>
         </div>
 
         <div class="agent-area">
@@ -219,7 +219,7 @@ onUnmounted(() => {
     <!-- Progress dialog -->
     <NModal v-model:show="showDialog" :mask-closable="false" :close-on-esc="false">
       <div class="progress-dialog">
-        <NText strong class="progress-dialog-title">正在解析仓库</NText>
+        <NText strong class="progress-dialog-title">正在从 GitHub 下载并分析仓库...</NText>
         <NProgress
           type="line"
           :percentage="downloadProgress"

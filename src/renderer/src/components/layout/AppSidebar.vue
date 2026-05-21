@@ -24,7 +24,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { key: 'search', icon: SearchOutline, label: '搜索技能' },
   { key: 'installed', icon: CubeOutline, label: '已安装' },
-  { key: 'agent-view', icon: GitMergeOutline, label: 'Agent 管理' },
+  { key: 'agent-view', icon: GitMergeOutline, label: 'AI 工具' },
   { key: 'settings', icon: SettingsOutline, label: '设置' }
 ]
 
