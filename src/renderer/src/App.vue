@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref, computed, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import {
   NConfigProvider,
   NMessageProvider,
@@ -13,10 +13,13 @@ import {
 import AppSidebar from './components/layout/AppSidebar.vue'
 import TaskDrawer from './components/tasks/TaskDrawer.vue'
 import { useEnvStore } from './stores/env'
+import { useSkillsStore } from './stores/skills'
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
 const envStore = useEnvStore()
+const skillsStore = useSkillsStore()
 const router = useRouter()
+const route = useRoute()
 
 const isMainWindow = windowType === 'main'
 const taskDrawerVisible = ref(false)
@@ -30,10 +33,35 @@ const envBannerVisible = computed(
   () => isMainWindow && !envStore.fetching && envStore.status !== null && !envOk.value
 )
 
+/**
+ * Global keyboard shortcut handler.
+ * - `/` or `Ctrl/Cmd + K` → focus search input on search page
+ * - `Escape` → close modals/drawers (handled by NaiveUI, but we ensure router back if needed)
+ */
+function handleKeydown(e: KeyboardEvent): void {
+  const tag = (e.target as HTMLElement)?.tagName?.toLowerCase()
+  const isInputFocused = tag === 'input' || tag === 'textarea' || (e.target as HTMLElement)?.isContentEditable
+
+  // Ctrl/Cmd + K or / (when not in input)
+  if ((e.key === 'k' && (e.ctrlKey || e.metaKey)) || (e.key === '/' && !isInputFocused)) {
+    e.preventDefault()
+    if (route.name !== 'search') {
+      router.push({ name: 'search' })
+    }
+    skillsStore.triggerFocusSearch()
+    return
+  }
+}
+
 onMounted(() => {
   if (isMainWindow) {
     envStore.check()
   }
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 
 function goToSettings(): void {

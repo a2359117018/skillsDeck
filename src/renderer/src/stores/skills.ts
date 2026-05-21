@@ -40,6 +40,9 @@ export const useSkillsStore = defineStore('skills', () => {
     ((msg: string, type: 'success' | 'warning' | 'error') => void) | null
   >(null)
 
+  /** Flag to trigger search input focus from global keyboard shortcuts */
+  const focusSearchTrigger = ref(0)
+
   const agentScanCache = useCachedResource<AgentScanResult[]>(
     async () => unwrapResult(await window.api.agents.scanAll()),
     []
@@ -102,6 +105,13 @@ export const useSkillsStore = defineStore('skills', () => {
     handler: (msg: string, type: 'success' | 'warning' | 'error') => void
   ): void {
     _openLocationMessage.value = handler
+  }
+
+  /**
+   * Trigger search input focus. Incrementing counter allows watchers to react.
+   */
+  function triggerFocusSearch(): void {
+    focusSearchTrigger.value++
   }
 
   async function search(keyword: string): Promise<void> {
@@ -213,11 +223,13 @@ export const useSkillsStore = defineStore('skills', () => {
     refreshing,
     error,
     searchKeyword,
+    focusSearchTrigger,
     clearError,
     setSearchKeyword,
     toggleAgent,
     clearAgentFilter,
     setMessageHandler,
+    triggerFocusSearch,
     search,
     fetchInstalled,
     install,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
 import { SearchOutline } from '@vicons/ionicons5'
 import { useSkillsStore } from '@renderer/stores/skills'
@@ -15,6 +15,17 @@ const showInstallDialog = ref(false)
 const selectedSource = ref('')
 const hasSearched = ref(false)
 const activeTab = ref('search')
+
+/** Watch for global shortcut trigger and focus the search input */
+watch(
+  () => skillsStore.focusSearchTrigger,
+  () => {
+    nextTick(() => {
+      const input = document.querySelector('.search-input input') as HTMLInputElement | null
+      input?.focus()
+    })
+  }
+)
 
 const SUGGESTIONS = ['code-review', 'testing', 'debug', 'docs']
 

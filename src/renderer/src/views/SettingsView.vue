@@ -343,6 +343,29 @@ async function handleUpdateAll(): Promise<void> {
       </div>
     </div>
 
+    <!-- Guided setup banner for first-time users -->
+    <div
+      v-if="!envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled"
+      class="setup-welcome-banner"
+    >
+      <div class="setup-welcome-title">首次使用？请先完成运行环境配置，然后设置你的偏好选项。</div>
+      <div class="setup-welcome-checklist">
+        <span class="setup-step" :class="{ 'setup-step--done': envStore.status?.nodeInstalled }">
+          1. 安装 Node.js
+        </span>
+        <span class="setup-step-divider">→</span>
+        <span class="setup-step" :class="{ 'setup-step--done': envStore.status?.skillsInstalled }">
+          2. 安装 skills CLI
+        </span>
+        <span class="setup-step-divider">→</span>
+        <span class="setup-step" :class="{ 'setup-step--done': settingsStore.defaultAgent }">
+          3. 选择默认 Agent
+        </span>
+        <span class="setup-step-divider">→</span>
+        <span class="setup-step">4. 保存设置</span>
+      </div>
+    </div>
+
     <NCard class="settings-card">
       <NAlert v-if="hasUnsavedChanges" type="warning" :show-icon="false" class="unsaved-banner">
         您有未保存的更改
@@ -475,10 +498,17 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-title">运行环境</span>
           <span class="section-line" />
         </div>
-        <NText depth="3" style="display: block; margin-bottom: var(--space-md); font-size: var(--text-body-sm)">
-          NPX Skills UI 依赖 Node.js 和 npx skills CLI 来安装、更新和管理技能。
-        </NText>
-        <div class="env-checks">
+        <div
+          class="env-checks-wrapper"
+          :class="{ 'env-checks-wrapper--missing': !envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled }"
+        >
+          <NText
+            depth="3"
+            style="display: block; margin-bottom: var(--space-md); font-size: var(--text-body-sm)"
+          >
+            需要 Node.js 和 skills CLI 才能安装和管理技能
+          </NText>
+          <div class="env-checks">
           <div class="env-check-item">
             <div
               class="env-check-icon"
@@ -550,6 +580,8 @@ async function handleUpdateAll(): Promise<void> {
           </div>
         </div>
 
+        </div>
+
         <div v-if="envDownloading" class="env-actions">
           <div class="env-download-progress">
             <div class="env-progress-header">
@@ -579,7 +611,7 @@ async function handleUpdateAll(): Promise<void> {
               <template #icon>
                 <NIcon :size="14"><DownloadOutline /></NIcon>
               </template>
-              下载并安装 Node.js（运行环境）
+              去安装 Node.js（运行环境）
             </NButton>
             <NButton
               v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
@@ -887,5 +919,55 @@ async function handleUpdateAll(): Promise<void> {
 
 .unsaved-banner :deep(.n-alert-body) {
   padding: 10px 16px;
+}
+
+/* Guided setup welcome banner */
+.setup-welcome-banner {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-xl);
+  background: var(--color-brand-blue-200);
+  color: var(--color-brand-blue-deep);
+}
+
+.setup-welcome-title {
+  font-size: var(--text-body-md);
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--space-sm);
+}
+
+.setup-welcome-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-body-sm);
+}
+
+.setup-step {
+  font-weight: var(--weight-medium);
+  opacity: 0.85;
+}
+
+.setup-step--done {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.setup-step-divider {
+  opacity: 0.6;
+}
+
+/* Environment checks wrapper with warning styling when missing */
+.env-checks-wrapper {
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.env-checks-wrapper--missing {
+  background: var(--color-warning-bg);
+  border-color: rgba(240, 160, 32, 0.35);
 }
 </style>
