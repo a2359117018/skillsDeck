@@ -6,12 +6,6 @@ export const isNavigating = ref(false)
 const routes = [
   { path: '/', name: 'installed', component: () => import('../views/InstalledList.vue') },
   { path: '/search', name: 'search', component: () => import('../views/SkillsSearch.vue') },
-  {
-    path: '/skill/:packageRef',
-    name: 'skill-detail',
-    component: () => import('../views/SkillDetail.vue'),
-    props: true
-  },
   { path: '/agent-view', name: 'agent-view', component: () => import('../views/AgentView.vue') },
   { path: '/env', name: 'env', component: () => import('../views/SettingsView.vue') },
   { path: '/settings', name: 'settings', component: () => import('../views/SettingsView.vue') }

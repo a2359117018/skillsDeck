@@ -41,7 +41,6 @@ minHeight: 800
 | `InstalledList.vue` | `max-width: 960px`                                | 移除 max-width；保留 min-height 用于空状态            |
 | `AgentView.vue`     | `max-width: 960px` + 固定 3 列 + drawer width 500 | 移除 max-width；网格改 `auto-fill`；drawer 改相对宽度 |
 | `SettingsView.vue`  | `max-width: 720px` + label-width 140 + FAB fixed  | 移除 max-width；label 改弹性；FAB 保留但确认不遮挡    |
-| `SkillDetail.vue`   | 无水平 padding + `max-width: 900px`               | 添加水平 padding；移除 max-width                      |
 
 ### 组件
 

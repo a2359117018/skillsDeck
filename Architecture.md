@@ -60,11 +60,10 @@ NPX Skills UI
 │   │       ├── main.ts                # Vue 应用入口
 │   │       ├── App.vue                # 根组件：主题、侧边栏、路由视图
 │   │       ├── router/
-│   │       │   └── index.ts           # Hash 路由（6 条路由）
+│   │       │   └── index.ts           # Hash 路由（5 条路由）
 │   │       ├── views/                 # 页面组件
 │   │       │   ├── InstalledList.vue   # / — 已安装技能列表
 │   │       │   ├── SkillsSearch.vue    # /search — 技能搜索
-│   │       │   ├── SkillDetail.vue     # /skill/:packageRef — 技能详情
 │   │       │   ├── AgentView.vue       # /agent-view — Agent 管理
 │   │       │   └── SettingsView.vue    # /env, /settings — 设置与环境
 │   │       ├── components/            # 可复用组件
@@ -148,7 +147,7 @@ graph TB
     subgraph Renderer["渲染进程 (Chromium + Vue 3)"]
         App["App.vue"]
         Router["Vue Router<br/>Hash 模式"]
-        Views["Views (5 页面)"]
+        Views["Views (4 页面)"]
         Stores["Pinia Stores<br/>4 个 Store"]
         Comps["Components"]
 
@@ -265,9 +264,8 @@ graph TB
     subgraph Router["路由（Hash 模式）"]
         R1[/"/"<br/>InstalledList/]
         R2[/"/search"<br/>SkillsSearch/]
-        R3[/"/skill/:packageRef"<br/>SkillDetail/]
-        R4[/"/agent-view"<br/>AgentView/]
-        R5[/"/env, /settings"<br/>SettingsView/]
+        R3[/"/agent-view"<br/>AgentView/]
+        R4[/"/env, /settings"<br/>SettingsView/]
     end
 
     subgraph Stores["Pinia Stores"]
@@ -645,7 +643,6 @@ interface SkillSearchResponse {
 | -------------------- | -------------- | ------------------- | --------------------------------------------------- |
 | `/`                  | `installed`    | `InstalledList.vue` | 已安装技能列表（首页）                              |
 | `/search`            | `search`       | `SkillsSearch.vue`  | 技能搜索                                            |
-| `/skill/:packageRef` | `skill-detail` | `SkillDetail.vue`   | 技能详情页，`packageRef` 格式：`owner/repo@version` |
 | `/agent-view`        | `agent-view`   | `AgentView.vue`     | Agent 管理（卡片网格 + 抽屉详情）                   |
 | `/env`               | `env`          | `SettingsView.vue`  | 环境检测与修复                                      |
 | `/settings`          | `settings`     | `SettingsView.vue`  | 应用设置（别名路由）                                |
