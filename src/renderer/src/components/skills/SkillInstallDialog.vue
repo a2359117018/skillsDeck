@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted, watch } from 'vue'
+import { ref, computed, nextTick, onUnmounted, watch } from 'vue'
 import {
   NModal,
   NCard,
@@ -12,8 +12,6 @@ import {
   NText,
   NTag,
   NIcon,
-  NProgress,
-  NScrollbar,
   useMessage
 } from 'naive-ui'
 import { DownloadOutline, CheckmarkCircle, CloseCircle } from '@vicons/ionicons5'
@@ -37,35 +35,14 @@ const filterText = ref('')
 const installing = ref(false)
 const installStatus = ref<'idle' | 'installing' | 'success' | 'failed' | 'cancelled'>('idle')
 const commandOutput = ref('')
-const simulatedProgress = ref(0)
-let progressTimer: ReturnType<typeof setTimeout> | null = null
+const terminalRef = ref<HTMLElement | null>(null)
 
-function startProgressSimulation(): void {
-  simulatedProgress.value = 0
-  const startTime = Date.now()
-
-  function tick(): void {
-    const elapsed = (Date.now() - startTime) / 1000
-    if (elapsed < 3) {
-      simulatedProgress.value = Math.min(85, simulatedProgress.value + 3 + Math.random() * 2)
-      progressTimer = setTimeout(tick, 200)
-    } else if (elapsed < 6) {
-      simulatedProgress.value = Math.min(92, simulatedProgress.value + 1 + Math.random() * 2)
-      progressTimer = setTimeout(tick, 300)
-    } else {
-      simulatedProgress.value = Math.min(92, simulatedProgress.value + Math.random())
-      progressTimer = setTimeout(tick, 500)
-    }
-  }
-
-  progressTimer = setTimeout(tick, 200)
-}
-
-function stopProgressSimulation(): void {
-  if (progressTimer) {
-    clearTimeout(progressTimer)
-    progressTimer = null
-  }
+/** 自动滚动终端输出到底部 */
+function scrollTerminalToBottom(): void {
+  nextTick(() => {
+    const el = terminalRef.value
+    if (el) el.scrollTop = el.scrollHeight
+  })
 }
 
 const commonAgents = getCommonAgents()
@@ -141,10 +118,10 @@ async function handleInstall(): Promise<void> {
   installing.value = true
   installStatus.value = 'installing'
   commandOutput.value = ''
-  startProgressSimulation()
 
   removeOutputListener = window.api.skills.onInstallOutput((text) => {
     commandOutput.value += text
+    scrollTerminalToBottom()
   })
 
   try {
@@ -153,9 +130,7 @@ async function handleInstall(): Promise<void> {
       selectedAgents.value,
       isGlobal.value
     )
-    stopProgressSimulation()
     if (result.success) {
-      simulatedProgress.value = 100
       installStatus.value = 'success'
       setTimeout(() => {
         emit('update:show', false)
@@ -165,9 +140,9 @@ async function handleInstall(): Promise<void> {
       installStatus.value = 'failed'
     }
   } catch (error) {
-    stopProgressSimulation()
     const errMsg = error instanceof Error ? error.message : String(error)
     commandOutput.value += errMsg
+    scrollTerminalToBottom()
     installStatus.value = 'failed'
     message.error('安装失败: ' + errMsg)
   } finally {
@@ -180,9 +155,9 @@ async function handleInstall(): Promise<void> {
 }
 
 async function handleCancelInstall(): Promise<void> {
-  stopProgressSimulation()
   await window.api.skills.cancelInstall()
   commandOutput.value += '\n安装已取消'
+  scrollTerminalToBottom()
   installStatus.value = 'cancelled'
   installing.value = false
   if (removeOutputListener) {
@@ -210,11 +185,9 @@ function resetState(): void {
   installing.value = false
   installStatus.value = 'idle'
   commandOutput.value = ''
-  simulatedProgress.value = 0
 }
 
 onUnmounted(() => {
-  stopProgressSimulation()
   if (removeOutputListener) {
     removeOutputListener()
     removeOutputListener = null
@@ -319,24 +292,20 @@ const failedLogLines = computed(() => {
           </NSpace>
         </div>
 
-        <!-- Installing state -->
+        <!-- Installing state: real CLI output -->
         <div v-if="installStatus === 'installing'" class="install-progress">
           <div class="progress-header">
             <NText depth="3" class="progress-label">正在安装中...</NText>
-            <NText strong class="progress-percent">{{ Math.round(simulatedProgress) }}%</NText>
+            <NButton size="tiny" round class="progress-cancel-btn" @click="handleCancelInstall">
+              取消安装
+            </NButton>
           </div>
-          <NProgress
-            type="line"
-            :percentage="simulatedProgress"
-            :show-indicator="false"
-            :height="8"
-            :border-radius="4"
-            :fill-border-radius="4"
-            status="default"
-          />
-          <NButton size="small" round class="progress-cancel-btn" @click="handleCancelInstall">
-            取消安装
-          </NButton>
+          <div
+            ref="terminalRef"
+            class="install-terminal"
+          >
+            <pre class="terminal-content">{{ commandOutput || '等待输出...' }}</pre>
+          </div>
         </div>
 
         <!-- Success state -->
@@ -350,9 +319,7 @@ const failedLogLines = computed(() => {
           <NIcon :size="48" color="#d03050"><CloseCircle /></NIcon>
           <NText type="error">安装失败</NText>
           <div v-if="commandOutput" class="failed-log">
-            <NScrollbar style="max-height: 200px">
               <pre class="terminal-content">{{ failedLogLines.join('\n') }}</pre>
-            </NScrollbar>
           </div>
         </div>
 
@@ -456,7 +423,7 @@ const failedLogLines = computed(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-lg) 0;
+  padding: var(--space-md) 0;
 }
 
 .progress-header {
@@ -469,16 +436,16 @@ const failedLogLines = computed(() => {
   font-size: var(--text-body-sm);
 }
 
-.progress-percent {
-  font-size: var(--text-body-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--color-ink);
-  font-variant-numeric: tabular-nums;
+.progress-cancel-btn {
+  flex-shrink: 0;
 }
 
-.progress-cancel-btn {
-  align-self: flex-end;
-  margin-top: var(--space-xs);
+.install-terminal {
+  max-height: 240px;
+  overflow-y: auto;
+  background: #1e1e1e;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
 }
 
 .install-result {

@@ -413,8 +413,8 @@ onUnmounted(() => {
 
 /* Card Color Themes */
 .agent-card.color-0 {
-  background: #fff5f2;
-  border-color: #ffe0d6;
+  background: var(--color-agent-coral-bg);
+  border-color: var(--color-agent-coral-border);
 }
 .agent-card.color-0:hover {
   box-shadow:
@@ -429,8 +429,8 @@ onUnmounted(() => {
 }
 
 .agent-card.color-1 {
-  background: #eff6ff;
-  border-color: #dbeafe;
+  background: var(--color-agent-blue-bg);
+  border-color: var(--color-agent-blue-border);
 }
 .agent-card.color-1:hover {
   box-shadow:
@@ -445,8 +445,8 @@ onUnmounted(() => {
 }
 
 .agent-card.color-2 {
-  background: #fdf2f8;
-  border-color: #fce7f3;
+  background: var(--color-agent-magenta-bg);
+  border-color: var(--color-agent-magenta-border);
 }
 .agent-card.color-2:hover {
   box-shadow:
@@ -461,8 +461,8 @@ onUnmounted(() => {
 }
 
 .agent-card.color-3 {
-  background: #faf5ff;
-  border-color: #f3e8ff;
+  background: var(--color-agent-purple-bg);
+  border-color: var(--color-agent-purple-border);
 }
 .agent-card.color-3:hover {
   box-shadow:
@@ -518,12 +518,12 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: white;
+  background: var(--color-canvas);
 }
 
 /* Drawer Header - 紧凑一行布局 */
 .drawer-header {
-  padding: 12px 20px;
+  padding: var(--space-sm) var(--space-lg);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-hairline);
   display: flex;
@@ -535,15 +535,15 @@ onUnmounted(() => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-sm);
 }
 
 .header-avatar {
   width: 38px;
   height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #2563eb, #06b6d4);
-  color: white;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-brand-blue-600), #06b6d4);
+  color: var(--color-canvas);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -566,8 +566,8 @@ onUnmounted(() => {
 
 .header-count {
   font-size: var(--text-caption);
-  color: #475569;
-  background: rgba(37, 99, 235, 0.08);
+  color: var(--color-stone);
+  background: var(--color-brand-blue-tint);
   padding: 2px 8px;
   border-radius: var(--radius-full);
   width: fit-content;
@@ -576,52 +576,52 @@ onUnmounted(() => {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xxs);
 }
 
 .header-icon-btn {
   width: 34px !important;
   height: 34px !important;
-  color: #475569 !important;
+  color: var(--color-stone) !important;
 }
 
 .header-icon-btn:hover {
-  background: rgba(37, 99, 235, 0.08) !important;
-  color: #2563eb !important;
+  background: var(--color-brand-blue-tint) !important;
+  color: var(--color-brand-blue-600) !important;
 }
 
 /* Drawer Body - 卡片列表 */
 .drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: #eff6ff;
+  gap: var(--space-xs);
+  background: var(--color-agent-blue-bg);
 }
 
 /* Skill Card */
 .skill-card {
-  background: white;
-  border: 1px solid rgba(37, 99, 235, 0.1);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-brand-blue-tint);
   border-radius: var(--radius-lg);
-  padding: 12px 16px;
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 150ms ease;
+  transition: all var(--transition-base);
 }
 
 .skill-card:hover {
-  border-color: #2563eb;
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.1);
+  border-color: var(--color-brand-blue-600);
+  box-shadow: 0 2px 12px var(--color-brand-blue-tint);
 }
 
 .skill-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-sm);
   min-width: 0;
   flex: 1;
 }
@@ -630,8 +630,8 @@ onUnmounted(() => {
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  background: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
+  background: var(--color-brand-blue-tint);
+  color: var(--color-brand-blue-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -652,24 +652,24 @@ onUnmounted(() => {
 /* Action Buttons */
 .skill-actions {
   display: flex;
-  gap: 4px;
+  gap: var(--space-xxs);
   flex-shrink: 0;
 }
 
 .action-btn {
   width: 32px !important;
   height: 32px !important;
-  color: #475569 !important;
+  color: var(--color-stone) !important;
 }
 
 .action-btn.update:hover {
-  background: rgba(37, 99, 235, 0.08) !important;
-  color: #2563eb !important;
+  background: var(--color-brand-blue-tint) !important;
+  color: var(--color-brand-blue-600) !important;
 }
 
 .action-btn.delete:hover {
-  background: #fef2f2 !important;
-  color: #ef4444 !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
 }
 </style>
 

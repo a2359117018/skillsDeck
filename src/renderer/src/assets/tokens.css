@@ -35,6 +35,20 @@
   --color-brand-magenta-light: #ff6ec7;
   --color-brand-coral-dark: #e64720;
 
+  /* Agent card tints (four-color cycling) */
+  --color-agent-coral-bg: #fff5f2;
+  --color-agent-coral-border: #ffe0d6;
+  --color-agent-blue-bg: #eff6ff;
+  --color-agent-blue-border: #dbeafe;
+  --color-agent-magenta-bg: #fdf2f8;
+  --color-agent-magenta-border: #fce7f3;
+  --color-agent-purple-bg: #faf5ff;
+  --color-agent-purple-border: #f3e8ff;
+
+  /* Agent drawer interactive tints */
+  --color-brand-blue-tint: rgba(37, 99, 235, 0.08);
+  --color-brand-blue-600: #2563eb;
+
   /* Semantic */
   --color-success-bg: #dcfce7;
   --color-success-text: #166534;
@@ -44,7 +58,7 @@
   /* Sidebar */
   --sidebar-bg-start: #0a0a0a;
   --sidebar-bg-end: #1a1a2e;
-  --sidebar-width: 60px;
+  --sidebar-width: 72px;
   --sidebar-icon-color: rgba(255, 255, 255, 0.55);
   --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
   --sidebar-icon-active-color: #ffffff;

@@ -41,9 +41,10 @@ function navigate(key: string): void {
           @click="navigate(item.key)"
         >
           <div class="active-bar"></div>
-          <NIcon :size="24">
+          <NIcon :size="22">
             <component :is="item.icon" />
           </NIcon>
+          <span class="sidebar-label">{{ item.label }}</span>
         </button>
       </template>
     </nav>
@@ -94,11 +95,13 @@ function navigate(key: string): void {
 
 .sidebar-item {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  padding: 6px 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -133,5 +136,14 @@ function navigate(key: string): void {
 
 .sidebar-item.active .active-bar {
   transform: translateY(-50%) scaleY(1);
+}
+
+.sidebar-label {
+  font-size: 9px;
+  line-height: 1.2;
+  color: inherit;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
 }
 </style>
