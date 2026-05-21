@@ -31,7 +31,6 @@ export const useSkillsStore = defineStore('skills', () => {
   const selectedAgents = ref<string[]>([])
   const searchKeyword = ref('')
   const _searchResults = ref<SkillSearchResult[]>([])
-  const _searchDuration = ref(0)
   const installing = ref(false)
   const removing = ref(false)
   const searching = ref(false)
@@ -78,7 +77,6 @@ export const useSkillsStore = defineStore('skills', () => {
   )
 
   const searchResults = computed(() => _searchResults.value)
-  const searchDuration = computed(() => _searchDuration.value)
 
   function clearError(): void {
     error.value = null
@@ -121,11 +119,9 @@ export const useSkillsStore = defineStore('skills', () => {
       const result = await window.api.skills.search(keyword)
       const response = unwrapResult(result)
       _searchResults.value = response.skills
-      _searchDuration.value = response.duration_ms
     } catch (e) {
       error.value = extractError(e)
       _searchResults.value = []
-      _searchDuration.value = 0
     } finally {
       searching.value = false
     }
@@ -210,7 +206,6 @@ export const useSkillsStore = defineStore('skills', () => {
 
   return {
     searchResults,
-    searchDuration,
     installedSkills,
     selectedAgents,
     filteredSkills,

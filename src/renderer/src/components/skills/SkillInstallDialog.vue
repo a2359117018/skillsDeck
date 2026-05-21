@@ -302,7 +302,7 @@ const failedLogLines = computed(() => {
 .install-terminal {
   max-height: 240px;
   overflow-y: auto;
-  background: #1e1e1e;
+  background: var(--color-ink);
   border-radius: var(--radius-md);
   padding: var(--space-xs);
 }
@@ -330,13 +330,13 @@ const failedLogLines = computed(() => {
 .failed-log {
   width: 100%;
   margin-top: var(--space-md);
-  background: #1e1e1e;
+  background: var(--color-ink);
   border-radius: var(--radius-md);
   padding: var(--space-xs);
 }
 
 .terminal-content {
-  color: #d4d4d4;
+  color: var(--color-muted);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.5;
