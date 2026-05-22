@@ -30,7 +30,6 @@ import { useEnvStore } from '../stores/env'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
 import { useNotify } from '../composables/useNotify'
-import { AGENTS } from '../constants/agents'
 
 interface ProxyOption extends SelectOption {
   icon?: Component
@@ -48,13 +47,10 @@ const envDownloadProgress = ref(0)
 
 const isLoaded = ref(false)
 const originalSettings = ref({
-  defaultAgent: '',
   autoCheckEnv: true,
   proxyUrl: '',
   npmRegistry: ''
 })
-
-const agentOptions = AGENTS.map((a) => ({ label: a.name, value: a.agentFlag }))
 
 const CUSTOM_PROXY_VALUE = '__custom__'
 
@@ -122,7 +118,6 @@ onMounted(() => {
     }
 
     originalSettings.value = {
-      defaultAgent: settingsStore.defaultAgent,
       autoCheckEnv: settingsStore.autoCheckEnv,
       proxyUrl: effectiveProxyUrl.value,
       npmRegistry: effectiveRegistryUrl.value
@@ -195,7 +190,6 @@ function renderProxyTag(props: { option: SelectOption; handleClose: () => void }
 const hasUnsavedChanges = computed(() => {
   if (!isLoaded.value) return false
   return (
-    settingsStore.defaultAgent !== originalSettings.value.defaultAgent ||
     settingsStore.autoCheckEnv !== originalSettings.value.autoCheckEnv ||
     effectiveProxyUrl.value !== originalSettings.value.proxyUrl ||
     effectiveRegistryUrl.value !== originalSettings.value.npmRegistry
@@ -220,13 +214,11 @@ async function handleSave(): Promise<void> {
     return
   }
   await settingsStore.save({
-    defaultAgent: settingsStore.defaultAgent,
     autoCheckEnv: settingsStore.autoCheckEnv,
     proxyUrl: effectiveProxyUrl.value,
     npmRegistry: effectiveRegistryUrl.value
   })
   originalSettings.value = {
-    defaultAgent: settingsStore.defaultAgent,
     autoCheckEnv: settingsStore.autoCheckEnv,
     proxyUrl: effectiveProxyUrl.value,
     npmRegistry: effectiveRegistryUrl.value
@@ -356,11 +348,7 @@ async function handleUpdateAll(): Promise<void> {
           2. 安装 skills CLI
         </span>
         <span class="setup-step-divider">→</span>
-        <span class="setup-step" :class="{ 'setup-step--done': settingsStore.defaultAgent }">
-          3. 选择默认 Agent
-        </span>
-        <span class="setup-step-divider">→</span>
-        <span class="setup-step">4. 保存设置</span>
+        <span class="setup-step">3. 保存设置</span>
       </div>
     </div>
 
@@ -376,14 +364,6 @@ async function handleUpdateAll(): Promise<void> {
           <span class="section-line" />
         </div>
         <NForm label-placement="left" label-width="140" class="settings-form">
-          <NFormItem label="默认安装的 AI 工具">
-            <NSelect
-              v-model:value="settingsStore.defaultAgent"
-              :options="agentOptions"
-              filterable
-              class="settings-select"
-            />
-          </NFormItem>
           <NFormItem label="启动时检查运行环境">
             <NSwitch v-model:value="settingsStore.autoCheckEnv" />
           </NFormItem>

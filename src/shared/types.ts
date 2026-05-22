@@ -61,7 +61,6 @@ export interface CommandErrorInfo {
 }
 
 export interface AppSettings {
-  defaultAgent: string
   autoCheckEnv: boolean
   proxyUrl?: string
   npmRegistry?: string

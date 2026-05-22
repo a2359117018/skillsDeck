@@ -7,7 +7,6 @@ interface StoreSchema {
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
-  defaultAgent: 'claude-code',
   autoCheckEnv: true,
   proxyUrl: '',
   npmRegistry: 'https://registry.npmmirror.com/'
