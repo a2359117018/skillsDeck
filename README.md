@@ -1,4 +1,4 @@
-# NPX Skills UI
+# SkillDeck
 
 ![Electron](https://img.shields.io/badge/Electron-39-47848F?logo=electron&logoColor=white)
 ![Vue](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)
@@ -7,7 +7,7 @@
 
 [`npx skills`](https://github.com/vercel-labs/skills) CLI 的图形化管理桌面应用。
 
-NPX Skills UI 是 [vercel-labs/skills](https://github.com/vercel-labs/skills) 的 GUI 包装与功能增强版。它将命令行操作转化为直观的可视化界面，让你告别繁琐的终端命令，统一管理 50+ AI 编码助手的技能包。
+SkillDeck 是 [vercel-labs/skills](https://github.com/vercel-labs/skills) 的 GUI 包装与功能增强版。它将命令行操作转化为直观的可视化界面，让你告别繁琐的终端命令，统一管理 50+ AI 编码助手的技能包。
 
 ---
 

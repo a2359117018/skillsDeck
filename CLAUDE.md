@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NPX Skills UI is an Electron desktop app providing a GUI for managing AI coding agent skills via the `npx skills` CLI. It supports searching, installing, updating, and removing skills across 50+ AI agents (Claude Code, Cursor, Codex, etc.). The search API is hosted at `skills.sh`.
+SkillDeck is an Electron desktop app providing a GUI for managing AI coding agent skills via the `npx skills` CLI. It supports searching, installing, updating, and removing skills across 50+ AI agents (Claude Code, Cursor, Codex, etc.). The search API is hosted at `skills.sh`.
 
 **Tech Stack:** Electron 39 + Vue 3.5 + TypeScript 5.9 + Pinia 3 + Naive UI 2.44 + electron-vite 5
 

@@ -1,5 +1,5 @@
 ---
-name: NPX Skills UI
+name: SkillDeck
 description: Desktop GUI for managing AI agent skills across 50+ coding agents
 colors:
   carbon-ink: '#0a0a0a'
@@ -100,7 +100,7 @@ components:
     width: '60px'
 ---
 
-# Design System: NPX Skills UI
+# Design System: SkillDeck
 
 ## 1. Overview
 

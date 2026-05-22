@@ -51,7 +51,7 @@ export function createMainWindow(): BrowserWindow {
       height: 800,
       minWidth: 1200,
       minHeight: 800,
-      title: 'NPX Skills UI'
+      title: 'SkillDeck'
     })
   )
   loadWindow(mainWindow)

@@ -28,7 +28,7 @@ function cleanupOrphanedTempDirs(): void {
 
 app.whenReady().then(() => {
   cleanupOrphanedTempDirs()
-  electronApp.setAppUserModelId('com.npx-skills-ui')
+  electronApp.setAppUserModelId('com.skilldeck.app')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
