@@ -26,77 +26,9 @@ No test infrastructure exists in this project.
 
 ## Architecture
 
-Built with **electron-vite**. Three-process Electron architecture:
+electron-vite 三进程架构。Main process（Node.js services + IPC handlers）、Preload（contextBridge）、Renderer（Vue 3 SPA）。详见 [references/architecture.md](references/architecture.md)。
 
-```
-src/
-├── main/                    # Main process (Node.js)
-│   ├── index.ts             # App lifecycle, window creation, IPC registration
-│   ├── services/            # Business logic (singletons)
-│   │   ├── CommandRunner.ts        # execa wrapper: streaming, timeout, cancel
-│   │   ├── SkillsService.ts        # All `npx skills` CLI interactions
-│   │   ├── AgentScanner.ts         # Filesystem scanning for agent skill dirs
-│   │   ├── EnvService.ts           # Node.js detection, download, extraction
-│   │   ├── StoreService.ts         # electron-store wrapper for settings
-│   │   ├── BackgroundTaskService.ts # Long-running task management
-│   │   ├── WindowManager.ts        # Multi-window (main 1200×800, settings 600×500)
-│   │   ├── LocalSkillInstaller.ts  # Copy skill dirs into agent skill paths
-│   │   ├── GitHubSkillInstaller.ts # Download & extract GitHub repos as skill sources
-│   │   └── ArchiveSkillInstaller.ts # Extract .zip/.tar.gz/.tgz archives as skill sources
-│   ├── api/
-│   │   └── skills.ts               # HTTP client for skills.sh search API
-│   └── ipc/                         # IPC handler modules
-│       ├── index.ts                 # Central registration + error serialization
-│       ├── skills.ipc.ts            # Skill CRUD + streaming install + GitHub/archive
-│       ├── agents.ipc.ts            # Agent scanning
-│       ├── env.ipc.ts               # Environment detection & Node.js install
-│       ├── store.ipc.ts             # Settings persistence
-│       └── tasks.ipc.ts             # Background task lifecycle
-├── preload/                 # Preload script (contextBridge)
-│   ├── index.ts             # Exposes window.api.* with typed IPC methods
-│   └── index.d.ts           # TypeScript declarations for window.api
-├── renderer/                # Renderer process (Vue 3 SPA)
-│   └── src/
-│       ├── App.vue               # Root: NaiveUI config, sidebar + router-view
-│       ├── router/index.ts       # Hash-based routing (6 routes)
-│       ├── views/                # Page components
-│       ├── components/           # Reusable (layout, skills, common)
-│       ├── stores/               # Pinia stores (skills, env, tasks, settings)
-│       ├── composables/          # useCachedResource, useConfirm
-│       ├── constants/            # Agent definitions from shared/agents.json
-│       └── assets/               # CSS design system (tokens.css, main.css, card.css)
-└── shared/
-    ├── types.ts             # Shared interfaces and utility functions
-    └── agents.json          # Agent registry: name, agentFlag, project/global paths
-```
-
-### Key Patterns
-
-- **IPC communication**: Main↔renderer via typed Electron IPC. Preload exposes `window.api.*`; handlers registered in `src/main/ipc/`. All IPC errors are serialized via `CommandErrorInfo`. Handlers return `{ ok: true, data: T } | { ok: false, error: CommandErrorInfo }`.
-- **Stale-while-revalidate**: `useCachedResource<T>` provides `ensure()`, `invalidate()`, `refresh()` for all Pinia store data fetching.
-- **CLI interaction**: `CommandRunner` wraps `execa` with streaming output, timeout, and cancel. `SkillsService` uses it for all `npx skills` commands. `shell: true` on Windows.
-- **Agent scanning**: `AgentScanner` reads `shared/agents.json` and scans each agent's `globalPath` to discover installed skills. Renderer enriches data with agent associations via path matching.
-- **Background tasks**: `BackgroundTaskService` manages long-running operations (update-skills, install-node, install-skills, skill-update, skill-update-all) with progress streaming via IPC.
-- **Multi-source install**: Three install paths—CLI (`SkillsService`), GitHub URL (`GitHubSkillInstaller` → download zipball → extract → `LocalSkillInstaller`), and local archive (`ArchiveSkillInstaller` → extract → `LocalSkillInstaller`). `LocalSkillInstaller` copies skill dirs into agent skill paths and handles cleanup.
-- **Multi-window**: `WindowManager` manages main window and settings modal. Window type passed via `?window=` query parameter.
-- **Design system**: NaiveUI with custom theme overrides in `App.vue`. CSS tokens in `tokens.css`. Pill-shaped buttons (9999px radius), rounded cards (16px). Font: DM Sans.
-- **Drag-drop file paths**: Uses `webUtils.getPathForFile()` (not `file.path`) for contextIsolation compatibility.
-
-### IPC Channels
-
-| Category       | Channels                                                                                                                                                                                                                                                                                                                                                                           |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Skills         | `skills:search`, `skills:list`, `skills:install`, `skills:install-streaming`, `skills:install-cancel`, `skills:update`, `skills:update-all`, `skills:remove`, `skills:update-background`, `skills:update-all-background`, `skills:parse-github`, `skills:select-archive`, `skills:extract-archive`, `skills:install-local`, `skills:cancel-github-download`, `skills:cleanup-temp` |
-| Skills (←main) | `skills:install-output`, `skills:github-download-progress` (main→renderer push)                                                                                                                                                                                                                                                                                                    |
-| Agents         | `agent:scan-all`, `agent:scan-one`                                                                                                                                                                                                                                                                                                                                                 |
-| Environment    | `env:check`, `env:install-node`, `env:install-skills`, `env:cancel-install-node`, `env:download-progress`                                                                                                                                                                                                                                                                          |
-| Settings       | `store:get-settings`, `store:set-settings`                                                                                                                                                                                                                                                                                                                                         |
-| Tasks          | `tasks:start`, `tasks:cancel`, `tasks:get-all`, `tasks:update`                                                                                                                                                                                                                                                                                                                     |
-| Shell          | `shell:open-path`, `window:open-settings`                                                                                                                                                                                                                                                                                                                                          |
-
-### Shared Types (shared/types.ts)
-
-Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `InstalledSkill`, `InstalledSkillAgent`, `CommandResult`, `CommandErrorInfo`, `AppSettings`, `SkillSearchResult`, `SkillSearchResponse`, `ScannedSkill`, `LocalInstallResult`, `ParsedGitHubUrl`, `GitHubParseResult`. Utility functions: `toPackageRef()`, `formatInstalls()`.
+> 修改架构（新增/删除文件、IPC channel、service 等）时，必须同步更新 references/architecture.md。
 
 ## Code Style
 
@@ -107,29 +39,33 @@ Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `Inst
 - **Component naming**: PascalCase `.vue` files, camelCase for composables (`use*.ts`)
 - **IPC naming**: `category:action` format (e.g., `skills:install-streaming`)
 
-## CSS 约束
+## 样式与布局约束
 
-- **必须使用 design tokens**：颜色、间距、圆角、阴影、字体大小等一律使用 `tokens.css` 中的 CSS 变量（如 `var(--color-ink)`、`var(--space-md)`）
-- **禁止硬编码视觉值**：不得在 scoped style 中直接写 hex/rgb 颜色或 magic number 间距，应使用对应的 token
-- **scoped 优先**：组件样式使用 `<style scoped>`，仅在需要穿透 teleport/portal 元素时才用 `<style>` 并加注释说明原因
-- **类名规范**：使用 BEM-like 命名（`.block-element`、`.block--modifier`），单词用 kebab-case 连接
-- **新增 token 流程**：如果现有 token 不满足需求，先在 `tokens.css` 中按命名规范添加新变量，再在组件中使用
-- **样式块长度**：单个组件的 `<style>` 超过 80 行时，考虑拆分子组件或提取公共 class 到 `card.css` 等全局文件
-- **NaiveUI 样式覆盖**：优先使用 `themeOverrides` prop，其次用 `:deep()` 选择器
-- **流式布局优先**：所有页面容器使用 `width: 100%` + padding，禁止写死 `max-width` 或固定像素宽度
-- **网格使用 auto-fill**：多列卡片列表使用 `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`，禁止写死 `repeat(N, 1fr)`
-- **零 media query 原则**：布局弹性通过 flex 和 grid 的内建能力实现，不引入断点；仅在极特殊场景下可例外
+### Token 规范
+- 必须使用 design tokens（tokens.css），禁止硬编码 hex/rgb 颜色或 magic number 间距
+- 新增 token 先在 tokens.css 添加，再在组件中引用
+- 文本颜色必须通过 WCAG AA（对比度 >= 4.5:1），新增 token 时验证
 
-## 布局约束
+### 布局
+- app shell 为 flex 水平排列，页面容器为 flex column
+- 卡片网格：CSS grid + `repeat(auto-fill, minmax(280px, 1fr))`，不用 flex wrap
+- 工具栏：flex row + gap，必须 `flex-wrap: wrap`
+- 页面容器：`width: 100%` + padding 填满内容区；文本块可用 `max-width: 75ch` 限制行宽，但禁止给页面容器设固定像素宽度
+- 间距：flex/grid 容器用 `gap` + spacing token，不在子元素上用 margin 拆分
+- Drawer：`min(固定值, 窗口百分比)`，不用固定像素
+- 最小窗口 1200×800，布局在此尺寸下必须可用
 
-- **整体布局使用 flex**：app shell（`.app-shell`）为 `display: flex` 水平排列（sidebar + content area），每个页面容器为 `flex-direction: column` 垂直排列
-- **卡片网格用 CSS grid**：多列卡片列表（如 Agent 卡片、搜索结果）使用 `display: grid` + `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`，不用 flex wrap
-- **工具栏统一 flex row**：页面顶部 toolbar 使用 `display: flex; align-items: center; gap: var(--space-*)`
-- **页面容器填满内容区**：每个页面根元素为 `width: 100%`，通过 `padding` 控制内容边距，不用 `max-width` 限制
-- **间距用 gap**：flex/grid 容器中子元素间距使用 `gap` 属性 + spacing token，不在子元素上用 margin 拆分
-- **工具栏允许换行**：`display: flex` 的 toolbar 必须设置 `flex-wrap: wrap`，防止空间不足时溢出
-- **Drawer 使用相对宽度**：侧滑抽屉宽度使用 `min(固定值, 窗口百分比)`，不用固定像素
-- **最小窗口保障**：Electron 主进程设置 `minWidth: 1200, minHeight: 800`，布局在此尺寸下必须可用
+### 组件样式
+- scoped 优先，穿透 teleport/portal 时用全局 `<style>` 并注释原因
+- BEM-like 命名（`.block-element`），kebab-case
+- 单组件 style 超 80 行时考虑拆分子组件或提取公共 class
+- NaiveUI 覆盖：`themeOverrides` prop > `:deep()` 选择器
+- 禁止嵌套卡片（内层用 surface 背景 + hairline 边框）
+- 禁止侧条纹强调（> 1px border-left/right），sidebar 活跃指示条除外
+
+### 动画
+- 仅允许 100-200ms ease 过渡用于状态变化（hover、展开/收起）
+- 禁止 bounce/elastic 缓动、布局属性动画、装饰性动画
 
 ## Constraints
 
@@ -142,59 +78,4 @@ Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `Inst
 
 ## Audit 范式
 
-每次执行 `/impeccable audit` 后，必须按以下规范生成审计报告并持久化到磁盘。
-
-### 执行流程
-
-审计必须覆盖 **5 个维度**，每个维度单独评分 0-4：
-
-| 维度                     | 检查要点                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------ |
-| **Accessibility (A11y)** | 对比度 (< 4.5:1)、ARIA 缺失、键盘导航、语义 HTML、alt 文本、表单标签           |
-| **Performance**          | 布局抖动、昂贵动画、懒加载缺失、bundle 体积、不必要的重渲染                    |
-| **Theming**              | 硬编码颜色、暗黑模式缺失、token 使用不一致、主题切换问题                       |
-| **Responsive Design**    | 固定宽度、触摸目标 < 44px、水平溢出、文本缩放破坏、断点缺失                    |
-| **Anti-Patterns**        | AI slop 迹象（渐变文字、玻璃拟态、英雄指标、相同卡片网格）、DESIGN.md 禁令违反 |
-
-**评分标准**：
-
-- 0 = 严重/不可用，1 = 重大问题，2 = 部分达标，3 = 良好/小缺陷，4 = 优秀
-- **总分 18-20** = 优秀，**14-17** = 良好，**10-13** = 可接受需改进，**6-9** = 较差，**0-5** = 关键问题
-
-### 报告格式
-
-审计报告必须包含以下章节（按顺序）：
-
-1. **Audit Health Score** — 表格，5 个维度 + 总分
-2. **Anti-Patterns Verdict** — 是否看起来像 AI 生成，列出具体迹象
-3. **Executive Summary** — 总分、问题统计 (P0/P1/P2/P3)、Top 5 关键问题、下一步建议
-4. **Detailed Findings by Severity** — 按 P0 → P3 分级，每个问题必须包含：
-   - 问题名称（带 `[P?]` 标签）
-   - **Location**：文件路径 + 行号
-   - **Category**：Accessibility / Performance / Theming / Responsive / Anti-Pattern
-   - **Impact**：对用户的影响
-   - **WCAG/Standard**：违反的标准（如适用）
-   - **Recommendation**：具体修复建议
-   - **Suggested command**：推荐的 `/impeccable` 子命令
-5. **Patterns & Systemic Issues** — 反复出现的问题模式，而非一次性错误
-6. **Positive Findings** — 值得保持的良好实践
-7. **Recommended Actions** — 按优先级排序的 `/impeccable` 命令列表
-
-### Severity 定义
-
-| 级别            | 定义                                | 修复时机 |
-| --------------- | ----------------------------------- | -------- |
-| **P0 Blocking** | 阻止任务完成，必须立即修复          | 立即     |
-| **P1 Major**    | 重大困难或 WCAG AA 违反，发布前修复 | 发布前   |
-| **P2 Minor**    | 有变通方案，下次迭代修复            | 下一周期 |
-| **P3 Polish**   | 锦上添花，有时间再修                | 有空时   |
-
-### 文件输出规范
-
-每次审计完成后，必须将完整报告写入文件：
-
-- **存放路径**：`.impeccable/audit/`
-- **命名格式**：`{ISO-date}T{ISO-time}Z__audit-report.md`
-- 示例：`.impeccable/audit/2026-05-21T21-30-00Z__audit-report.md`
-
-如果 `.impeccable/audit/` 目录不存在，先创建目录再写入文件。
+执行 `/impeccable audit` 时的审计规范（5 维度评分、报告格式、severity 定义、文件输出）。详见 [references/impeccable-audit.md](references/impeccable-audit.md)。
