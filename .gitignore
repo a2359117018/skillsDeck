@@ -12,3 +12,8 @@ build
 bun.lock
 debug-*.png
 *.tsbuildinfo
+
+# Local tool configs
+.claude/settings.local.json
+.claude/skills/
+.playwright-cli/
