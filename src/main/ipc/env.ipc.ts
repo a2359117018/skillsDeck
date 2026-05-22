@@ -8,6 +8,7 @@ import {
 } from '../services/EnvService'
 import { setEnvStatus } from '../services/StoreService'
 import { createSettingsWindow } from '../services/WindowManager'
+import { toIpcError } from '../../shared/types'
 
 export function registerEnvIpc(): void {
   ipcMain.handle('env:check', async () => {
@@ -27,8 +28,7 @@ export function registerEnvIpc(): void {
       setEnvStatus(status)
       return { success: true }
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      return { success: false, error: message }
+      return { success: false, error: toIpcError(error).message }
     }
   })
 
@@ -39,8 +39,7 @@ export function registerEnvIpc(): void {
       setEnvStatus(status)
       return result
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      return { success: false, error: message }
+      return { success: false, error: toIpcError(error).message }
     }
   })
 

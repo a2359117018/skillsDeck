@@ -122,3 +122,21 @@ export interface ArchiveScanResult {
   skills: ScannedSkill[]
   tempDir: string
 }
+
+/** IPC 统一错误响应格式（轻量版，不含命令专用字段） */
+export interface IpcError {
+  message: string
+  code?: string
+}
+
+/** IPC 统一结果格式 */
+export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: IpcError }
+
+/** 将任意错误转换为 IpcError */
+export function toIpcError(e: unknown): IpcError {
+  if (e instanceof Error && 'code' in e) {
+    const cmdErr = e as { code: string; message: string }
+    return { message: cmdErr.message, code: cmdErr.code }
+  }
+  return { message: e instanceof Error ? e.message : String(e) }
+}

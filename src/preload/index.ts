@@ -1,13 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type {
-  LocalInstallResult,
-  CommandErrorInfo,
-  GitHubParseResult,
-  ArchiveScanResult
-} from '../shared/types'
-
-type IpcResult<T> = { ok: true; data: T } | { ok: false; error: CommandErrorInfo }
+import type { LocalInstallResult, GitHubParseResult, ArchiveScanResult, IpcResult } from '../shared/types'
 
 const api = {
   /** 从拖拽的 File 对象获取本地文件路径（contextIsolation 兼容） */

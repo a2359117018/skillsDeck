@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import { backgroundTaskService } from '../services/BackgroundTaskService'
 import type { BackgroundTask } from '../../shared/types'
+import { toIpcError } from '../../shared/types'
 
 export function registerTasksIpc(): void {
   ipcMain.handle('tasks:start', async (_, { type }: { type: BackgroundTask['type'] }) => {
@@ -8,8 +9,7 @@ export function registerTasksIpc(): void {
       const taskId = await backgroundTaskService.startBuiltin(type)
       return { taskId }
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      return { taskId: '', error: message }
+      return { taskId: '', error: toIpcError(error).message }
     }
   })
 
