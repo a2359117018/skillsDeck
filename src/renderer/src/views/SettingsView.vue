@@ -13,7 +13,6 @@ import {
   NText,
   NProgress,
   NAlert,
-  useMessage,
   type SelectOption
 } from 'naive-ui'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
@@ -30,6 +29,7 @@ import { useSkillsStore } from '../stores/skills'
 import { useEnvStore } from '../stores/env'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
+import { useNotify } from '../composables/useNotify'
 import { AGENTS } from '../constants/agents'
 
 interface ProxyOption extends SelectOption {
@@ -40,7 +40,7 @@ const settingsStore = useSettingsStore()
 const skillsStore = useSkillsStore()
 const envStore = useEnvStore()
 const taskStore = useTaskStore()
-const message = useMessage()
+const notify = useNotify()
 const { confirmUpdateAll, confirmUpdateEnv } = useConfirm()
 
 const envDownloading = ref(false)
@@ -208,7 +208,7 @@ async function handleSave(): Promise<void> {
     customProxyUrl.value &&
     !customProxyUrl.value.trim().startsWith('https://')
   ) {
-    message.warning('自定义代理地址必须以 https:// 开头')
+    notify.warning('自定义代理地址必须以 https:// 开头')
     return
   }
   if (
@@ -216,7 +216,7 @@ async function handleSave(): Promise<void> {
     customRegistryUrl.value &&
     !customRegistryUrl.value.trim().startsWith('https://')
   ) {
-    message.warning('自定义镜像地址必须以 https:// 开头')
+    notify.warning('自定义镜像地址必须以 https:// 开头')
     return
   }
   await settingsStore.save({
@@ -231,7 +231,7 @@ async function handleSave(): Promise<void> {
     proxyUrl: effectiveProxyUrl.value,
     npmRegistry: effectiveRegistryUrl.value
   }
-  message.success('设置已保存')
+  notify.success('设置已保存')
 }
 
 async function handleInstallNode(): Promise<void> {
@@ -243,13 +243,13 @@ async function handleInstallNode(): Promise<void> {
   try {
     const result = await window.api.env.installNode()
     if (!result.success) throw new Error(result.error)
-    message.success('Node.js 安装成功')
+    notify.success('Node.js 安装成功')
     await envStore.check()
   } catch (e) {
     if (e instanceof Error && e.message === '下载已取消') {
-      message.info('下载已取消')
+      notify.info('下载已取消')
     } else {
-      message.error(e instanceof Error ? e.message : 'Node.js 安装失败')
+      notify.error(e instanceof Error ? e.message : 'Node.js 安装失败')
     }
   } finally {
     envDownloading.value = false
@@ -268,10 +268,10 @@ async function handleInstallSkills(): Promise<void> {
   try {
     const result = await window.api.env.installSkills()
     if (!result.success) throw new Error(result.error || '安装失败')
-    message.success('skills CLI 安装成功')
+    notify.success('skills CLI 安装成功')
     await envStore.check()
   } catch (e) {
-    message.error(e instanceof Error ? e.message : 'skills CLI 安装失败')
+    notify.error(e instanceof Error ? e.message : 'skills CLI 安装失败')
   } finally {
     skillsInstalling.value = false
   }
@@ -280,9 +280,9 @@ async function handleInstallSkills(): Promise<void> {
 async function handleEnvRecheck(): Promise<void> {
   try {
     await envStore.check()
-    message.success('环境检测完成')
+    notify.success('环境检测完成')
   } catch {
-    message.error('环境检测失败，请重试')
+    notify.error('环境检测失败，请重试')
   }
 }
 
@@ -292,22 +292,22 @@ async function handleUpdateSkills(): Promise<void> {
   taskStore
     .start('update-skills', {
       onSuccess: () => {
-        message.success('skills CLI 已更新')
+        notify.success('skills CLI 已更新')
         envStore.check()
       },
       onError: (err) => {
-        message.error(`skills CLI 更新失败: ${err}`)
+        notify.error(`skills CLI 更新失败: ${err}`)
       }
     })
     .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
+      notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
 }
 
 async function handleUpdateAll(): Promise<void> {
   const names = skillsStore.installedSkills.map((s) => s.name)
   if (names.length === 0) {
-    message.info('没有可更新的技能')
+    notify.info('没有可更新的技能')
     return
   }
   const confirmed = await confirmUpdateAll(names)
@@ -316,14 +316,14 @@ async function handleUpdateAll(): Promise<void> {
     .start('skill-update-all', {
       global: true,
       onSuccess: () => {
-        message.success('全部更新成功')
+        notify.success('全部更新成功')
       },
       onError: (err) => {
-        message.error(`更新失败: ${err}`)
+        notify.error(`更新失败: ${err}`)
       }
     })
     .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
+      notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
 }
 </script>

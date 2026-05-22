@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
+import { NInput, NIcon, NButton, NSpin } from 'naive-ui'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '../stores/skills'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
+import { useNotify } from '../composables/useNotify'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
 import SkillRemoveDialog from '../components/skills/SkillRemoveDialog.vue'
@@ -15,7 +16,7 @@ import type { InstalledSkillAgent } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
-const message = useMessage()
+const notify = useNotify()
 const router = useRouter()
 const { confirmUpdate, confirmRemove, confirmUpdateAll } = useConfirm()
 
@@ -24,10 +25,6 @@ const removeDialogState = ref<{
   skillName: string
   agents: InstalledSkillAgent[]
 }>({ visible: false, skillName: '', agents: [] })
-
-skillsStore.setMessageHandler((msg, type) => {
-  message[type](msg)
-})
 
 async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled()
@@ -40,9 +37,9 @@ onMounted(() => {
 async function handleRefresh(): Promise<void> {
   try {
     await loadSkills()
-    message.success('刷新完成')
+    notify.success('刷新完成')
   } catch {
-    message.error('刷新失败，请重试')
+    notify.error('刷新失败，请重试')
   }
 }
 
@@ -54,15 +51,15 @@ async function handleUpdate(name: string): Promise<void> {
       packageRef: name,
       global: true,
       onSuccess: () => {
-        message.success(`${name} 更新成功`)
+        notify.success(`${name} 更新成功`)
         loadSkills()
       },
       onError: (err) => {
-        message.error(`${name} 更新失败: ${err}`)
+        notify.error(`${name} 更新失败: ${err}`)
       }
     })
     .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
+      notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
 }
 
@@ -76,13 +73,13 @@ async function handleRemove(name: string): Promise<void> {
     try {
       const result = await skillsStore.remove(name, true)
       if (result.success) {
-        message.success(`${name} 已删除`)
+        notify.success(`${name} 已删除`)
         await loadSkills()
       } else {
-        message.error(`${name} 删除失败`)
+        notify.error(`${name} 删除失败`)
       }
     } catch {
-      message.error(`${name} 删除失败`)
+      notify.error(`${name} 删除失败`)
     }
     return
   }
@@ -103,13 +100,13 @@ async function handleRemoveDialogDone(result: {
   try {
     const removeResult = await skillsStore.remove(skillName, true, result.agent)
     if (removeResult.success) {
-      message.success(`${skillName} 已删除`)
+      notify.success(`${skillName} 已删除`)
       await loadSkills()
     } else {
-      message.error(`${skillName} 删除失败`)
+      notify.error(`${skillName} 删除失败`)
     }
   } catch {
-    message.error(`${skillName} 删除失败`)
+    notify.error(`${skillName} 删除失败`)
   }
 }
 
@@ -120,7 +117,7 @@ function handleOpenLocation(path: string): void {
 async function handleUpdateAll(): Promise<void> {
   const names = skillsStore.installedSkills.map((s) => s.name)
   if (names.length === 0) {
-    message.info('没有可更新的技能')
+    notify.info('没有可更新的技能')
     return
   }
   const confirmed = await confirmUpdateAll(names)
@@ -129,15 +126,15 @@ async function handleUpdateAll(): Promise<void> {
     .start('skill-update-all', {
       global: true,
       onSuccess: () => {
-        message.success('全部更新成功')
+        notify.success('全部更新成功')
         loadSkills()
       },
       onError: (err) => {
-        message.error(`更新失败: ${err}`)
+        notify.error(`更新失败: ${err}`)
       }
     })
     .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
+      notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
 }
 

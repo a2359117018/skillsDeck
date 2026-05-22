@@ -35,9 +35,6 @@ export const useSkillsStore = defineStore('skills', () => {
   const removing = ref(false)
   const searching = ref(false)
   const error = ref<string | null>(null)
-  const _openLocationMessage = ref<
-    ((msg: string, type: 'success' | 'warning' | 'error') => void) | null
-  >(null)
 
   /** Flag to trigger search input focus from global keyboard shortcuts */
   const focusSearchTrigger = ref(0)
@@ -97,12 +94,6 @@ export const useSkillsStore = defineStore('skills', () => {
 
   function clearAgentFilter(): void {
     selectedAgents.value = []
-  }
-
-  function setMessageHandler(
-    handler: (msg: string, type: 'success' | 'warning' | 'error') => void
-  ): void {
-    _openLocationMessage.value = handler
   }
 
   /**
@@ -195,10 +186,7 @@ export const useSkillsStore = defineStore('skills', () => {
 
   async function openLocation(path: string): Promise<void> {
     try {
-      const result = await window.api.shell.openPath(path)
-      if (!result.success && _openLocationMessage.value) {
-        _openLocationMessage.value(result.error || '无法打开路径', 'warning')
-      }
+      await window.api.shell.openPath(path)
     } catch (e) {
       error.value = extractError(e)
     }
@@ -223,7 +211,6 @@ export const useSkillsStore = defineStore('skills', () => {
     setSearchKeyword,
     toggleAgent,
     clearAgentFilter,
-    setMessageHandler,
     triggerFocusSearch,
     search,
     fetchInstalled,

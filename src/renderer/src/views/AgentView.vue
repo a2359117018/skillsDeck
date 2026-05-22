@@ -2,7 +2,7 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWindowSize } from '@vueuse/core'
-import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
+import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin } from 'naive-ui'
 import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
@@ -12,18 +12,15 @@ import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
 import { useConfirm } from '@renderer/composables/useConfirm'
+import { useNotify } from '@renderer/composables/useNotify'
 import EmptyState from '@renderer/components/common/EmptyState.vue'
 import type { AgentScanResult } from '../../../shared/types'
 
 const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
-const message = useMessage()
+const notify = useNotify()
 const router = useRouter()
 const { confirmUpdate, confirmRemove } = useConfirm()
-
-skillsStore.setMessageHandler((msg, type) => {
-  message[type](msg)
-})
 
 const agentSearchKeyword = ref('')
 const selectedAgentFlag = ref<string | null>(null)
@@ -86,15 +83,15 @@ async function handleUpdate(name: string): Promise<void> {
       packageRef: name,
       global: true,
       onSuccess: () => {
-        message.success(`${name} 更新成功`)
+        notify.success(`${name} 更新成功`)
         skillsStore.fetchInstalled()
       },
       onError: (err) => {
-        message.error(`${name} 更新失败: ${err}`)
+        notify.error(`${name} 更新失败: ${err}`)
       }
     })
     .catch((e) => {
-      message.info(e instanceof Error ? e.message : '启动更新失败')
+      notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
 }
 
@@ -105,13 +102,13 @@ async function handleRemove(name: string): Promise<void> {
   try {
     const result = await skillsStore.remove(name, true, selectedAgent.value?.agentFlag)
     if (result.success) {
-      message.success(`${name} 已删除`)
+      notify.success(`${name} 已删除`)
       await skillsStore.fetchInstalled()
     } else {
-      message.error(`${name} 删除失败`)
+      notify.error(`${name} 删除失败`)
     }
   } catch {
-    message.error(`${name} 删除失败`)
+    notify.error(`${name} 删除失败`)
   } finally {
     removingSkill.value = null
   }
@@ -120,9 +117,9 @@ async function handleRemove(name: string): Promise<void> {
 async function handleRefresh(): Promise<void> {
   try {
     await skillsStore.fetchInstalled()
-    message.success('刷新完成')
+    notify.success('刷新完成')
   } catch {
-    message.error('刷新失败，请重试')
+    notify.error('刷新失败，请重试')
   }
 }
 

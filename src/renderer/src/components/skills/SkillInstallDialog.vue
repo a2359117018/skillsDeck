@@ -9,8 +9,7 @@ import {
   NSpace,
   NText,
   NTag,
-  NIcon,
-  useMessage
+  NIcon
 } from 'naive-ui'
 import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import CheckmarkCircle from '@vicons/ionicons5/CheckmarkCircle'
@@ -18,6 +17,7 @@ import CloseCircle from '@vicons/ionicons5/CloseCircle'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillsStore } from '../../stores/skills'
+import { useNotify } from '../../composables/useNotify'
 
 const props = defineProps<{ show: boolean; source: string }>()
 const emit = defineEmits<{
@@ -25,7 +25,7 @@ const emit = defineEmits<{
   (e: 'complete'): void
 }>()
 const skillsStore = useSkillsStore()
-const message = useMessage()
+const notify = useNotify()
 
 const currentStep = ref(1)
 const isGlobal = ref(false)
@@ -73,7 +73,7 @@ const canGoNext = computed(() => {
 
 function goNext(): void {
   if (!canGoNext.value) {
-    message.warning('请选择至少一个安装目标')
+    notify.warning('请选择至少一个安装目标')
     return
   }
   currentStep.value = 2
@@ -116,7 +116,7 @@ async function handleInstall(): Promise<void> {
     commandOutput.value += errMsg
     scrollTerminalToBottom()
     installStatus.value = 'failed'
-    message.error('安装失败: ' + errMsg)
+    notify.error('安装失败: ' + errMsg)
   } finally {
     installing.value = false
     if (removeOutputListener) {
