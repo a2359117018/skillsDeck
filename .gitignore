@@ -14,6 +14,5 @@ debug-*.png
 *.tsbuildinfo
 
 # Local tool configs
-.claude/settings.local.json
-.claude/skills/
+.claude/
 .playwright-cli/
