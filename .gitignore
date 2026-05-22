@@ -15,3 +15,6 @@ debug-*.png
 # Local tool configs
 .claude/
 .playwright-cli/
+.impeccable/
+docs/
+openspec/
