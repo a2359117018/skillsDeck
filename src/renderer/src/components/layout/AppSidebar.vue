@@ -2,13 +2,11 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
-import {
-  CubeOutline,
-  SearchOutline,
-  GitMergeOutline,
-  SettingsOutline,
-  RocketOutline
-} from '@vicons/ionicons5'
+import CubeOutline from '@vicons/ionicons5/CubeOutline'
+import SearchOutline from '@vicons/ionicons5/SearchOutline'
+import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
+import SettingsOutline from '@vicons/ionicons5/SettingsOutline'
+import RocketOutline from '@vicons/ionicons5/RocketOutline'
 import { useTaskStore } from '../../stores/tasks'
 
 const router = useRouter()
@@ -63,7 +61,8 @@ const emit = defineEmits<{
           :title="item.label"
           @click="navigate(item.key)"
         >
-          <NIcon :size="22">
+          <!-- 装饰性图标，对屏幕阅读器隐藏，避免与按钮文本重复朗读 -->
+          <NIcon :size="22" aria-hidden="true">
             <component :is="item.icon" />
           </NIcon>
           <span class="sidebar-label">{{ item.label }}</span>
@@ -147,16 +146,16 @@ const emit = defineEmits<{
 
 .sidebar-item:hover {
   color: var(--sidebar-icon-hover-color);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--sidebar-item-hover-bg);
 }
 
 .sidebar-item.active {
   color: var(--sidebar-icon-active-color);
-  background: rgba(255, 255, 255, 0.10);
+  background: var(--sidebar-item-active-bg);
 }
 
 .sidebar-label {
-  font-size: 11px;
+  font-size: var(--text-micro);
   line-height: 1.2;
   color: inherit;
   text-align: center;
@@ -181,19 +180,7 @@ const emit = defineEmits<{
   border-radius: 50%;
   background: var(--color-brand-coral);
   border: 1.5px solid var(--sidebar-bg);
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(0.85);
-  }
+  /* 静态指示点，移除连续脉冲动画以符合 "Speed over polish" 原则 */
 }
 
 .task-indicator:hover {

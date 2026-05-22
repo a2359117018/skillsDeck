@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
-import { SearchOutline } from '@vicons/ionicons5'
+import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
@@ -50,7 +50,7 @@ function handleLocalInstallComplete(): void {
 </script>
 
 <template>
-  <div class="search-page">
+  <main class="search-page">
     <NTabs v-model:value="activeTab" type="line">
       <NTabPane name="search" tab="搜索安装">
         <div class="tab-content">
@@ -131,7 +131,7 @@ function handleLocalInstallComplete(): void {
       :source="selectedSource"
       @complete="handleInstallComplete"
     />
-  </div>
+  </main>
 </template>
 
 <style scoped>

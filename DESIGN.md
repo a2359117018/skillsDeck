@@ -2,102 +2,102 @@
 name: NPX Skills UI
 description: Desktop GUI for managing AI agent skills across 50+ coding agents
 colors:
-  carbon-ink: "#0a0a0a"
-  text-primary: "#1a1a1a"
-  text-secondary: "#6b7280"
-  text-muted: "#9ca3af"
-  canvas: "#ffffff"
-  surface: "#f7f8fa"
-  hairline: "#e5e7eb"
-  ember-coral: "#ff5530"
-  steel-blue: "#1456f0"
-  neon-magenta: "#ea5ec1"
-  ion-purple: "#a855f7"
-  ember-coral-light: "#ff7a59"
-  ember-coral-dark: "#e64720"
-  steel-blue-200: "#dbeafe"
-  steel-blue-deep: "#1e40af"
-  neon-magenta-light: "#ff6ec7"
-  success-bg: "#dcfce7"
-  success-text: "#166534"
-  error: "#d45656"
-  error-bg: "#fef2f2"
-  sidebar-dark-start: "#0a0a0a"
-  sidebar-dark-end: "#1a1a2e"
+  carbon-ink: '#0a0a0a'
+  text-primary: '#1a1a1a'
+  text-secondary: '#6b7280'
+  text-muted: '#9ca3af'
+  canvas: '#ffffff'
+  surface: '#f7f8fa'
+  hairline: '#e5e7eb'
+  ember-coral: '#ff5530'
+  steel-blue: '#1456f0'
+  neon-magenta: '#ea5ec1'
+  ion-purple: '#a855f7'
+  ember-coral-light: '#ff7a59'
+  ember-coral-dark: '#e64720'
+  steel-blue-200: '#dbeafe'
+  steel-blue-deep: '#1e40af'
+  neon-magenta-light: '#ff6ec7'
+  success-bg: '#dcfce7'
+  success-text: '#166534'
+  error: '#d45656'
+  error-bg: '#fef2f2'
+  sidebar-dark-start: '#0a0a0a'
+  sidebar-dark-end: '#1a1a2e'
 typography:
   display:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "2rem"
+    fontSize: '2rem'
     fontWeight: 700
     lineHeight: 1.25
   headline:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "1.5rem"
+    fontSize: '1.5rem'
     fontWeight: 700
     lineHeight: 1.25
   title:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "1.25rem"
+    fontSize: '1.25rem'
     fontWeight: 600
     lineHeight: 1.25
   body:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "1rem"
+    fontSize: '1rem'
     fontWeight: 400
     lineHeight: 1.5
   label:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "0.8125rem"
+    fontSize: '0.8125rem'
     fontWeight: 500
     lineHeight: 1.5
-    letterSpacing: "0.5px"
+    letterSpacing: '0.5px'
 rounded:
-  xs: "4px"
-  sm: "6px"
-  md: "8px"
-  lg: "12px"
-  xl: "16px"
-  xxl: "20px"
-  hero: "32px"
-  full: "9999px"
+  xs: '4px'
+  sm: '6px'
+  md: '8px'
+  lg: '12px'
+  xl: '16px'
+  xxl: '20px'
+  hero: '32px'
+  full: '9999px'
 spacing:
-  xxs: "4px"
-  xs: "8px"
-  sm: "12px"
-  md: "16px"
-  lg: "20px"
-  xl: "24px"
-  xxl: "32px"
-  xxxl: "48px"
+  xxs: '4px'
+  xs: '8px'
+  sm: '12px'
+  md: '16px'
+  lg: '20px'
+  xl: '24px'
+  xxl: '32px'
+  xxxl: '48px'
 components:
   button-primary:
-    backgroundColor: "{colors.carbon-ink}"
-    textColor: "{colors.canvas}"
-    rounded: "{rounded.full}"
-    padding: "8px 20px"
+    backgroundColor: '{colors.carbon-ink}'
+    textColor: '{colors.canvas}'
+    rounded: '{rounded.full}'
+    padding: '8px 20px'
   button-primary-hover:
-    backgroundColor: "{colors.text-primary}"
+    backgroundColor: '{colors.text-primary}'
   button-secondary:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.text-primary}"
-    rounded: "{rounded.full}"
+    backgroundColor: '{colors.canvas}'
+    textColor: '{colors.text-primary}'
+    rounded: '{rounded.full}'
   chip:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.text-secondary}"
-    rounded: "{rounded.full}"
-    padding: "4px 12px"
+    backgroundColor: '{colors.surface}'
+    textColor: '{colors.text-secondary}'
+    rounded: '{rounded.full}'
+    padding: '4px 12px'
   card:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.xl}"
-    padding: "16px"
+    backgroundColor: '{colors.canvas}'
+    rounded: '{rounded.xl}'
+    padding: '16px'
   input:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.text-primary}"
-    rounded: "{rounded.md}"
-    height: "40px"
+    backgroundColor: '{colors.canvas}'
+    textColor: '{colors.text-primary}'
+    rounded: '{rounded.md}'
+    height: '40px'
   nav-sidebar:
-    backgroundColor: "{colors.sidebar-dark-start}"
-    width: "60px"
+    backgroundColor: '{colors.sidebar-dark-start}'
+    width: '60px'
 ---
 
 # Design System: NPX Skills UI
@@ -113,6 +113,7 @@ The design system serves a single posture: a developer opens the app to do one s
 The dark sidebar is the constant: it anchors navigation and signals "this is a tool, not a website." The content area is clean canvas where information density wins over whitespace. Agent cards use saturated color to make the multi-agent landscape scannable at a glance.
 
 **Key Characteristics:**
+
 - Dark sidebar + light canvas: two-zone architecture with distinct purposes
 - Pill-shaped controls: every button is a rounded pill (9999px radius), forming a consistent tactile vocabulary
 - Tonal layering over shadows: surfaces differentiate by background color value, not by drop shadows

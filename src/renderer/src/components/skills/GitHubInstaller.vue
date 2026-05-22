@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { NInput, NButton, NText, NModal, NProgress, useNotification } from 'naive-ui'
+import { NInput, NButton, NText, NProgress, useNotification } from 'naive-ui'
 import type { GitHubParseResult, ParsedGitHubUrl } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
@@ -27,7 +27,6 @@ const {
 const url = ref('')
 const parsing = ref(false)
 const downloadProgress = ref(0)
-const showDialog = ref(false)
 const scanResult = ref<GitHubParseResult | null>(null)
 const parsedUrl = ref<ParsedGitHubUrl | null>(null)
 
@@ -48,7 +47,6 @@ async function handleParse(): Promise<void> {
   }
   parsing.value = true
   downloadProgress.value = 0
-  showDialog.value = true
   scanResult.value = null
   parsedUrl.value = null
 
@@ -80,7 +78,6 @@ async function handleParse(): Promise<void> {
     })
   } finally {
     parsing.value = false
-    showDialog.value = false
     if (removeProgressListener) {
       removeProgressListener()
       removeProgressListener = null
@@ -91,7 +88,6 @@ async function handleParse(): Promise<void> {
 function handleCancel(): void {
   window.api.skills.cancelGitHubDownload()
   parsing.value = false
-  showDialog.value = false
 }
 
 function handleReparse(): void {
@@ -126,12 +122,14 @@ onUnmounted(() => {
         <!-- GitHub input card -->
         <div class="input-card">
           <div class="input-card-header">
+            <!-- 装饰性 GitHub 图标，对屏幕阅读器隐藏 -->
             <svg
               width="16"
               height="16"
               viewBox="0 0 16 16"
               fill="var(--color-ink)"
               class="github-icon"
+              aria-hidden="true"
             >
               <path
                 d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
@@ -150,19 +148,36 @@ onUnmounted(() => {
             <NButton
               v-if="!isParsed"
               type="primary"
+              round
               :disabled="parsing || !url.trim()"
               @click="handleParse"
             >
               分析仓库
             </NButton>
-            <NButton v-else @click="handleReparse"> 重新分析 </NButton>
+            <NButton v-else round @click="handleReparse"> 重新分析 </NButton>
+          </div>
+          <!-- Inline download progress -->
+          <div v-if="parsing" class="inline-progress">
+            <NProgress
+              type="line"
+              :percentage="downloadProgress"
+              :show-indicator="true"
+              :height="6"
+              status="default"
+            />
+            <div class="inline-progress-footer">
+              <NText depth="3" class="inline-progress-hint">
+                {{ downloadProgress < 100 ? '正在下载...' : '正在扫描技能...' }}
+              </NText>
+              <NButton size="tiny" round @click="handleCancel">取消</NButton>
+            </div>
           </div>
         </div>
 
         <!-- Step 1 -->
         <div class="step-header">
           <span class="step-number">1</span>
-          <span class="step-title">选择技能</span>
+          <h3 class="step-title">选择技能</h3>
           <span v-if="skills.length > 0" class="step-count">
             {{ selectedSkills.length }} / {{ skills.length }}
           </span>
@@ -182,7 +197,7 @@ onUnmounted(() => {
       <div class="column-right">
         <div class="step-header">
           <span class="step-number">2</span>
-          <span class="step-title">选择安装目标</span>
+          <h3 class="step-title">选择安装目标</h3>
         </div>
 
         <div class="agent-area">
@@ -212,24 +227,6 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-
-    <!-- Progress dialog -->
-    <NModal v-model:show="showDialog" :mask-closable="false" :close-on-esc="false">
-      <div class="progress-dialog">
-        <NText strong class="progress-dialog-title">正在从 GitHub 下载并分析仓库...</NText>
-        <NProgress
-          type="line"
-          :percentage="downloadProgress"
-          :show-indicator="true"
-          :height="8"
-          status="default"
-        />
-        <NText depth="3" class="progress-dialog-hint">
-          {{ downloadProgress < 100 ? '正在下载...' : '正在扫描技能...' }}
-        </NText>
-        <NButton @click="handleCancel">取消</NButton>
-      </div>
-    </NModal>
   </div>
 </template>
 
@@ -242,7 +239,7 @@ onUnmounted(() => {
 
 .github-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   grid-template-rows: minmax(0, 1fr);
   gap: var(--space-lg);
   flex: 1;
@@ -268,6 +265,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-sm);
   flex-shrink: 0;
+  min-height: 120px;
 }
 
 .input-card-header {
@@ -372,24 +370,20 @@ onUnmounted(() => {
   font-weight: var(--weight-semibold);
 }
 
-/* --- Progress dialog --- */
-.progress-dialog {
-  min-width: 360px;
-  max-width: 440px;
-  padding: var(--space-lg);
-  background: var(--color-canvas);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-4);
+/* --- Inline progress --- */
+.inline-progress {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xxs);
 }
 
-.progress-dialog-title {
-  font-size: var(--text-body-sm);
+.inline-progress-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.progress-dialog-hint {
+.inline-progress-hint {
   font-size: var(--text-micro);
 }
 </style>

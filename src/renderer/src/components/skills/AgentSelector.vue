@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { NCheckbox, NButton, NInput, NSpace, NText, NIcon } from 'naive-ui'
-import { ChevronDownOutline } from '@vicons/ionicons5'
+import ChevronDownOutline from '@vicons/ionicons5/ChevronDownOutline'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 
 const props = defineProps<{
@@ -71,7 +71,13 @@ function toggleGlobal(val: boolean): void {
         </NButton>
       </NSpace>
 
-      <div class="expand-bar" @click="expanded = !expanded">
+      <!-- 改为 button 以支持键盘聚焦和激活，提升可访问性 -->
+      <button
+        type="button"
+        class="expand-bar"
+        :aria-expanded="expanded"
+        @click="expanded = !expanded"
+      >
         <NText depth="3" class="expand-text">
           {{ expanded ? '收起' : '安装到其他 agent...' }}
         </NText>
@@ -80,7 +86,7 @@ function toggleGlobal(val: boolean): void {
           :class="['expand-icon', { rotated: expanded }]"
           :component="ChevronDownOutline"
         />
-      </div>
+      </button>
 
       <div v-if="expanded" class="other-agents">
         <NInput
@@ -130,7 +136,7 @@ function toggleGlobal(val: boolean): void {
 }
 
 .section-label {
-  font-size: 13px;
+  font-size: var(--text-caption);
   margin-bottom: var(--space-sm);
   display: block;
   color: var(--color-muted);
@@ -148,10 +154,16 @@ function toggleGlobal(val: boolean): void {
   padding: var(--space-xs) 0;
   margin-bottom: var(--space-sm);
   user-select: none;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+  text-align: left;
 }
 
 .expand-text {
-  font-size: 13px;
+  font-size: var(--text-caption);
 }
 
 .expand-icon {
@@ -181,7 +193,7 @@ function toggleGlobal(val: boolean): void {
 }
 
 .selected-count {
-  font-size: 12px;
+  font-size: var(--text-micro);
   margin-top: var(--space-sm);
   display: block;
   color: var(--color-muted);

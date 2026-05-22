@@ -1,58 +1,199 @@
-<div style="max-width: 800px; margin: 0 auto;">
+<div style="max-width: 800px; margin: 0 auto">
   <!-- Page Header -->
-  <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-    <div style="width:28px; height:28px; background:#3a4a5c; border-radius:6px;"></div>
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px">
+    <div style="width: 28px; height: 28px; background: #3a4a5c; border-radius: 6px"></div>
     <div>
-      <div style="font-size:20px; font-weight:600;">设置</div>
-      <div style="font-size:14px; color:#666;">管理应用偏好、网络代理和技能更新</div>
+      <div style="font-size: 20px; font-weight: 600">设置</div>
+      <div style="font-size: 14px; color: #666">管理应用偏好、网络代理和技能更新</div>
     </div>
   </div>
 
   <!-- Card -->
-  <div style="background:white; border-radius:16px; padding:24px; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
-
+  <div
+    style="
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    "
+  >
     <!-- 通用设置 -->
-    <div style="margin-bottom:32px;">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <span style="font-size:13px; font-weight:600; color:#666; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">通用设置</span>
-        <div style="flex:1; height:1px; background:#e5e5e5;"></div>
+    <div style="margin-bottom: 32px">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+        <span
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          "
+          >通用设置</span
+        >
+        <div style="flex: 1; height: 1px; background: #e5e5e5"></div>
       </div>
 
-      <div style="display:flex; align-items:center; gap:16px; margin-bottom:12px;">
-        <label style="width:140px; font-size:14px; font-weight:500; color:#333; flex-shrink:0; text-align:right;">默认安装目标</label>
-        <div style="flex:1; padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; background:#f9fafb; font-size:14px; color:#666;">Claude Code ▼</div>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px">
+        <label
+          style="
+            width: 140px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            flex-shrink: 0;
+            text-align: right;
+          "
+          >默认安装目标</label
+        >
+        <div
+          style="
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f9fafb;
+            font-size: 14px;
+            color: #666;
+          "
+        >
+          Claude Code ▼
+        </div>
       </div>
 
-      <div style="display:flex; align-items:center; gap:16px;">
-        <label style="width:140px; font-size:14px; font-weight:500; color:#333; flex-shrink:0; text-align:right;">启动时检查环境</label>
-        <div style="width:44px; height:24px; background:#22c55e; border-radius:12px; position:relative;"><div style="width:20px; height:20px; background:white; border-radius:50%; position:absolute; right:2px; top:2px; box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div></div>
+      <div style="display: flex; align-items: center; gap: 16px">
+        <label
+          style="
+            width: 140px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            flex-shrink: 0;
+            text-align: right;
+          "
+          >启动时检查环境</label
+        >
+        <div
+          style="
+            width: 44px;
+            height: 24px;
+            background: #22c55e;
+            border-radius: 12px;
+            position: relative;
+          "
+        >
+          <div
+            style="
+              width: 20px;
+              height: 20px;
+              background: white;
+              border-radius: 50%;
+              position: absolute;
+              right: 2px;
+              top: 2px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            "
+          ></div>
+        </div>
       </div>
     </div>
 
     <!-- 网络设置 -->
-    <div style="margin-bottom:32px;">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <span style="font-size:13px; font-weight:600; color:#666; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">网络设置</span>
-        <div style="flex:1; height:1px; background:#e5e5e5;"></div>
+    <div style="margin-bottom: 32px">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+        <span
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          "
+          >网络设置</span
+        >
+        <div style="flex: 1; height: 1px; background: #e5e5e5"></div>
       </div>
 
-      <div style="display:flex; align-items:flex-start; gap:16px; margin-bottom:12px;">
-        <label style="width:140px; font-size:14px; font-weight:500; color:#333; flex-shrink:0; text-align:right; margin-top:8px;">GitHub 代理</label>
-        <div style="flex:1;">
-          <div style="padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; background:#f9fafb; font-size:14px; color:#666; margin-bottom:8px;">gh-proxy.org ▼</div>
-          <div style="display:flex; align-items:center; gap:4px; font-size:12px; color:#888;">
-            <span style="width:14px; height:14px; background:#22c55e; border-radius:50%; display:inline-block;"></span>
+      <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 12px">
+        <label
+          style="
+            width: 140px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            flex-shrink: 0;
+            text-align: right;
+            margin-top: 8px;
+          "
+          >GitHub 代理</label
+        >
+        <div style="flex: 1">
+          <div
+            style="
+              padding: 8px 12px;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              background: #f9fafb;
+              font-size: 14px;
+              color: #666;
+              margin-bottom: 8px;
+            "
+          >
+            gh-proxy.org ▼
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #888">
+            <span
+              style="
+                width: 14px;
+                height: 14px;
+                background: #22c55e;
+                border-radius: 50%;
+                display: inline-block;
+              "
+            ></span>
             当前生效：gh-proxy.org
           </div>
         </div>
       </div>
 
-      <div style="display:flex; align-items:flex-start; gap:16px;">
-        <label style="width:140px; font-size:14px; font-weight:500; color:#333; flex-shrink:0; text-align:right; margin-top:8px;">npm 镜像</label>
-        <div style="flex:1;">
-          <div style="padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; background:#f9fafb; font-size:14px; color:#666; margin-bottom:8px;">淘宝 (npmmirror.com) ▼</div>
-          <div style="display:flex; align-items:center; gap:4px; font-size:12px; color:#888;">
-            <span style="width:14px; height:14px; background:#22c55e; border-radius:50%; display:inline-block;"></span>
+      <div style="display: flex; align-items: flex-start; gap: 16px">
+        <label
+          style="
+            width: 140px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            flex-shrink: 0;
+            text-align: right;
+            margin-top: 8px;
+          "
+          >npm 镜像</label
+        >
+        <div style="flex: 1">
+          <div
+            style="
+              padding: 8px 12px;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              background: #f9fafb;
+              font-size: 14px;
+              color: #666;
+              margin-bottom: 8px;
+            "
+          >
+            淘宝 (npmmirror.com) ▼
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #888">
+            <span
+              style="
+                width: 14px;
+                height: 14px;
+                background: #22c55e;
+                border-radius: 50%;
+                display: inline-block;
+              "
+            ></span>
             当前生效：淘宝 (npmmirror.com)
           </div>
         </div>
@@ -60,55 +201,204 @@
     </div>
 
     <!-- 管理操作 -->
-    <div style="margin-bottom:32px;">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <span style="font-size:13px; font-weight:600; color:#666; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">管理操作</span>
-        <div style="flex:1; height:1px; background:#e5e5e5;"></div>
+    <div style="margin-bottom: 32px">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+        <span
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          "
+          >管理操作</span
+        >
+        <div style="flex: 1; height: 1px; background: #e5e5e5"></div>
       </div>
-      <div style="display:flex; align-items:center; gap:16px;">
-        <label style="width:140px; font-size:14px; font-weight:500; color:#333; flex-shrink:0; text-align:right;">技能管理</label>
-        <button style="padding:8px 16px; background:#f3f4f6; border:1px solid #e5e5e5; border-radius:9999px; font-size:14px; cursor:pointer;">🔄 全部更新 (5)</button>
+      <div style="display: flex; align-items: center; gap: 16px">
+        <label
+          style="
+            width: 140px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            flex-shrink: 0;
+            text-align: right;
+          "
+          >技能管理</label
+        >
+        <button
+          style="
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border: 1px solid #e5e5e5;
+            border-radius: 9999px;
+            font-size: 14px;
+            cursor: pointer;
+          "
+        >
+          🔄 全部更新 (5)
+        </button>
       </div>
     </div>
 
     <!-- 运行环境 -->
     <div>
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-        <span style="font-size:13px; font-weight:600; color:#666; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">运行环境</span>
-        <div style="flex:1; height:1px; background:#e5e5e5;"></div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+        <span
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          "
+          >运行环境</span
+        >
+        <div style="flex: 1; height: 1px; background: #e5e5e5"></div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; align-items:center; gap:12px; padding:10px 16px; background:#f9fafb; border-radius:10px; border:1px solid #e5e5e5;">
-          <div style="width:28px; height:28px; background:#dcfce7; color:#16a34a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">✓</div>
-          <div style="flex:1;">
-            <div style="font-size:14px; font-weight:500;">Node.js</div>
-            <div style="font-size:12px; color:#888;">v20.12.0</div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e5e5;
+          "
+        >
+          <div
+            style="
+              width: 28px;
+              height: 28px;
+              background: #dcfce7;
+              color: #16a34a;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+            "
+          >
+            ✓
+          </div>
+          <div style="flex: 1">
+            <div style="font-size: 14px; font-weight: 500">Node.js</div>
+            <div style="font-size: 12px; color: #888">v20.12.0</div>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px 16px; background:#f9fafb; border-radius:10px; border:1px solid #e5e5e5;">
-          <div style="width:28px; height:28px; background:#dcfce7; color:#16a34a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">✓</div>
-          <div style="flex:1;">
-            <div style="font-size:14px; font-weight:500;">npm</div>
-            <div style="font-size:12px; color:#888;">v10.5.0</div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e5e5;
+          "
+        >
+          <div
+            style="
+              width: 28px;
+              height: 28px;
+              background: #dcfce7;
+              color: #16a34a;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+            "
+          >
+            ✓
+          </div>
+          <div style="flex: 1">
+            <div style="font-size: 14px; font-weight: 500">npm</div>
+            <div style="font-size: 12px; color: #888">v10.5.0</div>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px 16px; background:#f9fafb; border-radius:10px; border:1px solid #e5e5e5;">
-          <div style="width:28px; height:28px; background:#dcfce7; color:#16a34a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">✓</div>
-          <div style="flex:1;">
-            <div style="font-size:14px; font-weight:500;">skills</div>
-            <div style="font-size:12px; color:#888;">v1.2.3</div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e5e5;
+          "
+        >
+          <div
+            style="
+              width: 28px;
+              height: 28px;
+              background: #dcfce7;
+              color: #16a34a;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+            "
+          >
+            ✓
           </div>
-          <button style="padding:4px 10px; background:#f3f4f6; border:1px solid #e5e5e5; border-radius:9999px; font-size:12px; cursor:pointer;">🔄 更新</button>
+          <div style="flex: 1">
+            <div style="font-size: 14px; font-weight: 500">skills</div>
+            <div style="font-size: 12px; color: #888">v1.2.3</div>
+          </div>
+          <button
+            style="
+              padding: 4px 10px;
+              background: #f3f4f6;
+              border: 1px solid #e5e5e5;
+              border-radius: 9999px;
+              font-size: 12px;
+              cursor: pointer;
+            "
+          >
+            🔄 更新
+          </button>
         </div>
       </div>
-      <div style="margin-top:16px; display:flex; gap:8px;">
-        <button style="padding:6px 14px; background:#f3f4f6; border:1px solid #e5e5e5; border-radius:9999px; font-size:13px; cursor:pointer;">🔄 重新检测</button>
+      <div style="margin-top: 16px; display: flex; gap: 8px">
+        <button
+          style="
+            padding: 6px 14px;
+            background: #f3f4f6;
+            border: 1px solid #e5e5e5;
+            border-radius: 9999px;
+            font-size: 13px;
+            cursor: pointer;
+          "
+        >
+          🔄 重新检测
+        </button>
       </div>
     </div>
   </div>
 
   <!-- FAB -->
-  <div style="position:fixed; bottom:24px; right:24px;">
-    <button style="padding:12px 24px; background:#3a4a5c; color:white; border:none; border-radius:9999px; font-size:15px; font-weight:500; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">✓ 保存设置</button>
+  <div style="position: fixed; bottom: 24px; right: 24px">
+    <button
+      style="
+        padding: 12px 24px;
+        background: #3a4a5c;
+        color: white;
+        border: none;
+        border-radius: 9999px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      "
+    >
+      ✓ 保存设置
+    </button>
   </div>
 </div>

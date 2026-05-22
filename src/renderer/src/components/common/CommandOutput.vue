@@ -26,7 +26,8 @@ const segments = computed(() => {
 </script>
 
 <template>
-  <div class="terminal-output">
+  <!-- aria-live 使动态命令输出可被屏幕阅读器播报 -->
+  <div class="terminal-output" aria-live="polite" aria-atomic="false">
     <template v-for="(seg, i) in segments" :key="i">
       <span v-if="seg.type === 'text'" class="text">{{ seg.value }}</span>
       <a v-else class="skill-ref" @click.prevent="emit('navigate', seg.value)">{{ seg.value }}</a>
@@ -36,12 +37,12 @@ const segments = computed(() => {
 
 <style scoped>
 .terminal-output {
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--color-terminal-bg);
+  color: var(--color-terminal-text);
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--radius-md);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 13px;
+  font-size: var(--text-caption);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-all;

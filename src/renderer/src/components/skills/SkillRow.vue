@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { NIcon, NButton, NTag, NText } from 'naive-ui'
-import { FolderOpenOutline, RefreshOutline, TrashOutline } from '@vicons/ionicons5'
+import { NIcon, NButton, NText } from 'naive-ui'
+import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
+import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import type { InstalledSkill } from '../../../../shared/types'
 
 const props = defineProps<{ skill: InstalledSkill }>()
@@ -21,7 +23,7 @@ const emit = defineEmits<{
         <NButton
           quaternary
           circle
-          size="tiny"
+          size="small"
           class="action-btn"
           title="打开位置"
           aria-label="打开位置"
@@ -34,7 +36,7 @@ const emit = defineEmits<{
         <NButton
           quaternary
           circle
-          size="tiny"
+          size="small"
           class="action-btn"
           title="更新"
           aria-label="更新"
@@ -47,7 +49,7 @@ const emit = defineEmits<{
         <NButton
           quaternary
           circle
-          size="tiny"
+          size="small"
           type="error"
           class="action-btn action-btn--danger"
           title="删除"
@@ -61,17 +63,16 @@ const emit = defineEmits<{
       </div>
     </div>
     <div v-if="props.skill.agents.length > 0" class="skill-agents">
-      <NTag
+      <!-- 使用 button 替代可点击 NTag，确保键盘可聚焦和可激活 -->
+      <button
         v-for="agent in props.skill.agents"
         :key="agent.name"
-        size="small"
-        :bordered="false"
-        round
+        type="button"
         class="agent-tag agent-tag--clickable"
         @click="emit('filterAgent', agent.name)"
       >
         {{ agent.name }}
-      </NTag>
+      </button>
     </div>
   </div>
 </template>
@@ -85,7 +86,9 @@ const emit = defineEmits<{
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
   background: var(--color-canvas);
-  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  transition:
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
 }
 
 .skill-card:hover {
@@ -138,7 +141,14 @@ const emit = defineEmits<{
   background: var(--color-surface);
   color: var(--color-stone);
   border: 1px solid var(--color-hairline);
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+  /* 重置 button 默认样式，保持视觉与之前 NTag 一致 */
+  font-family: inherit;
+  line-height: var(--leading-normal);
+  padding: 0 8px;
 }
 
 .agent-tag--clickable {
@@ -149,5 +159,10 @@ const emit = defineEmits<{
   background: var(--color-muted);
   color: var(--color-ink);
   border-color: var(--color-muted);
+}
+
+.agent-tag:focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 2px;
 }
 </style>

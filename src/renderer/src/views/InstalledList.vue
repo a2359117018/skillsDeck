@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { NInput, NIcon, NButton, NSpin, useMessage } from 'naive-ui'
-import { RefreshOutline, SearchOutline } from '@vicons/ionicons5'
+import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
+import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '../stores/skills'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
@@ -150,7 +151,7 @@ function handleFilterAgent(agentFlag: string): void {
 </script>
 
 <template>
-  <div class="installed-list-page">
+  <main class="installed-list-page">
     <div class="container">
       <!-- Toolbar -->
       <div class="toolbar">
@@ -162,6 +163,7 @@ function handleFilterAgent(agentFlag: string): void {
           <NInput
             :value="skillsStore.searchKeyword"
             placeholder="搜索技能..."
+            aria-label="搜索已安装技能"
             clearable
             size="large"
             class="toolbar-search-input"
@@ -236,7 +238,7 @@ function handleFilterAgent(agentFlag: string): void {
         @done="handleRemoveDialogDone"
       />
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
@@ -272,7 +274,7 @@ function handleFilterAgent(agentFlag: string): void {
 
 .toolbar-badge {
   background: var(--color-brand-blue);
-  color: white;
+  color: var(--color-canvas);
   padding: 2px 10px;
   border-radius: var(--radius-full);
   font-size: var(--text-body-sm);
@@ -322,7 +324,9 @@ function handleFilterAgent(agentFlag: string): void {
 /* List Transitions */
 .list-enter-active,
 .list-leave-active {
-  transition: opacity var(--transition-base), transform var(--transition-base);
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base);
 }
 
 .list-enter-from,

@@ -4,6 +4,14 @@ import App from './App.vue'
 import { router } from './router'
 import './assets/main.css'
 
+// 监听系统暗黑模式偏好并同步到 html[data-theme]
+function syncTheme(): void {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
+}
+syncTheme()
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme)
+
 // 消除 Chrome 对非 passive wheel/touch 事件监听器的警告（Naive UI 内部组件引起）
 const origAddEventListener = EventTarget.prototype.addEventListener
 EventTarget.prototype.addEventListener = function (

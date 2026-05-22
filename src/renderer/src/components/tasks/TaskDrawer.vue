@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
+import { useWindowSize } from '@vueuse/core'
 import { NDrawer, NDrawerContent, NButton, NIcon, NEmpty } from 'naive-ui'
-import { TrashOutline } from '@vicons/ionicons5'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import TaskItem from './TaskItem.vue'
 import { useTaskStore } from '../../stores/tasks'
 
@@ -14,20 +15,9 @@ const emit = defineEmits<{
 }>()
 
 const taskStore = useTaskStore()
-const windowWidth = ref(1200)
 
-function handleResize(): void {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  windowWidth.value = window.innerWidth
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+/** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
+const { width: windowWidth } = useWindowSize()
 
 const drawerWidth = computed(() => Math.min(480, windowWidth.value * 0.4))
 
@@ -41,14 +31,9 @@ function handleCancel(taskId: string): void {
   taskStore.cancel(taskId)
 }
 
-/** 清除已完成的任务（从列表中移除 success/error/cancelled） */
+/** 清除已完成的任务，通过调用 store action 而非直接修改数组 */
 function clearCompleted(): void {
-  taskStore.tasks
-    .filter((t) => t.status !== 'running' && t.status !== 'pending')
-    .forEach((t) => {
-      const idx = taskStore.tasks.indexOf(t)
-      if (idx >= 0) taskStore.tasks.splice(idx, 1)
-    })
+  taskStore.clearCompleted()
 }
 
 /** 是否存在已完成可清除的任务 */
@@ -74,6 +59,7 @@ const hasCompletedTasks = computed(() =>
             v-if="hasCompletedTasks"
             size="tiny"
             quaternary
+            round
             class="drawer-clear-btn"
             @click="clearCompleted"
           >
@@ -104,8 +90,8 @@ const hasCompletedTasks = computed(() =>
 }
 
 .drawer-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--text-body-md);
+  font-weight: var(--weight-semibold);
   color: var(--color-ink);
 }
 
@@ -119,8 +105,8 @@ const hasCompletedTasks = computed(() =>
   border-radius: var(--radius-full);
   background: var(--color-brand-blue);
   color: var(--color-canvas);
-  font-size: 0.6875rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
 }
 
 .drawer-clear-btn {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { NText, NIcon, NButton, NSpin, useNotification } from 'naive-ui'
-import { ArchiveOutline } from '@vicons/ionicons5'
+import ArchiveOutline from '@vicons/ionicons5/ArchiveOutline'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillInstall } from '@renderer/composables/useSkillInstall'
@@ -150,51 +150,67 @@ onUnmounted(() => {
 
 <template>
   <div class="archive-installer">
-    <!-- Main two-column layout (always visible) -->
     <div class="archive-columns">
-      <!-- Left column: drag zone + skill list -->
+      <!-- Left column -->
       <div class="column-left">
-        <div
-          :class="['drop-zone', { active: isDragging }]"
-          role="button"
-          tabindex="0"
-          @dragenter="handleDragEnter"
-          @dragleave="handleDragLeave"
-          @dragover="handleDragOver"
-          @drop="handleDrop"
-          @click="handleClickSelect"
-          @keydown.enter="handleClickSelect"
-          @keydown.space.prevent="handleClickSelect"
-        >
-          <div class="drop-zone-content">
-            <NIcon :size="24" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
+        <!-- Input card: matches GitHubInstaller's input-card structure -->
+        <div class="input-card">
+          <div class="input-card-header">
+            <!-- 装饰性图标，对屏幕阅读器隐藏 -->
+            <NIcon :size="16" color="var(--color-ink)" aria-hidden="true">
               <ArchiveOutline />
             </NIcon>
-            <div class="drop-zone-text">
+            <NText class="input-card-title">从压缩包导入技能</NText>
+          </div>
+
+          <div
+            :class="['drop-zone', { active: isDragging }]"
+            role="button"
+            tabindex="0"
+            aria-label="选择或拖拽压缩包文件"
+            @dragenter="handleDragEnter"
+            @dragleave="handleDragLeave"
+            @dragover="handleDragOver"
+            @drop="handleDrop"
+            @click="handleClickSelect"
+            @keydown.enter="handleClickSelect"
+            @keydown.space.prevent="handleClickSelect"
+          >
+            <div class="drop-zone-content">
+              <NIcon :size="20" :color="isDragging ? DRAG_ACTIVE_COLOR : DRAG_DEFAULT_COLOR">
+                <ArchiveOutline />
+              </NIcon>
               <NText :depth="isDragging ? 1 : 3" style="font-weight: 500">
                 {{ isDragging ? '松开鼠标以导入文件' : '拖拽或点击选择压缩包' }}
               </NText>
             </div>
+            <NText v-if="selectedFile" depth="3" class="selected-file">
+              {{ selectedFile }}
+            </NText>
           </div>
-          <NText v-if="selectedFile" depth="3" class="selected-file">
-            {{ selectedFile }}
-          </NText>
+
+          <!-- Inline extracting indicator (matches GitHub's inline-progress) -->
+          <div v-if="extracting" class="inline-progress">
+            <div class="inline-progress-footer">
+              <NText depth="3" class="inline-progress-hint">
+                <NSpin :size="14" style="margin-right: var(--space-xs)" />
+                正在解压并扫描文件...
+              </NText>
+              <NButton size="tiny" round @click="extracting = false">取消</NButton>
+            </div>
+          </div>
         </div>
 
-        <!-- Loading indicator inside left column -->
-        <div v-if="extracting" class="archive-loading">
-          <NSpin size="large" />
-          <NText depth="3">正在解压并扫描文件...</NText>
-        </div>
-
+        <!-- Step 1 -->
         <div class="step-header">
           <span class="step-number">1</span>
-          <span class="step-title">选择技能</span>
+          <h3 class="step-title">选择技能</h3>
           <span v-if="hasScannedSkills" class="step-count">
             {{ selectedSkills.length }} / {{ scannedSkills.length }}
           </span>
         </div>
 
+        <!-- Skill list area -->
         <div class="skill-list-area">
           <SkillScanResult
             :skills="scannedSkills"
@@ -204,11 +220,11 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Right column: agent selector + install button -->
+      <!-- Right column -->
       <div class="column-right">
         <div class="step-header">
           <span class="step-number">2</span>
-          <span class="step-title">选择安装目标</span>
+          <h3 class="step-title">选择安装目标</h3>
         </div>
 
         <div class="agent-area">
@@ -220,16 +236,20 @@ onUnmounted(() => {
           />
         </div>
 
-        <div class="column-actions">
+        <!-- Compact action bar (matches GitHubInstaller) -->
+        <div class="action-bar">
+          <span class="action-bar-count">
+            已选 <span class="action-bar-num">{{ selectedSkills.length }}</span> 个技能
+          </span>
           <NButton
             type="primary"
+            size="small"
             :disabled="!canInstall || installing"
             :loading="installing"
             round
-            block
             @click="handleInstall"
           >
-            安装选中技能 ({{ selectedSkills.length }})
+            安装
           </NButton>
         </div>
       </div>
@@ -241,22 +261,12 @@ onUnmounted(() => {
 .archive-installer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
   height: 100%;
-}
-
-.archive-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-xl) 0;
-  flex-shrink: 0;
 }
 
 .archive-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   grid-template-rows: minmax(0, 1fr);
   gap: var(--space-lg);
   flex: 1;
@@ -272,15 +282,47 @@ onUnmounted(() => {
   padding-bottom: var(--space-lg);
 }
 
+/* --- Input card (matches GitHubInstaller) --- */
+.input-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+  min-height: 120px;
+}
+
+.input-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.input-card-title {
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+}
+
+/* --- Drop zone (inside input-card) --- */
 .drop-zone {
   border: 2px dashed var(--color-hairline);
-  border-radius: var(--radius-xl);
-  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
   text-align: center;
   cursor: pointer;
-  transition: border-color var(--transition-base), background var(--transition-base);
-  background: var(--color-canvas);
-  flex-shrink: 0;
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xxs);
 }
 
 .drop-zone:hover {
@@ -296,20 +338,12 @@ onUnmounted(() => {
 
 .drop-zone-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-xxs);
-}
-
-.drop-zone-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .selected-file {
   display: block;
-  margin-top: var(--space-xs);
   font-size: var(--text-micro);
   word-break: break-all;
 }
@@ -373,7 +407,44 @@ onUnmounted(() => {
   overflow-y: auto;
 }
 
-.column-actions {
+/* --- Action bar (matches GitHubInstaller) --- */
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
   flex-shrink: 0;
+}
+
+.action-bar-count {
+  font-size: var(--text-micro);
+  color: var(--color-muted);
+}
+
+.action-bar-num {
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+}
+
+/* --- Inline progress (matches GitHubInstaller) --- */
+.inline-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+
+.inline-progress-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inline-progress-hint {
+  font-size: var(--text-micro);
+  display: flex;
+  align-items: center;
 }
 </style>

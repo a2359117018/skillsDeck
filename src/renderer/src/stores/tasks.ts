@@ -80,5 +80,20 @@ export const useTaskStore = defineStore('tasks', () => {
     return tasks.value.some((t) => t.type === type && t.status === 'running')
   }
 
-  return { tasks, activeTasks, hasActiveTasks, start, cancel, sync, subscribe, isRunning }
+  /** 清除已完成的任务（状态非 running/pending） */
+  function clearCompleted(): void {
+    tasks.value = tasks.value.filter((t) => t.status === 'running' || t.status === 'pending')
+  }
+
+  return {
+    tasks,
+    activeTasks,
+    hasActiveTasks,
+    start,
+    cancel,
+    sync,
+    subscribe,
+    isRunning,
+    clearCompleted
+  }
 })

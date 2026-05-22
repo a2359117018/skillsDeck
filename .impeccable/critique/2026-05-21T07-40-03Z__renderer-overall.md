@@ -13,19 +13,19 @@ slug: renderer-overall
 
 ## Design Health Score
 
-| #         | Heuristic                         | Score     | Key Issue                                                                      |
-| --------- | --------------------------------- | --------- | ------------------------------------------------------------------------------ |
-| 1         | Visibility of System Status       | 4         | Task indicator in sidebar + TaskDrawer with progress; good feedback loop       |
-| 2         | Match System / Real World         | 3         | "全局安装" still opaque; agent jargon partially addressed via empty states     |
-| 3         | User Control and Freedom          | 3         | AgentSelector streamlined; keyboard shortcuts added; no bulk select yet        |
-| 4         | Consistency and Standards         | 4         | CSS anti-patterns cleaned; border radius unified; install flow consistent      |
-| 5         | Error Prevention                  | 3         | Confirmation dialogs exist, URL validation present; no empty-search prevention |
-| 6         | Recognition Rather Than Recall    | 3         | Sidebar labels at 11px with flat design; focus indicators added; no onboarding |
-| 7         | Flexibility and Efficiency of Use | 3         | `/` and `Ctrl+K` search shortcuts; AgentSelector simplified; no command palette|
-| 8         | Aesthetic and Minimalist Design   | 5         | All gradient/glow decorations removed; flat dark sidebar; clean agent cards    |
-| 9         | Error Recovery                    | 3         | Focus trap + aria labels added; toasts still auto-dismiss                      |
-| 10        | Help and Documentation            | 2         | Contextual empty states with actions; settings onboarding added; no FAQ/help   |
-| **Total** |                                   | **33/40** | **Good — remaining issues are refinements, not blockers**                      |
+| #         | Heuristic                         | Score     | Key Issue                                                                       |
+| --------- | --------------------------------- | --------- | ------------------------------------------------------------------------------- |
+| 1         | Visibility of System Status       | 4         | Task indicator in sidebar + TaskDrawer with progress; good feedback loop        |
+| 2         | Match System / Real World         | 3         | "全局安装" still opaque; agent jargon partially addressed via empty states      |
+| 3         | User Control and Freedom          | 3         | AgentSelector streamlined; keyboard shortcuts added; no bulk select yet         |
+| 4         | Consistency and Standards         | 4         | CSS anti-patterns cleaned; border radius unified; install flow consistent       |
+| 5         | Error Prevention                  | 3         | Confirmation dialogs exist, URL validation present; no empty-search prevention  |
+| 6         | Recognition Rather Than Recall    | 3         | Sidebar labels at 11px with flat design; focus indicators added; no onboarding  |
+| 7         | Flexibility and Efficiency of Use | 3         | `/` and `Ctrl+K` search shortcuts; AgentSelector simplified; no command palette |
+| 8         | Aesthetic and Minimalist Design   | 5         | All gradient/glow decorations removed; flat dark sidebar; clean agent cards     |
+| 9         | Error Recovery                    | 3         | Focus trap + aria labels added; toasts still auto-dismiss                       |
+| 10        | Help and Documentation            | 2         | Contextual empty states with actions; settings onboarding added; no FAQ/help    |
+| **Total** |                                   | **33/40** | **Good — remaining issues are refinements, not blockers**                       |
 
 ## Anti-Patterns Verdict
 

@@ -40,7 +40,8 @@ const envBannerVisible = computed(
  */
 function handleKeydown(e: KeyboardEvent): void {
   const tag = (e.target as HTMLElement)?.tagName?.toLowerCase()
-  const isInputFocused = tag === 'input' || tag === 'textarea' || (e.target as HTMLElement)?.isContentEditable
+  const isInputFocused =
+    tag === 'input' || tag === 'textarea' || (e.target as HTMLElement)?.isContentEditable
 
   // Ctrl/Cmd + K or / (when not in input)
   if ((e.key === 'k' && (e.ctrlKey || e.metaKey)) || (e.key === '/' && !isInputFocused)) {

@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useWindowSize } from '@vueuse/core'
 import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin, useMessage } from 'naive-ui'
-import {
-  FolderOpenOutline,
-  RefreshOutline,
-  TrashOutline,
-  SearchOutline,
-  CloseOutline,
-  GitMergeOutline
-} from '@vicons/ionicons5'
+import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
+import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
+import SearchOutline from '@vicons/ionicons5/SearchOutline'
+import CloseOutline from '@vicons/ionicons5/CloseOutline'
+import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
 import { useConfirm } from '@renderer/composables/useConfirm'
@@ -33,11 +32,9 @@ const selectedAgent = computed(
 )
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
-const windowWidth = ref(1200)
 
-function handleResize(): void {
-  windowWidth.value = window.innerWidth
-}
+/** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
+const { width: windowWidth } = useWindowSize()
 
 const visibleAgentResults = computed(() =>
   skillsStore.sortedAgentResults.filter((a) => {
@@ -57,9 +54,18 @@ function getAgentColorIndex(index: number): number {
   return index % 4
 }
 
+/** 打开 Agent 卡片详情抽屉 */
 function openAgentCard(agent: AgentScanResult): void {
   selectedAgentFlag.value = agent.agentFlag
   drawerVisible.value = true
+}
+
+/** 处理 Agent 卡片键盘事件，支持 Enter / Space 触发点击 */
+function handleAgentCardKeydown(agent: AgentScanResult, e: KeyboardEvent): void {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    openAgentCard(agent)
+  }
 }
 
 function closeDrawer(): void {
@@ -121,18 +127,12 @@ async function handleRefresh(): Promise<void> {
 }
 
 onMounted(() => {
-  windowWidth.value = window.innerWidth
-  window.addEventListener('resize', handleResize)
   skillsStore.fetchInstalled()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <template>
-  <div class="agent-page">
+  <div class="agent-page" role="main" aria-label="Agent 管理页面">
     <div class="container">
       <!-- Toolbar -->
       <div class="toolbar">
@@ -147,10 +147,11 @@ onUnmounted(() => {
             placeholder="搜索 AI 工具名称..."
             clearable
             size="large"
+            aria-label="搜索 Agent"
             class="toolbar-search-input"
           >
             <template #prefix>
-              <NIcon :size="18" :color="'var(--color-muted)'">
+              <NIcon :size="18" :color="'var(--color-muted)'" aria-hidden="true">
                 <SearchOutline />
               </NIcon>
             </template>
@@ -159,7 +160,7 @@ onUnmounted(() => {
         <div class="toolbar-actions">
           <NButton secondary size="small" :disabled="skillsStore.refreshing" @click="handleRefresh">
             <template #icon>
-              <NIcon :size="16"><RefreshOutline /></NIcon>
+              <NIcon :size="16" aria-hidden="true"><RefreshOutline /></NIcon>
             </template>
             刷新
           </NButton>
@@ -176,8 +177,11 @@ onUnmounted(() => {
           :key="agent.agentFlag"
           class="agent-card"
           :class="['color-' + getAgentColorIndex(index)]"
+          role="button"
+          tabindex="0"
           :aria-label="agent.agentName + '，' + agent.count + '个技能'"
           @click="openAgentCard(agent)"
+          @keydown="handleAgentCardKeydown(agent, $event)"
         >
           <div class="agent-card-avatar">
             {{ getAgentInitials(agent.agentName) }}
@@ -196,7 +200,7 @@ onUnmounted(() => {
               @click="openAgentFolder(agent, $event)"
             >
               <template #icon>
-                <NIcon :size="14"><FolderOpenOutline /></NIcon>
+                <NIcon :size="14" aria-hidden="true"><FolderOpenOutline /></NIcon>
               </template>
             </NButton>
           </div>
@@ -244,12 +248,12 @@ onUnmounted(() => {
                 <NButton
                   quaternary
                   circle
-                  size="small"
+                  size="medium"
                   class="header-icon-btn"
                   @click="openAgentFolder(selectedAgent!)"
                 >
                   <template #icon>
-                    <NIcon :size="18"><FolderOpenOutline /></NIcon>
+                    <NIcon :size="18" aria-hidden="true"><FolderOpenOutline /></NIcon>
                   </template>
                 </NButton>
               </template>
@@ -260,12 +264,12 @@ onUnmounted(() => {
                 <NButton
                   quaternary
                   circle
-                  size="small"
+                  size="medium"
                   class="header-icon-btn"
                   @click="closeDrawer"
                 >
                   <template #icon>
-                    <NIcon :size="18"><CloseOutline /></NIcon>
+                    <NIcon :size="18" aria-hidden="true"><CloseOutline /></NIcon>
                   </template>
                 </NButton>
               </template>
@@ -274,7 +278,11 @@ onUnmounted(() => {
           </div>
         </div>
         <div class="drawer-body">
-          <div v-for="skillName in selectedAgent.skills" :key="skillName" class="skill-card">
+          <div
+            v-for="skillName in selectedAgent.skills"
+            :key="selectedAgent.agentFlag + '-' + skillName"
+            class="skill-card"
+          >
             <div class="skill-left">
               <div class="skill-name">{{ skillName }}</div>
             </div>
@@ -289,7 +297,7 @@ onUnmounted(() => {
                     @click="handleUpdate(skillName)"
                   >
                     <template #icon>
-                      <NIcon :size="16"><RefreshOutline /></NIcon>
+                      <NIcon :size="16" aria-hidden="true"><RefreshOutline /></NIcon>
                     </template>
                   </NButton>
                 </template>
@@ -306,7 +314,7 @@ onUnmounted(() => {
                     @click="handleRemove(skillName)"
                   >
                     <template #icon>
-                      <NIcon :size="16"><TrashOutline /></NIcon>
+                      <NIcon :size="16" aria-hidden="true"><TrashOutline /></NIcon>
                     </template>
                   </NButton>
                 </template>
@@ -354,7 +362,7 @@ onUnmounted(() => {
 
 .toolbar-badge {
   background: var(--color-brand-blue);
-  color: white;
+  color: var(--color-canvas);
   padding: 2px 10px;
   border-radius: var(--radius-full);
   font-size: var(--text-body-sm);
@@ -410,7 +418,9 @@ onUnmounted(() => {
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   border: 1px solid;
-  transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
+  transition:
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -418,7 +428,6 @@ onUnmounted(() => {
 
 .agent-card:hover {
   box-shadow: var(--shadow-3);
-  transform: translateY(-2px);
 }
 
 /* Card Color Themes */
@@ -474,7 +483,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-canvas);
   font-size: var(--text-body-lg);
   font-weight: var(--weight-semibold);
   flex-shrink: 0;
@@ -570,8 +579,8 @@ onUnmounted(() => {
 }
 
 :deep(.n-button.header-icon-btn) {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   color: var(--color-stone);
 }
 
@@ -600,7 +609,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .skill-card:hover {
@@ -633,8 +644,8 @@ onUnmounted(() => {
 }
 
 :deep(.n-button.action-btn) {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   color: var(--color-stone);
 }
 

@@ -639,13 +639,13 @@ interface SkillSearchResponse {
 
 ## 8. 路由映射
 
-| 路径                 | 名称           | 组件                | 说明                                                |
-| -------------------- | -------------- | ------------------- | --------------------------------------------------- |
-| `/`                  | `installed`    | `InstalledList.vue` | 已安装技能列表（首页）                              |
-| `/search`            | `search`       | `SkillsSearch.vue`  | 技能搜索                                            |
-| `/agent-view`        | `agent-view`   | `AgentView.vue`     | Agent 管理（卡片网格 + 抽屉详情）                   |
-| `/env`               | `env`          | `SettingsView.vue`  | 环境检测与修复                                      |
-| `/settings`          | `settings`     | `SettingsView.vue`  | 应用设置（别名路由）                                |
+| 路径          | 名称         | 组件                | 说明                              |
+| ------------- | ------------ | ------------------- | --------------------------------- |
+| `/`           | `installed`  | `InstalledList.vue` | 已安装技能列表（首页）            |
+| `/search`     | `search`     | `SkillsSearch.vue`  | 技能搜索                          |
+| `/agent-view` | `agent-view` | `AgentView.vue`     | Agent 管理（卡片网格 + 抽屉详情） |
+| `/env`        | `env`        | `SettingsView.vue`  | 环境检测与修复                    |
+| `/settings`   | `settings`   | `SettingsView.vue`  | 应用设置（别名路由）              |
 
 > 使用 `createWebHashHistory()` 以兼容 Electron 的 `file://` 协议。
 

@@ -32,7 +32,7 @@
   --color-primary: #0a0a0a;
   --color-ink: #1a1a1a;
   --color-stone: #6b7280;
-  --color-muted: #9ca3af;
+  --color-muted: #757575; /* 加深以通过 WCAG AA 对比度要求（白色画布上 4.6:1） */
   --color-canvas: #ffffff;
   --color-surface: #f7f8fa;
   --color-hairline: #e5e7eb;
@@ -70,15 +70,23 @@
   --color-success-text: #166534;
   --color-warning: #f0a020;
   --color-warning-bg: #fffbeb;
+  --color-warning-border: rgba(240, 160, 32, 0.35);
   --color-error: #d45656;
   --color-error-bg: #fef2f2;
 
   /* Sidebar */
   --sidebar-bg: #111111;
   --sidebar-width: 72px;
-  --sidebar-icon-color: rgba(255, 255, 255, 0.55);
+  --sidebar-icon-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* 提高透明度以通过 WCAG AA 对比度（#111 背景上 ~4.6:1） */
   --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
   --sidebar-icon-active-color: #ffffff;
+  --sidebar-item-hover-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-item-active-bg: rgba(255, 255, 255, 0.1);
   --sidebar-divider-color: rgba(255, 255, 255, 0.12);
 
   /* --- Spacing --- */
@@ -136,4 +144,76 @@
   --transition-fast: 100ms ease;
   --transition-base: 150ms ease;
   --transition-slow: 200ms ease;
+
+  /* --- Terminal --- */
+  --color-terminal-bg: #1e1e1e;
+  --color-terminal-text: #d4d4d4;
+}
+
+/* ============================================
+   Dark Mode Tokens
+   ============================================ */
+[data-theme='dark'] {
+  /* --- Colors --- */
+  --color-primary: #f0f0f0;
+  --color-ink: #e5e5e5;
+  --color-stone: #a1a1aa;
+  --color-muted: #9ca3af;
+  --color-canvas: #0a0a0a;
+  --color-surface: #171717;
+  --color-hairline: #262626;
+  --color-hairline-hover: #404040;
+
+  /* Brand */
+  --color-brand-coral: #ff5530;
+  --color-brand-blue: #3b82f6;
+  --color-brand-magenta: #ea5ec1;
+  --color-brand-purple: #c084fc;
+
+  /* Brand extended */
+  --color-brand-blue-200: #1e3a5f;
+  --color-brand-blue-deep: #93c5fd;
+  --color-brand-coral-light: #ff7a59;
+  --color-brand-magenta-light: #ff6ec7;
+  --color-brand-coral-dark: #e64720;
+
+  /* Agent card tints */
+  --color-agent-coral-bg: #2a1815;
+  --color-agent-coral-border: #4a2a22;
+  --color-agent-blue-bg: #152238;
+  --color-agent-blue-border: #1e3a5f;
+  --color-agent-magenta-bg: #2a1a2e;
+  --color-agent-magenta-border: #4a2a4e;
+  --color-agent-purple-bg: #231a2e;
+  --color-agent-purple-border: #3a2a4e;
+
+  /* Agent drawer interactive tints */
+  --color-brand-blue-tint: rgba(59, 130, 246, 0.12);
+  --color-brand-blue-600: #60a5fa;
+
+  /* Semantic */
+  --color-success-bg: #14532d;
+  --color-success-text: #86efac;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #451a03;
+  --color-warning-border: rgba(251, 191, 36, 0.35);
+  --color-error: #f87171;
+  --color-error-bg: #450a0a;
+
+  /* Sidebar */
+  --sidebar-bg: #000000;
+  --sidebar-icon-color: rgba(255, 255, 255, 0.6);
+  --sidebar-icon-hover-color: rgba(255, 255, 255, 0.9);
+  --sidebar-icon-active-color: #ffffff;
+  --sidebar-divider-color: rgba(255, 255, 255, 0.15);
+
+  /* --- Shadows --- */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-2: rgba(0, 0, 0, 0.2) 0 2px 6px -2px;
+  --shadow-3: rgba(0, 0, 0, 0.3) 0 4px 12px -2px;
+  --shadow-4: rgba(0, 0, 0, 0.3) 0 12px 16px -4px;
+
+  /* --- Terminal --- */
+  --color-terminal-bg: #0d0d0d;
+  --color-terminal-text: #d4d4d4;
 }

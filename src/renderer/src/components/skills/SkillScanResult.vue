@@ -102,6 +102,6 @@ function toggleSkill(path: string): void {
 }
 
 .skill-path {
-  font-size: 12px;
+  font-size: var(--text-micro);
 }
 </style>

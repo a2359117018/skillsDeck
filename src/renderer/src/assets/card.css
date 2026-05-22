@@ -4,7 +4,8 @@
   background-color: var(--color-canvas);
   display: flex;
   overflow: hidden;
-  box-shadow: var(--shadow-1);
+  /* 移除静止阴影，仅保留 hover 阴影（遵循阴影-at-rest 原则） */
+  box-shadow: var(--shadow-0);
   transition:
     box-shadow var(--transition-base),
     border-color var(--transition-base);

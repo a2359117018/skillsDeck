@@ -16,17 +16,15 @@ import {
   useMessage,
   type SelectOption
 } from 'naive-ui'
-import {
-  RefreshOutline,
-  SettingsOutline,
-  LinkOutline,
-  UnlinkOutline,
-  PencilOutline,
-  CheckmarkCircleOutline,
-  CheckmarkOutline,
-  CloseOutline,
-  DownloadOutline
-} from '@vicons/ionicons5'
+import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
+import SettingsOutline from '@vicons/ionicons5/SettingsOutline'
+import LinkOutline from '@vicons/ionicons5/LinkOutline'
+import UnlinkOutline from '@vicons/ionicons5/UnlinkOutline'
+import PencilOutline from '@vicons/ionicons5/PencilOutline'
+import CheckmarkCircleOutline from '@vicons/ionicons5/CheckmarkCircleOutline'
+import CheckmarkOutline from '@vicons/ionicons5/CheckmarkOutline'
+import CloseOutline from '@vicons/ionicons5/CloseOutline'
+import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import { useSettingsStore } from '../stores/settings'
 import { useSkillsStore } from '../stores/skills'
 import { useEnvStore } from '../stores/env'
@@ -331,7 +329,7 @@ async function handleUpdateAll(): Promise<void> {
 </script>
 
 <template>
-  <div class="settings-page">
+  <main class="settings-page">
     <!-- Page Header -->
     <div class="page-header">
       <NIcon :size="28" color="var(--color-ink)">
@@ -500,7 +498,10 @@ async function handleUpdateAll(): Promise<void> {
         </div>
         <div
           class="env-checks-wrapper"
-          :class="{ 'env-checks-wrapper--missing': !envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled }"
+          :class="{
+            'env-checks-wrapper--missing':
+              !envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled
+          }"
         >
           <NText
             depth="3"
@@ -509,77 +510,80 @@ async function handleUpdateAll(): Promise<void> {
             需要 Node.js 和 skills CLI 才能安装和管理技能
           </NText>
           <div class="env-checks">
-          <div class="env-check-item">
-            <div
-              class="env-check-icon"
-              :class="{
-                success: envStore.status?.nodeInstalled,
-                error: !envStore.status?.nodeInstalled
-              }"
-            >
-              <NIcon :size="16">
-                <component :is="envStore.status?.nodeInstalled ? CheckmarkOutline : CloseOutline" />
-              </NIcon>
+            <div class="env-check-item">
+              <div
+                class="env-check-icon"
+                :class="{
+                  success: envStore.status?.nodeInstalled,
+                  error: !envStore.status?.nodeInstalled
+                }"
+              >
+                <NIcon :size="16">
+                  <component
+                    :is="envStore.status?.nodeInstalled ? CheckmarkOutline : CloseOutline"
+                  />
+                </NIcon>
+              </div>
+              <div class="env-check-body">
+                <NText class="env-check-name">Node.js</NText>
+                <NText depth="3" class="env-check-version">{{
+                  envStore.status?.nodeVersion || '未安装'
+                }}</NText>
+              </div>
             </div>
-            <div class="env-check-body">
-              <NText class="env-check-name">Node.js</NText>
-              <NText depth="3" class="env-check-version">{{
-                envStore.status?.nodeVersion || '未安装'
-              }}</NText>
+
+            <div class="env-check-item">
+              <div
+                class="env-check-icon"
+                :class="{
+                  success: envStore.status?.npmInstalled,
+                  error: !envStore.status?.npmInstalled
+                }"
+              >
+                <NIcon :size="16">
+                  <component
+                    :is="envStore.status?.npmInstalled ? CheckmarkOutline : CloseOutline"
+                  />
+                </NIcon>
+              </div>
+              <div class="env-check-body">
+                <NText class="env-check-name">npm</NText>
+                <NText depth="3" class="env-check-version">{{
+                  envStore.status?.npmVersion || '未安装'
+                }}</NText>
+              </div>
+            </div>
+
+            <div class="env-check-item">
+              <div
+                class="env-check-icon"
+                :class="{
+                  success: envStore.status?.skillsInstalled,
+                  error: !envStore.status?.skillsInstalled
+                }"
+              >
+                <NIcon :size="16">
+                  <component
+                    :is="envStore.status?.skillsInstalled ? CheckmarkOutline : CloseOutline"
+                  />
+                </NIcon>
+              </div>
+              <div class="env-check-body">
+                <NText class="env-check-name">skills</NText>
+                <NText depth="3" class="env-check-version">{{
+                  envStore.status?.skillsVersion || '未安装'
+                }}</NText>
+              </div>
+              <div v-if="envStore.status?.skillsInstalled" class="env-check-actions">
+                <NButton size="tiny" round @click="handleUpdateSkills">
+                  <template #icon>
+                    <NIcon :size="12"><RefreshOutline /></NIcon>
+                  </template>
+                  更新
+                </NButton>
+              </div>
             </div>
           </div>
-
-          <div class="env-check-item">
-            <div
-              class="env-check-icon"
-              :class="{
-                success: envStore.status?.npmInstalled,
-                error: !envStore.status?.npmInstalled
-              }"
-            >
-              <NIcon :size="16">
-                <component :is="envStore.status?.npmInstalled ? CheckmarkOutline : CloseOutline" />
-              </NIcon>
-            </div>
-            <div class="env-check-body">
-              <NText class="env-check-name">npm</NText>
-              <NText depth="3" class="env-check-version">{{
-                envStore.status?.npmVersion || '未安装'
-              }}</NText>
-            </div>
-          </div>
-
-          <div class="env-check-item">
-            <div
-              class="env-check-icon"
-              :class="{
-                success: envStore.status?.skillsInstalled,
-                error: !envStore.status?.skillsInstalled
-              }"
-            >
-              <NIcon :size="16">
-                <component
-                  :is="envStore.status?.skillsInstalled ? CheckmarkOutline : CloseOutline"
-                />
-              </NIcon>
-            </div>
-            <div class="env-check-body">
-              <NText class="env-check-name">skills</NText>
-              <NText depth="3" class="env-check-version">{{
-                envStore.status?.skillsVersion || '未安装'
-              }}</NText>
-            </div>
-            <div v-if="envStore.status?.skillsInstalled" class="env-check-actions">
-              <NButton size="tiny" round @click="handleUpdateSkills">
-                <template #icon>
-                  <NIcon :size="12"><RefreshOutline /></NIcon>
-                </template>
-                更新
-              </NButton>
-            </div>
-          </div>
-        </div>
-
         </div>
 
         <div v-if="envDownloading" class="env-actions">
@@ -645,7 +649,7 @@ async function handleUpdateAll(): Promise<void> {
         保存设置
       </NButton>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
@@ -684,6 +688,12 @@ async function handleUpdateAll(): Promise<void> {
 /* Card */
 .settings-card {
   border-radius: var(--radius-xl);
+  /* 移除静止阴影，仅保留 hover 状态（遵循阴影-at-rest 原则） */
+  box-shadow: var(--shadow-0);
+  transition: box-shadow var(--transition-base);
+}
+
+.settings-card:hover {
   box-shadow: var(--shadow-3);
 }
 
@@ -735,7 +745,6 @@ async function handleUpdateAll(): Promise<void> {
 
 .settings-select {
   width: 100%;
-  max-width: 320px;
 }
 
 /* Proxy Field */
@@ -744,7 +753,6 @@ async function handleUpdateAll(): Promise<void> {
   flex-direction: column;
   gap: var(--space-sm);
   width: 100%;
-  max-width: 320px;
 }
 
 .custom-input-wrapper {
@@ -775,7 +783,7 @@ async function handleUpdateAll(): Promise<void> {
 .settings-fab {
   position: fixed;
   bottom: var(--space-xl);
-  right: 32px;
+  right: var(--space-xl);
   z-index: 100;
 }
 
@@ -798,7 +806,9 @@ async function handleUpdateAll(): Promise<void> {
 /* Expand Transition — grid-template-rows avoids layout thrash from max-height */
 .expand-enter-active,
 .expand-leave-active {
-  transition: grid-template-rows var(--transition-base), opacity var(--transition-base);
+  transition:
+    grid-template-rows var(--transition-base),
+    opacity var(--transition-base);
 }
 
 .expand-enter-from,
@@ -841,7 +851,9 @@ async function handleUpdateAll(): Promise<void> {
   justify-content: center;
   border-radius: var(--radius-md);
   flex-shrink: 0;
-  transition: background var(--transition-base), color var(--transition-base);
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
 }
 
 .env-check-icon.success {
@@ -931,8 +943,9 @@ async function handleUpdateAll(): Promise<void> {
   margin-bottom: var(--space-xl);
   padding: var(--space-lg) var(--space-xl);
   border-radius: var(--radius-xl);
-  background: var(--color-brand-blue-200);
-  color: var(--color-brand-blue-deep);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  color: var(--color-ink);
 }
 
 .setup-welcome-title {
@@ -968,11 +981,13 @@ async function handleUpdateAll(): Promise<void> {
   padding: var(--space-md);
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  transition: background var(--transition-base), border-color var(--transition-base);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base);
 }
 
 .env-checks-wrapper--missing {
   background: var(--color-warning-bg);
-  border-color: rgba(240, 160, 32, 0.35);
+  border-color: var(--color-warning-border);
 }
 </style>

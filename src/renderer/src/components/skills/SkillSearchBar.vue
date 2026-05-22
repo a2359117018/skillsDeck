@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NInput, NIcon } from 'naive-ui'
-import { SearchOutline } from '@vicons/ionicons5'
+import SearchOutline from '@vicons/ionicons5/SearchOutline'
 
 const keyword = ref('')
 const emit = defineEmits<{ search: [keyword: string] }>()
@@ -21,6 +21,7 @@ function handleKeydown(e: KeyboardEvent): void {
       <NInput
         v-model:value="keyword"
         placeholder="输入技能名称或关键词搜索..."
+        aria-label="搜索技能"
         size="large"
         clearable
         round

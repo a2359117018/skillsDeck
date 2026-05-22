@@ -22,21 +22,22 @@ resolved:
     action: 删除未使用的 AgentFilter.vue 组件
     date: 2026-05-21
 ---
+
 ## Design Health Score
 
-| # | Heuristic | Score | Key Issue |
-|---|-----------|-------|-----------|
-| 1 | Visibility of System Status | 2 | 后台任务状态不可见，技能行无独立更新状态指示 |
-| 2 | Match System / Real World | 2 | "Agent"/"全局安装"术语未解释，三套 Agent 选择 UI 语义不一致 |
-| 3 | User Control and Freedom | 3 | 取消/确认机制存在，但删除不可撤销，后台更新无法从列表中断 |
-| 4 | Consistency and Standards | 2 | 三种 Agent 选择 UI（pills/checkboxes/tags），AgentView 硬编码颜色绕过 tokens |
-| 5 | Error Prevention | 2 | 自定义代理 URL 无即时验证，模拟进度条制造虚假预期 |
-| 6 | Recognition Rather Than Recall | 2 | 侧栏无文字标签仅靠图标（SkillDetail 页面已删除，不再适用） |
-| 7 | Flexibility and Efficiency of Use | 2 | 无键盘快捷键，无命令面板，无多选批量操作 |
-| 8 | Aesthetic and Minimalist Design | 3 | 整体简洁，但安装对话框 50+ Agent 列表信息过载 |
-| 9 | Error Recovery | 2 | 错误信息泛化（"安装失败"），无可操作恢复建议 |
-| 10 | Help and Documentation | 1 | 零应用内帮助，无新手引导，无概念解释 |
-| **Total** | | **21/40** | **Acceptable (需显著改善)** |
+| #         | Heuristic                         | Score     | Key Issue                                                                    |
+| --------- | --------------------------------- | --------- | ---------------------------------------------------------------------------- |
+| 1         | Visibility of System Status       | 2         | 后台任务状态不可见，技能行无独立更新状态指示                                 |
+| 2         | Match System / Real World         | 2         | "Agent"/"全局安装"术语未解释，三套 Agent 选择 UI 语义不一致                  |
+| 3         | User Control and Freedom          | 3         | 取消/确认机制存在，但删除不可撤销，后台更新无法从列表中断                    |
+| 4         | Consistency and Standards         | 2         | 三种 Agent 选择 UI（pills/checkboxes/tags），AgentView 硬编码颜色绕过 tokens |
+| 5         | Error Prevention                  | 2         | 自定义代理 URL 无即时验证，模拟进度条制造虚假预期                            |
+| 6         | Recognition Rather Than Recall    | 2         | 侧栏无文字标签仅靠图标（SkillDetail 页面已删除，不再适用）                   |
+| 7         | Flexibility and Efficiency of Use | 2         | 无键盘快捷键，无命令面板，无多选批量操作                                     |
+| 8         | Aesthetic and Minimalist Design   | 3         | 整体简洁，但安装对话框 50+ Agent 列表信息过载                                |
+| 9         | Error Recovery                    | 2         | 错误信息泛化（"安装失败"），无可操作恢复建议                                 |
+| 10        | Help and Documentation            | 1         | 零应用内帮助，无新手引导，无概念解释                                         |
+| **Total** |                                   | **21/40** | **Acceptable (需显著改善)**                                                  |
 
 ## Anti-Patterns Verdict
 
@@ -50,6 +51,7 @@ resolved:
 - ~~**SkillDetail.vue 是骨架而非功能页**~~: 已确认删除，页面为多余遗留内容。
 
 **分类直觉检查:**
+
 - 一阶：不像"通用技能管理后台"。深色渐变侧栏 + coral 强调色有辨识度，避开了蓝白 SaaS 陷阱。
 - 二阶：Drawer 模式、分步安装向导、Settings 分区是常见 UI 模式，不算独特也不算反参考。整体停在"合格的工具"层面，未达到 Linear/Figma 那种"设计感"。
 
@@ -78,6 +80,7 @@ resolved:
 ~~**[P0] SkillDetail.vue 是骨架不是功能页**~~ -- **已解决：用户确认页面为多余遗留内容，已删除。**
 
 **[P3] AgentFilter.vue 是死代码**
+
 - **What**: 深入分析后发现，AgentSelector（安装目标选择，写操作）和 AgentTagBar（列表过滤，读操作）交互模式不同是合理的。真正的冗余是 AgentFilter.vue，没有任何地方导入使用
 - **Why it matters**: 死代码增加维护负担，误导新贡献者
 - **Fix**: 删除 `src/renderer/src/components/skills/AgentFilter.vue`
@@ -85,6 +88,7 @@ resolved:
 **[P1] 模拟进度条破坏信任** -- **已解决：替换为真实 CLI 流式终端输出 + 自动滚动。**
 
 **[P2] AgentView drawer 硬编码颜色绕过 token 系统** -- **已解决：新增 Agent 卡片色调 token，替换所有硬编码 hex。**
+
 - 新增 token：`--color-agent-{coral,blue,magenta,purple}-{bg,border}`、`--color-brand-blue-tint`、`--color-brand-blue-600`
 
 **[P2] 侧栏无可见文字标签** -- **已解决：侧栏加宽到 72px，图标下方添加 9px 文字标签。**
@@ -94,6 +98,7 @@ resolved:
 ## Persona Red Flags
 
 **Alex（Power User，每天在编码间隙使用）**:
+
 - 无键盘快捷键。安装/搜索/导航全部依赖鼠标，Alex 会直接回到 CLI
 - 无命令面板或快速操作入口
 - 搜索结果无技能描述，无法在不点击的情况下判断相关性
@@ -102,6 +107,7 @@ resolved:
 - 后台任务状态不可从主列表页查看
 
 **Jordan（First-Timer，安装后首次探索）**:
+
 - 首次启动：环境 banner 说"运行环境不完整"但"去安装"按钮小且容易被忽略
 - "Agent"概念从未解释。安装对话框展示 50+ 复选框，无任何引导
 - Settings 页面四个区块同时呈现，无引导式设置向导

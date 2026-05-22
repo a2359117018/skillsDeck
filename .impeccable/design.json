@@ -111,26 +111,67 @@
       }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Page-level hero text. Reserved for the largest title on any screen." },
-      "headline": { "displayName": "Headline", "purpose": "Page titles. The typographic anchor of each page." },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page-level hero text. Reserved for the largest title on any screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles. The typographic anchor of each page."
+      },
       "title": { "displayName": "Title", "purpose": "Section titles and card names." },
       "body": { "displayName": "Body", "purpose": "Default text for all readable content." },
-      "label": { "displayName": "Label", "purpose": "Section markers in settings. Uppercase with letter-spacing." }
+      "label": {
+        "displayName": "Label",
+        "purpose": "Section markers in settings. Uppercase with letter-spacing."
+      }
     },
     "shadows": [
-      { "name": "ambient-low", "value": "0 1px 2px rgba(36,36,36,0.06)", "purpose": "Card rest state. Nearly invisible separation." },
-      { "name": "ambient-medium", "value": "rgba(36,36,36,0.06) 0 2px 6px -2px", "purpose": "Skill row hover state." },
-      { "name": "ambient-high", "value": "rgba(36,36,36,0.08) 0 4px 12px -2px", "purpose": "Card hover and settings card rest." },
-      { "name": "ambient-max", "value": "rgba(36,36,36,0.08) 0 12px 16px -4px", "purpose": "FAB and elevated modals." }
+      {
+        "name": "ambient-low",
+        "value": "0 1px 2px rgba(36,36,36,0.06)",
+        "purpose": "Card rest state. Nearly invisible separation."
+      },
+      {
+        "name": "ambient-medium",
+        "value": "rgba(36,36,36,0.06) 0 2px 6px -2px",
+        "purpose": "Skill row hover state."
+      },
+      {
+        "name": "ambient-high",
+        "value": "rgba(36,36,36,0.08) 0 4px 12px -2px",
+        "purpose": "Card hover and settings card rest."
+      },
+      {
+        "name": "ambient-max",
+        "value": "rgba(36,36,36,0.08) 0 12px 16px -4px",
+        "purpose": "FAB and elevated modals."
+      }
     ],
     "motion": [
-      { "name": "fast", "value": "100ms ease", "purpose": "Micro-interactions: icon hover, tag click." },
-      { "name": "standard", "value": "150ms ease", "purpose": "Default state transitions: button hover, card hover, sidebar active." },
-      { "name": "slow", "value": "200ms ease", "purpose": "Route transitions, panel expand/collapse." }
+      {
+        "name": "fast",
+        "value": "100ms ease",
+        "purpose": "Micro-interactions: icon hover, tag click."
+      },
+      {
+        "name": "standard",
+        "value": "150ms ease",
+        "purpose": "Default state transitions: button hover, card hover, sidebar active."
+      },
+      {
+        "name": "slow",
+        "value": "200ms ease",
+        "purpose": "Route transitions, panel expand/collapse."
+      }
     ],
     "breakpoints": [
       { "name": "sidebar", "value": "60px", "purpose": "Fixed sidebar width." },
-      { "name": "min-window", "value": "1200px", "purpose": "Minimum window width enforced by Electron." }
+      {
+        "name": "min-window",
+        "value": "1200px",
+        "purpose": "Minimum window width enforced by Electron."
+      }
     ]
   },
   "components": [
@@ -210,11 +251,31 @@
       "Four-brand-color agent system: coral, blue, magenta, purple distinguish agents visually"
     ],
     "rules": [
-      { "name": "The One Signal Rule", "body": "Ember Coral appears on exactly one element per screen (the active sidebar indicator, or a FAB). It is never used for cards, badges, or decorative fills. When you see coral, it means 'you are here.'", "section": "colors" },
-      { "name": "The Four-Color Agent Rule", "body": "Steel Blue, Neon Magenta, Ion Purple, and Ember Coral are assigned to agent cards by index (modulo 4). These colors serve a structural purpose: making the agent grid scannable. They are never used for status, priority, or data encoding.", "section": "colors" },
-      { "name": "The Single Family Rule", "body": "DM Sans handles every typographic role. No secondary font is introduced for emphasis. Hierarchy is achieved exclusively through size (0.75rem to 2rem, a 2.67x range) and weight (400 to 700, three steps).", "section": "typography" },
-      { "name": "The Flat-by-Default Rule", "body": "At rest, surfaces are flat. Shadows appear only as a hover response. A card at rest has a hairline border and canvas background; on hover it gains shadow-2 and a muted border. The target system replaces shadows entirely with tonal shifts.", "section": "elevation" },
-      { "name": "The No Nested Cards Rule", "body": "Nested cards (a card inside a card) are always wrong. If two levels of grouping are needed, the inner level uses surface background with a hairline border, never a full card with its own shadow.", "section": "elevation" }
+      {
+        "name": "The One Signal Rule",
+        "body": "Ember Coral appears on exactly one element per screen (the active sidebar indicator, or a FAB). It is never used for cards, badges, or decorative fills. When you see coral, it means 'you are here.'",
+        "section": "colors"
+      },
+      {
+        "name": "The Four-Color Agent Rule",
+        "body": "Steel Blue, Neon Magenta, Ion Purple, and Ember Coral are assigned to agent cards by index (modulo 4). These colors serve a structural purpose: making the agent grid scannable. They are never used for status, priority, or data encoding.",
+        "section": "colors"
+      },
+      {
+        "name": "The Single Family Rule",
+        "body": "DM Sans handles every typographic role. No secondary font is introduced for emphasis. Hierarchy is achieved exclusively through size (0.75rem to 2rem, a 2.67x range) and weight (400 to 700, three steps).",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "At rest, surfaces are flat. Shadows appear only as a hover response. A card at rest has a hairline border and canvas background; on hover it gains shadow-2 and a muted border. The target system replaces shadows entirely with tonal shifts.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Nested Cards Rule",
+        "body": "Nested cards (a card inside a card) are always wrong. If two levels of grouping are needed, the inner level uses surface background with a hairline border, never a full card with its own shadow.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do use the pill shape (9999px radius) for every button and chip. Shape consistency is an affordance.",

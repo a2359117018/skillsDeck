@@ -14,6 +14,7 @@ export function useCachedResource<T>(
   loading: Ref<boolean>
   refreshing: Ref<boolean>
   isStale: Ref<boolean>
+  error: Ref<Error | null>
   ensure: () => Promise<T>
   invalidate: () => void
   refresh: () => Promise<T>
@@ -23,6 +24,7 @@ export function useCachedResource<T>(
   const loading = ref(false)
   const refreshing = ref(false)
   const isStale = ref(true)
+  const error = ref<Error | null>(null)
 
   async function ensure(): Promise<T> {
     if (cache.value && !cache.value.stale) {
@@ -48,10 +50,14 @@ export function useCachedResource<T>(
       data.value = result
       cache.value = { data: result, timestamp: Date.now(), stale: false }
       isStale.value = false
+      error.value = null
       return result
-    } catch (error) {
-      console.error('Failed to refresh cached resource:', error)
-      throw error
+    } catch (err) {
+      console.error('Failed to refresh cached resource:', err)
+      /** 刷新失败时使缓存失效，确保下次调用 ensure() 会重试 */
+      invalidate()
+      error.value = err instanceof Error ? err : new Error(String(err))
+      throw err
     } finally {
       refreshing.value = false
       loading.value = false
@@ -65,5 +71,5 @@ export function useCachedResource<T>(
     isStale.value = true
   }
 
-  return { data, loading, refreshing, isStale, ensure, invalidate, refresh }
+  return { data, loading, refreshing, isStale, error, ensure, invalidate, refresh }
 }

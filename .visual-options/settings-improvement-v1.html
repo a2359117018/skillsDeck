@@ -1,514 +1,642 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>设置页改进方案</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      padding: 24px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    .page-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #111; }
-    .page-subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>设置页改进方案</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .page-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #111;
+      }
+      .page-subtitle {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 24px;
+      }
 
-    .split { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-    @media (max-width: 1200px) { .split { grid-template-columns: 1fr; } }
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 1200px) {
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .mockup { border: 1px solid #e5e5e5; border-radius: 10px; background: white; overflow: hidden; }
-    .mockup-header {
-      padding: 12px 16px;
-      background: #f9fafb;
-      border-bottom: 1px solid #e5e5e5;
-      font-size: 13px;
-      color: #666;
-      font-weight: 600;
-    }
-    .mockup-body { padding: 20px; }
+      .mockup {
+        border: 1px solid #e5e5e5;
+        border-radius: 10px;
+        background: white;
+        overflow: hidden;
+      }
+      .mockup-header {
+        padding: 12px 16px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e5e5;
+        font-size: 13px;
+        color: #666;
+        font-weight: 600;
+      }
+      .mockup-body {
+        padding: 20px;
+      }
 
-    /* Common styles */
-    .card-shell {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-    .section-line {
-      flex: 1;
-      height: 1px;
-      background: #e5e5e5;
-    }
+      /* Common styles */
+      .card-shell {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+      .section-line {
+        flex: 1;
+        height: 1px;
+        background: #e5e5e5;
+      }
 
-    /* Form row */
-    .form-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-    .form-label {
-      width: 120px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-      flex-shrink: 0;
-      text-align: right;
-    }
-    .form-label-top {
-      font-size: 13px;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 6px;
-    }
-    .select-box {
-      padding: 8px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: #f9fafb;
-      font-size: 14px;
-      color: #666;
-    }
-    .input-box {
-      padding: 8px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: white;
-      font-size: 14px;
-      color: #333;
-    }
-    .toggle {
-      width: 44px; height: 24px; background: #22c55e; border-radius: 12px; position: relative;
-    }
-    .toggle::after {
-      content: '';
-      width: 20px; height: 20px; background: white; border-radius: 50%;
-      position: absolute; right: 2px; top: 2px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .pill-btn {
-      padding: 6px 16px;
-      background: #f3f4f6;
-      border: 1px solid #e5e5e5;
-      border-radius: 9999px;
-      font-size: 13px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .pill-btn-primary {
-      padding: 8px 18px;
-      background: #3a4a5c;
-      color: white;
-      border: none;
-      border-radius: 9999px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .pill-btn-sm {
-      padding: 4px 12px;
-      background: #f3f4f6;
-      border: 1px solid #e5e5e5;
-      border-radius: 9999px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .text-btn {
-      padding: 4px 8px;
-      background: transparent;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #3a4a5c;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .text-btn:hover { background: #f3f4f6; }
+      /* Form row */
+      .form-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .form-label {
+        width: 120px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        flex-shrink: 0;
+        text-align: right;
+      }
+      .form-label-top {
+        font-size: 13px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 6px;
+      }
+      .select-box {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #f9fafb;
+        font-size: 14px;
+        color: #666;
+      }
+      .input-box {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        color: #333;
+      }
+      .toggle {
+        width: 44px;
+        height: 24px;
+        background: #22c55e;
+        border-radius: 12px;
+        position: relative;
+      }
+      .toggle::after {
+        content: '';
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .pill-btn {
+        padding: 6px 16px;
+        background: #f3f4f6;
+        border: 1px solid #e5e5e5;
+        border-radius: 9999px;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .pill-btn-primary {
+        padding: 8px 18px;
+        background: #3a4a5c;
+        color: white;
+        border: none;
+        border-radius: 9999px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .pill-btn-sm {
+        padding: 4px 12px;
+        background: #f3f4f6;
+        border: 1px solid #e5e5e5;
+        border-radius: 9999px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .text-btn {
+        padding: 4px 8px;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #3a4a5c;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .text-btn:hover {
+        background: #f3f4f6;
+      }
 
-    .env-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      background: #f9fafb;
-      border-radius: 10px;
-      border: 1px solid #e5e5e5;
-    }
-    .env-icon-ok {
-      width: 26px; height: 26px;
-      background: #dcfce7; color: #16a34a;
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; flex-shrink: 0;
-    }
-    .hint-text {
-      font-size: 12px;
-      color: #888;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 6px;
-    }
+      .env-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: #f9fafb;
+        border-radius: 10px;
+        border: 1px solid #e5e5e5;
+      }
+      .env-icon-ok {
+        width: 26px;
+        height: 26px;
+        background: #dcfce7;
+        color: #16a34a;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+      .hint-text {
+        font-size: 12px;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 6px;
+      }
 
-    /* Problem highlights */
-    .problem-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      background: #fef2f2;
-      color: #dc2626;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: 8px;
-    }
-  </style>
-</head>
-<body>
-  <div class="page-title">设置页改进方案</div>
-  <div class="page-subtitle">三个方向，解决 input 太宽 + 重新检测按钮问题</div>
+      /* Problem highlights */
+      .problem-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #fef2f2;
+        color: #dc2626;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-title">设置页改进方案</div>
+    <div class="page-subtitle">三个方向，解决 input 太宽 + 重新检测按钮问题</div>
 
-  <div class="split">
-
-    <!-- 方案 A -->
-    <div class="mockup">
-      <div class="mockup-header">方案 A：限制宽度 + 操作右对齐</div>
-      <div class="mockup-body">
-        <div class="card-shell" style="padding: 20px;">
-
-          <!-- 通用设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">通用设置</span>
-              <span class="section-line"></span>
+    <div class="split">
+      <!-- 方案 A -->
+      <div class="mockup">
+        <div class="mockup-header">方案 A：限制宽度 + 操作右对齐</div>
+        <div class="mockup-body">
+          <div class="card-shell" style="padding: 20px">
+            <!-- 通用设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">通用设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">默认安装目标</label>
+                <div class="select-box" style="max-width: 320px; flex: 1">Claude Code ▼</div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">启动时检查环境</label>
+                <div class="toggle"></div>
+              </div>
             </div>
-            <div class="form-row">
-              <label class="form-label">默认安装目标</label>
-              <div class="select-box" style="max-width: 320px; flex: 1;">Claude Code ▼</div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">启动时检查环境</label>
-              <div class="toggle"></div>
-            </div>
-          </div>
 
-          <!-- 网络设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">网络设置</span>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label class="form-label">GitHub 代理</label>
-              <div style="flex: 1; max-width: 320px;">
-                <div class="select-box">gh-proxy.org ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：gh-proxy.org
+            <!-- 网络设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">网络设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">GitHub 代理</label>
+                <div style="flex: 1; max-width: 320px">
+                  <div class="select-box">gh-proxy.org ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：gh-proxy.org
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">npm 镜像</label>
+                <div style="flex: 1; max-width: 320px">
+                  <div class="select-box">淘宝 (npmmirror.com) ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：淘宝镜像
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="form-row">
-              <label class="form-label">npm 镜像</label>
-              <div style="flex: 1; max-width: 320px;">
-                <div class="select-box">淘宝 (npmmirror.com) ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：淘宝镜像
-                </div>
+
+            <!-- 管理操作 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">管理操作</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">技能管理</label>
+                <button class="pill-btn">🔄 全部更新 (5)</button>
               </div>
             </div>
-          </div>
 
-          <!-- 管理操作 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">管理操作</span>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label class="form-label">技能管理</label>
-              <button class="pill-btn">🔄 全部更新 (5)</button>
-            </div>
-          </div>
-
-          <!-- 运行环境 -->
-          <div>
-            <div class="section-header">
-              <span class="section-title">运行环境</span>
-              <span class="section-line"></span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 12px;">
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">Node.js</div>
-                  <div style="font-size:12px; color:#888;">v20.12.0</div>
-                </div>
-              </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">npm</div>
-                  <div style="font-size:12px; color:#888;">v10.5.0</div>
-                </div>
-              </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">skills</div>
-                  <div style="font-size:12px; color:#888;">v1.2.3</div>
-                </div>
-                <button class="pill-btn-sm">🔄 更新</button>
-              </div>
-            </div>
-            <!-- 重新检测放在右侧 -->
-            <div style="display:flex; justify-content: flex-end;">
-              <button class="text-btn">🔄 重新检测</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- 方案 B -->
-    <div class="mockup">
-      <div class="mockup-header">方案 B：Label 上方 + 底部工具栏</div>
-      <div class="mockup-body">
-        <div class="card-shell" style="padding: 20px;">
-
-          <!-- 通用设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">通用设置</span>
-              <span class="section-line"></span>
-            </div>
-            <div style="display:flex; gap: 16px;">
-              <div style="flex: 1;">
-                <div class="form-label-top">默认安装目标</div>
-                <div class="select-box" style="max-width: 280px;">Claude Code ▼</div>
-              </div>
-              <div style="display:flex; align-items: flex-end; padding-bottom: 8px;">
-                <div style="display:flex; align-items:center; gap: 8px;">
-                  <div class="toggle"></div>
-                  <span style="font-size: 13px; color: #555;">启动时检查环境</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 网络设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">网络设置</span>
-              <span class="section-line"></span>
-            </div>
-            <div style="display:flex; gap: 16px; margin-bottom: 12px;">
-              <div style="flex: 1;">
-                <div class="form-label-top">GitHub 代理</div>
-                <div class="select-box" style="max-width: 280px;">gh-proxy.org ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：gh-proxy.org
-                </div>
-              </div>
-              <div style="flex: 1;">
-                <div class="form-label-top">npm 镜像</div>
-                <div class="select-box" style="max-width: 280px;">淘宝 (npmmirror.com) ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：淘宝镜像
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 管理操作 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">管理操作</span>
-              <span class="section-line"></span>
-            </div>
-            <button class="pill-btn">🔄 全部更新 (5)</button>
-          </div>
-
-          <!-- 运行环境 -->
-          <div>
-            <div class="section-header">
-              <span class="section-title">运行环境</span>
-              <span class="section-line"></span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">Node.js</div>
-                  <div style="font-size:12px; color:#888;">v20.12.0</div>
-                </div>
-              </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">npm</div>
-                  <div style="font-size:12px; color:#888;">v10.5.0</div>
-                </div>
-              </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">skills</div>
-                  <div style="font-size:12px; color:#888;">v1.2.3</div>
-                </div>
-                <button class="pill-btn-sm">🔄 更新</button>
-              </div>
-            </div>
-            <!-- 底部工具栏 -->
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e5e5; display:flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 12px; color: #888;">环境检测于 2 分钟前</span>
-              <button class="text-btn">🔄 重新检测</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- 方案 C -->
-    <div class="mockup">
-      <div class="mockup-header">方案 C：最大宽度 400px + 按钮精简</div>
-      <div class="mockup-body">
-        <div class="card-shell" style="padding: 20px;">
-
-          <!-- 通用设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">通用设置</span>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label class="form-label">默认安装目标</label>
-              <div class="select-box" style="width: 400px;">Claude Code ▼</div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">启动时检查环境</label>
-              <div class="toggle"></div>
-            </div>
-          </div>
-
-          <!-- 网络设置 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">网络设置</span>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label class="form-label">GitHub 代理</label>
-              <div style="width: 400px;">
-                <div class="select-box">gh-proxy.org ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：gh-proxy.org
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">npm 镜像</label>
-              <div style="width: 400px;">
-                <div class="select-box">淘宝 (npmmirror.com) ▼</div>
-                <div class="hint-text">
-                  <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-                  当前生效：淘宝镜像
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 管理操作 -->
-          <div style="margin-bottom: 24px;">
-            <div class="section-header">
-              <span class="section-title">管理操作</span>
-              <span class="section-line"></span>
-            </div>
-            <div class="form-row">
-              <label class="form-label">技能管理</label>
-              <button class="pill-btn">🔄 全部更新 (5)</button>
-            </div>
-          </div>
-
-          <!-- 运行环境 -->
-          <div>
-            <div class="section-header" style="justify-content: space-between;">
-              <div style="display:flex; align-items:center; gap: 12px; flex: 1;">
+            <!-- 运行环境 -->
+            <div>
+              <div class="section-header">
                 <span class="section-title">运行环境</span>
                 <span class="section-line"></span>
               </div>
-              <button class="text-btn" style="margin-left: 8px;">🔄 检测</button>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">Node.js</div>
-                  <div style="font-size:12px; color:#888;">v20.12.0</div>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px">
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">Node.js</div>
+                    <div style="font-size: 12px; color: #888">v20.12.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">npm</div>
+                    <div style="font-size: 12px; color: #888">v10.5.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">skills</div>
+                    <div style="font-size: 12px; color: #888">v1.2.3</div>
+                  </div>
+                  <button class="pill-btn-sm">🔄 更新</button>
                 </div>
               </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">npm</div>
-                  <div style="font-size:12px; color:#888;">v10.5.0</div>
-                </div>
-              </div>
-              <div class="env-item">
-                <div class="env-icon-ok">✓</div>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:500;">skills</div>
-                  <div style="font-size:12px; color:#888;">v1.2.3</div>
-                </div>
-                <button class="pill-btn-sm">🔄 更新</button>
+              <!-- 重新检测放在右侧 -->
+              <div style="display: flex; justify-content: flex-end">
+                <button class="text-btn">🔄 重新检测</button>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
+      <!-- 方案 B -->
+      <div class="mockup">
+        <div class="mockup-header">方案 B：Label 上方 + 底部工具栏</div>
+        <div class="mockup-body">
+          <div class="card-shell" style="padding: 20px">
+            <!-- 通用设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">通用设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div style="display: flex; gap: 16px">
+                <div style="flex: 1">
+                  <div class="form-label-top">默认安装目标</div>
+                  <div class="select-box" style="max-width: 280px">Claude Code ▼</div>
+                </div>
+                <div style="display: flex; align-items: flex-end; padding-bottom: 8px">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <div class="toggle"></div>
+                    <span style="font-size: 13px; color: #555">启动时检查环境</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 网络设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">网络设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div style="display: flex; gap: 16px; margin-bottom: 12px">
+                <div style="flex: 1">
+                  <div class="form-label-top">GitHub 代理</div>
+                  <div class="select-box" style="max-width: 280px">gh-proxy.org ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：gh-proxy.org
+                  </div>
+                </div>
+                <div style="flex: 1">
+                  <div class="form-label-top">npm 镜像</div>
+                  <div class="select-box" style="max-width: 280px">淘宝 (npmmirror.com) ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：淘宝镜像
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 管理操作 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">管理操作</span>
+                <span class="section-line"></span>
+              </div>
+              <button class="pill-btn">🔄 全部更新 (5)</button>
+            </div>
+
+            <!-- 运行环境 -->
+            <div>
+              <div class="section-header">
+                <span class="section-title">运行环境</span>
+                <span class="section-line"></span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">Node.js</div>
+                    <div style="font-size: 12px; color: #888">v20.12.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">npm</div>
+                    <div style="font-size: 12px; color: #888">v10.5.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">skills</div>
+                    <div style="font-size: 12px; color: #888">v1.2.3</div>
+                  </div>
+                  <button class="pill-btn-sm">🔄 更新</button>
+                </div>
+              </div>
+              <!-- 底部工具栏 -->
+              <div
+                style="
+                  margin-top: 12px;
+                  padding-top: 12px;
+                  border-top: 1px solid #e5e5e5;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <span style="font-size: 12px; color: #888">环境检测于 2 分钟前</span>
+                <button class="text-btn">🔄 重新检测</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 方案 C -->
+      <div class="mockup">
+        <div class="mockup-header">方案 C：最大宽度 400px + 按钮精简</div>
+        <div class="mockup-body">
+          <div class="card-shell" style="padding: 20px">
+            <!-- 通用设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">通用设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">默认安装目标</label>
+                <div class="select-box" style="width: 400px">Claude Code ▼</div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">启动时检查环境</label>
+                <div class="toggle"></div>
+              </div>
+            </div>
+
+            <!-- 网络设置 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">网络设置</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">GitHub 代理</label>
+                <div style="width: 400px">
+                  <div class="select-box">gh-proxy.org ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：gh-proxy.org
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">npm 镜像</label>
+                <div style="width: 400px">
+                  <div class="select-box">淘宝 (npmmirror.com) ▼</div>
+                  <div class="hint-text">
+                    <span
+                      style="
+                        width: 12px;
+                        height: 12px;
+                        background: #22c55e;
+                        border-radius: 50%;
+                        display: inline-block;
+                      "
+                    ></span>
+                    当前生效：淘宝镜像
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 管理操作 -->
+            <div style="margin-bottom: 24px">
+              <div class="section-header">
+                <span class="section-title">管理操作</span>
+                <span class="section-line"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label">技能管理</label>
+                <button class="pill-btn">🔄 全部更新 (5)</button>
+              </div>
+            </div>
+
+            <!-- 运行环境 -->
+            <div>
+              <div class="section-header" style="justify-content: space-between">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1">
+                  <span class="section-title">运行环境</span>
+                  <span class="section-line"></span>
+                </div>
+                <button class="text-btn" style="margin-left: 8px">🔄 检测</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">Node.js</div>
+                    <div style="font-size: 12px; color: #888">v20.12.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">npm</div>
+                    <div style="font-size: 12px; color: #888">v10.5.0</div>
+                  </div>
+                </div>
+                <div class="env-item">
+                  <div class="env-icon-ok">✓</div>
+                  <div style="flex: 1">
+                    <div style="font-size: 14px; font-weight: 500">skills</div>
+                    <div style="font-size: 12px; color: #888">v1.2.3</div>
+                  </div>
+                  <button class="pill-btn-sm">🔄 更新</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-  </div>
+    <div
+      style="
+        margin-top: 32px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e8e8e8;
+      "
+    >
+      <div style="font-size: 14px; font-weight: 600; color: #3a4a5c; margin-bottom: 12px">
+        问题说明
+      </div>
+      <ul style="font-size: 13px; color: #5a5a5a; padding-left: 18px; line-height: 1.8">
+        <li>
+          <strong>input 太宽：</strong>当前 <code>width: 100%</code> 使 select 占满 label
+          右侧全部空间，视觉上松散且横向过长。
+        </li>
+        <li>
+          <strong>重新检测按钮太长：</strong
+          >当前按钮独占一行，作为一个小操作显得过于"沉重"，与轻量级的检测动作不匹配。
+        </li>
+      </ul>
+    </div>
 
-  <div style="margin-top: 32px; padding: 20px; background: white; border-radius: 10px; border: 1px solid #e8e8e8;">
-    <div style="font-size: 14px; font-weight: 600; color: #3a4a5c; margin-bottom: 12px;">问题说明</div>
-    <ul style="font-size: 13px; color: #5a5a5a; padding-left: 18px; line-height: 1.8;">
-      <li><strong>input 太宽：</strong>当前 <code>width: 100%</code> 使 select 占满 label 右侧全部空间，视觉上松散且横向过长。</li>
-      <li><strong>重新检测按钮太长：</strong>当前按钮独占一行，作为一个小操作显得过于"沉重"，与轻量级的检测动作不匹配。</li>
-    </ul>
-  </div>
-
-  <div style="margin-top: 16px; padding: 20px; background: white; border-radius: 10px; border: 1px solid #e8e8e8;">
-    <div style="font-size: 14px; font-weight: 600; color: #3a4a5c; margin-bottom: 12px;">各方案差异</div>
-    <ul style="font-size: 13px; color: #5a5a5a; padding-left: 18px; line-height: 1.8;">
-      <li><strong>方案 A：</strong>select 加 <code>max-width: 320px</code>，保留左侧 label 布局，重新检测改为右侧文字按钮。改动最小，保守安全。</li>
-      <li><strong>方案 B：</strong>label 放在 input 上方，横向更紧凑；网络设置两项并排；环境区域底部增加工具栏，重新检测放在右下。布局更现代。</li>
-      <li><strong>方案 C：</strong>select 固定 <code>width: 400px</code>（非 100%），重新检测按钮精简为"检测"二字并移到 section header 右侧。最简洁。</li>
-    </ul>
-  </div>
-</body>
+    <div
+      style="
+        margin-top: 16px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e8e8e8;
+      "
+    >
+      <div style="font-size: 14px; font-weight: 600; color: #3a4a5c; margin-bottom: 12px">
+        各方案差异
+      </div>
+      <ul style="font-size: 13px; color: #5a5a5a; padding-left: 18px; line-height: 1.8">
+        <li>
+          <strong>方案 A：</strong>select 加 <code>max-width: 320px</code>，保留左侧 label
+          布局，重新检测改为右侧文字按钮。改动最小，保守安全。
+        </li>
+        <li>
+          <strong>方案 B：</strong>label 放在 input
+          上方，横向更紧凑；网络设置两项并排；环境区域底部增加工具栏，重新检测放在右下。布局更现代。
+        </li>
+        <li>
+          <strong>方案 C：</strong>select 固定 <code>width: 400px</code>（非
+          100%），重新检测按钮精简为"检测"二字并移到 section header 右侧。最简洁。
+        </li>
+      </ul>
+    </div>
+  </body>
 </html>

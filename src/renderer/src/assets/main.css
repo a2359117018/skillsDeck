@@ -35,3 +35,15 @@ body {
   outline-offset: 2px;
   border-radius: inherit;
 }
+
+/* useConfirm 对话框内联样式替换为 CSS 类 */
+.confirm-skill-list {
+  color: var(--color-stone);
+  font-size: var(--text-caption);
+}
+
+.confirm-skill-suffix {
+  color: var(--color-muted);
+  font-size: var(--text-micro);
+  margin-top: var(--space-sm);
+}

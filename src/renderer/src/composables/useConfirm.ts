@@ -63,8 +63,8 @@ export function useConfirm(): {
 
     const contentVNode = h('div', [
       h('p', { style: 'margin-bottom: 8px' }, '要更新以下技能吗？'),
-      h('p', { style: 'color: #666; font-size: 13px' }, displayed),
-      h('p', { style: 'color: #999; font-size: 12px; margin-top: 8px' }, suffix)
+      h('p', { class: 'confirm-skill-list' }, displayed),
+      h('p', { class: 'confirm-skill-suffix' }, suffix)
     ])
 
     return new Promise((resolve) => {

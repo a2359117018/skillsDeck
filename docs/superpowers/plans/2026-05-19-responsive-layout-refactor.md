@@ -395,15 +395,15 @@ git commit --allow-empty -m "chore: verify responsive layout refactor"
 
 ## Spec Coverage Checklist
 
-| Spec 要求                    | 对应任务           |
-| ---------------------------- | ------------------ |
+| Spec 要求                    | 对应任务        |
+| ---------------------------- | --------------- |
 | 容器零约束（移除 max-width） | Task 3, 4, 5, 6 |
-| 网格自适配（auto-fill）      | Task 3, 5          |
-| 组件内聚弹性（flex-wrap）    | Task 4, 5          |
-| Drawer 相对宽度              | Task 5             |
-| 窗口最小尺寸 1200×800        | Task 1             |
-| CLAUDE.md 规范更新           | Task 8             |
-| 验证所有页面                 | Task 9             |
+| 网格自适配（auto-fill）      | Task 3, 5       |
+| 组件内聚弹性（flex-wrap）    | Task 4, 5       |
+| Drawer 相对宽度              | Task 5          |
+| 窗口最小尺寸 1200×800        | Task 1          |
+| CLAUDE.md 规范更新           | Task 8          |
+| 验证所有页面                 | Task 9          |
 
 ## Placeholder Scan
 

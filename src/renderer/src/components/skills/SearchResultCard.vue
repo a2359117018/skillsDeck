@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NButton, NIcon, NText } from 'naive-ui'
-import { DownloadOutline } from '@vicons/ionicons5'
+import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import type { SkillSearchResult } from '../../../../shared/types'
 import { toPackageRef, formatInstalls } from '../../../../shared/types'
 
@@ -43,7 +43,9 @@ const detailUrl = `https://skills.sh/${props.result.id}`
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .result-card:hover {

@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { NIcon, NButton, NProgress } from 'naive-ui'
-import {
-  ReloadOutline,
-  CheckmarkCircleOutline,
-  CloseCircleOutline,
-  StopCircleOutline,
-  TimeOutline
-} from '@vicons/ionicons5'
+import ReloadOutline from '@vicons/ionicons5/ReloadOutline'
+import CheckmarkCircleOutline from '@vicons/ionicons5/CheckmarkCircleOutline'
+import CloseCircleOutline from '@vicons/ionicons5/CloseCircleOutline'
+import StopCircleOutline from '@vicons/ionicons5/StopCircleOutline'
+import TimeOutline from '@vicons/ionicons5/TimeOutline'
 import type { BackgroundTask } from '../../../../shared/types'
 
 const props = defineProps<{
@@ -59,9 +57,10 @@ const relativeTime = computed(() => {
 </script>
 
 <template>
-  <div class="task-item" :class="'status-' + task.status">
+  <!-- aria-live 使状态变化可被屏幕阅读器播报 -->
+  <div class="task-item" :class="'status-' + task.status" aria-live="polite" aria-atomic="true">
     <div class="task-row">
-      <div class="task-icon-wrap">
+      <div class="task-icon-wrap" aria-hidden="true">
         <NIcon :size="18" :color="statusConfig.color" :class="{ 'icon-spinning': isActive }">
           <component :is="statusConfig.icon" />
         </NIcon>
@@ -75,7 +74,7 @@ const relativeTime = computed(() => {
       </span>
       <NButton
         v-if="isActive"
-        size="tiny"
+        size="small"
         quaternary
         circle
         title="取消任务"
@@ -153,8 +152,8 @@ const relativeTime = computed(() => {
 }
 
 .task-name {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
   color: var(--color-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -162,14 +161,14 @@ const relativeTime = computed(() => {
 }
 
 .task-time {
-  font-size: 0.75rem;
+  font-size: var(--text-micro);
   color: var(--color-muted);
 }
 
 .task-status-badge {
   flex-shrink: 0;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
 }
 
 .task-progress {
@@ -178,7 +177,7 @@ const relativeTime = computed(() => {
 
 .task-error {
   margin-top: var(--space-xs);
-  font-size: 0.75rem;
+  font-size: var(--text-micro);
   color: var(--color-error);
   word-break: break-word;
 }

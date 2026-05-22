@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { NIcon } from 'naive-ui'
-import { ChevronDownOutline, ChevronUpOutline } from '@vicons/ionicons5'
+import ChevronDownOutline from '@vicons/ionicons5/ChevronDownOutline'
+import ChevronUpOutline from '@vicons/ionicons5/ChevronUpOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 
 const skillsStore = useSkillsStore()
@@ -26,7 +27,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 
 <template>
   <div v-if="agentTags.length > 0" class="agent-filter-panel">
-    <button class="panel-header" @click="toggleExpand">
+    <button class="panel-header" :aria-expanded="expanded" @click="toggleExpand">
       <span class="panel-header-label">
         筛选 AI 工具
         <span v-if="hasActiveFilter" class="panel-header-badge">
@@ -149,7 +150,10 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
   font-size: var(--text-body-sm);
   font-weight: var(--weight-medium);
   cursor: pointer;
-  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
+  transition:
+    border-color var(--transition-base),
+    color var(--transition-base),
+    background var(--transition-base);
   font-family: inherit;
   line-height: var(--leading-normal);
 }

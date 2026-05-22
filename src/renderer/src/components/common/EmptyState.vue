@@ -13,7 +13,8 @@ defineProps<{
 
 <template>
   <div class="empty-state">
-    <div class="empty-icon">
+    <!-- 装饰性图标，对屏幕阅读器隐藏 -->
+    <div class="empty-icon" aria-hidden="true">
       <NIcon :size="40" :color="'var(--color-muted)'">
         <component :is="icon" />
       </NIcon>
@@ -41,17 +42,17 @@ defineProps<{
 }
 
 .empty-title {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: var(--text-body-md);
+  font-weight: var(--weight-medium);
   color: var(--color-ink);
-  line-height: 1.5;
+  line-height: var(--leading-normal);
 }
 
 .empty-desc {
-  font-size: 0.875rem;
+  font-size: var(--text-body-sm);
   color: var(--color-stone);
   max-width: 280px;
-  line-height: 1.5;
+  line-height: var(--leading-normal);
   margin-top: var(--space-xs);
 }
 

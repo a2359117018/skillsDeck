@@ -3,6 +3,7 @@
 ## 背景
 
 设置页面中两个视觉问题：
+
 1. select/input 组件设置了 `width: 100%`，占满 label 右侧全部空间，视觉上松散且横向过长。
 2. 运行环境区域的"重新检测"按钮独占一行，作为轻量级操作显得过于"沉重"。
 
@@ -15,6 +16,7 @@
 ### 1. 表单控件宽度限制
 
 **改动前：**
+
 ```css
 .settings-select {
   width: 100%;
@@ -22,6 +24,7 @@
 ```
 
 **改动后：**
+
 ```css
 .settings-select {
   width: 100%;
@@ -34,6 +37,7 @@
 ### 2. 运行环境区域底部工具栏
 
 **改动前结构：**
+
 ```
 运行环境
 ├── Node.js 检查项
@@ -44,6 +48,7 @@
 ```
 
 **改动后结构：**
+
 ```
 运行环境
 ├── Node.js 检查项
@@ -56,6 +61,7 @@
 ```
 
 **样式：**
+
 - 工具栏顶部加 `border-top: 1px solid var(--color-hairline)` 与环境检查项分隔
 - 工具栏 `display: flex; justify-content: space-between; align-items: center`
 - 左侧时间提示：font-size 用 `var(--text-caption)`，color 用 `var(--color-muted)`
@@ -63,6 +69,7 @@
 - 工具栏 `margin-top: var(--space-md)`，`padding-top: var(--space-md)`
 
 **检测时间提示的数据：**
+
 - 目前 `EnvStore` 中没有记录上次检测时间。本次改动先不做时间追踪，工具栏左侧暂时留空或只显示"环境状态"字样。后续如需可增加 `lastCheckTime` 到 `EnvStatus`。
 
 ### 3. 保持不变的区域

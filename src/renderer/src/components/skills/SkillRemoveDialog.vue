@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NModal, NCard, NRadioGroup, NRadio, NButton, NIcon, NText } from 'naive-ui'
-import { TrashOutline } from '@vicons/ionicons5'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import type { InstalledSkillAgent } from '../../../../shared/types'
 import { AGENTS } from '../../constants/agents'
 
@@ -43,9 +43,14 @@ function handleCancel(): void {
 </script>
 
 <template>
-  <NModal v-model:show="visible" :mask-closable="false" :trap-focus="true" @mask-click="handleCancel">
+  <NModal
+    v-model:show="visible"
+    :mask-closable="false"
+    :trap-focus="true"
+    @mask-click="handleCancel"
+  >
     <NCard
-      style="width: 420px"
+      style="width: min(420px, 90vw)"
       :bordered="false"
       :title="`删除「${props.skillName}」`"
       size="medium"

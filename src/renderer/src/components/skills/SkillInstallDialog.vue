@@ -12,7 +12,9 @@ import {
   NIcon,
   useMessage
 } from 'naive-ui'
-import { DownloadOutline, CheckmarkCircle, CloseCircle } from '@vicons/ionicons5'
+import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
+import CheckmarkCircle from '@vicons/ionicons5/CheckmarkCircle'
+import CloseCircle from '@vicons/ionicons5/CloseCircle'
 import { AGENTS, getCommonAgents } from '../../constants/agents'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillsStore } from '../../stores/skills'
@@ -33,12 +35,24 @@ const installStatus = ref<'idle' | 'installing' | 'success' | 'failed' | 'cancel
 const commandOutput = ref('')
 const terminalRef = ref<HTMLElement | null>(null)
 
-/** 自动滚动终端输出到底部 */
+/** 滚动节流定时器，避免每个字符输出都触发滚动 */
+let scrollTimer: ReturnType<typeof setTimeout> | null = null
+
+/** 自动滚动终端输出到底部，节流到 200ms，且仅在用户已在底部时自动滚动 */
 function scrollTerminalToBottom(): void {
-  nextTick(() => {
-    const el = terminalRef.value
-    if (el) el.scrollTop = el.scrollHeight
-  })
+  if (scrollTimer) return
+  scrollTimer = setTimeout(() => {
+    scrollTimer = null
+    nextTick(() => {
+      const el = terminalRef.value
+      if (!el) return
+      const threshold = 50
+      const isNearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
+      if (isNearBottom) {
+        el.scrollTop = el.scrollHeight
+      }
+    })
+  }, 200)
 }
 
 const commonAgentFlags = getCommonAgents().map((a) => a.agentFlag)
@@ -165,7 +179,7 @@ const failedLogLines = computed(() => {
     :on-after-leave="resetState"
     @update:show="handleClose"
   >
-    <NCard title="安装技能" style="width: 620px">
+    <NCard title="安装技能" style="width: min(620px, 90vw)">
       <NText>即将安装：{{ source }}</NText>
 
       <NSteps :current="currentStep" style="margin-top: var(--space-md)" size="small">
@@ -201,7 +215,8 @@ const failedLogLines = computed(() => {
               取消安装
             </NButton>
           </div>
-          <div ref="terminalRef" class="install-terminal">
+          <!-- aria-live 使动态终端输出可被屏幕阅读器播报 -->
+          <div ref="terminalRef" class="install-terminal" aria-live="polite" aria-atomic="false">
             <pre class="terminal-content">{{ commandOutput || '等待输出...' }}</pre>
           </div>
         </div>
@@ -338,7 +353,7 @@ const failedLogLines = computed(() => {
 .terminal-content {
   color: var(--color-muted);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 13px;
+  font-size: var(--text-caption);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-all;

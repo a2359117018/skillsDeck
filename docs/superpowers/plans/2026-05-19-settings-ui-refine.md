@@ -12,8 +12,8 @@
 
 ### File Structure
 
-| File | Action | Description |
-|------|--------|-------------|
+| File                                      | Action | Description                                                       |
+| ----------------------------------------- | ------ | ----------------------------------------------------------------- |
 | `src/renderer/src/views/SettingsView.vue` | Modify | 样式：`.settings-select` 加 `max-width`；模板：运行环境底部工具栏 |
 
 ---
@@ -21,6 +21,7 @@
 ### Task 1: Select/Input 宽度限制
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue:700-702`
 
 - [ ] **Step 1: 修改 `.settings-select` 样式**
@@ -35,6 +36,7 @@
   ```
 
   当前代码位置约在 700 行附近：
+
   ```css
   .settings-select {
     width: 100%;
@@ -56,6 +58,7 @@
   解决方案：给 `.proxy-field` 也加 `max-width: 320px`。
 
   修改位置约在 705-710 行：
+
   ```css
   .proxy-field {
     display: flex;
@@ -71,6 +74,7 @@
 ### Task 2: 运行环境底部工具栏
 
 **Files:**
+
 - Modify: `src/renderer/src/views/SettingsView.vue:555-599`（运行环境区域模板）
 
 - [ ] **Step 1: 重构运行环境底部操作区**
@@ -159,7 +163,10 @@
   <div v-if="!envStore.status?.nodeInstalled" class="env-actions">
     <!-- 下载进度 or 下载按钮 -->
   </div>
-  <div v-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled" class="env-actions">
+  <div
+    v-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
+    class="env-actions"
+  >
     <!-- 安装 skills CLI 按钮 -->
   </div>
   <div class="env-actions">
@@ -219,7 +226,6 @@
   等等，这样当显示下载进度条时，进度条会和重新检测按钮并排，这不太好——进度条太宽了。
 
   好吧，我再想想。也许最简单的方法就是：
-
   1. 下载进度条保持独占一行（不改）
   2. 把原来的 3 个 `.env-actions` 合并，改为 `flex-direction: row; flex-wrap: wrap;`
   3. 给 `.env-actions` 加 `border-top` 和 `padding-top`，让它看起来像工具栏
@@ -251,6 +257,7 @@
   把原来的 3 个 `.env-actions` 块（约 556-599 行）替换为：
 
   保留下载进度条的独立区块（因为它内容太多，不适合并排）：
+
   ```vue
   <div v-if="envDownloading" class="env-actions">
     <div class="env-download-progress">
@@ -272,6 +279,7 @@
   ```
 
   然后把"安装按钮"和"重新检测"合并到一个工具栏：
+
   ```vue
   <div class="env-toolbar">
     <div class="env-toolbar-left">
@@ -330,6 +338,7 @@
 - [ ] **Step 3: 调整 `.env-actions` 样式（下载进度条容器）**
 
   当前 `.env-actions`：
+
   ```css
   .env-actions {
     margin-top: var(--space-lg);
@@ -400,15 +409,18 @@
 ## Self-Review
 
 **Spec coverage:**
+
 - [x] select/input 宽度限制 → Task 1
 - [x] 运行环境底部工具栏 → Task 2
 - [x] 保持其他区域不变 → 计划中未涉及其他区域
 
 **Placeholder scan:**
+
 - [x] 无 TBD/TODO
 - [x] 无 "add appropriate error handling" 类模糊描述
 - [x] 无 "similar to Task N" 引用
 - [x] 代码块包含完整代码
 
 **Type consistency:**
+
 - [x] 未引入新类型或方法签名
