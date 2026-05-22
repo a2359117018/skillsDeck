@@ -33,7 +33,6 @@ nsis:
   oneClick: false
   license: LICENSE
   allowToChangeInstallationDirectory: true
-  include: build/installer.nsh
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
