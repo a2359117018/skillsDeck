@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onUnmounted } from 'vue'
 import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
@@ -47,6 +47,10 @@ function handleSearch(keyword: string): void {
   searchKeyword.value = keyword
   debouncedSearch(keyword)
 }
+
+onUnmounted(() => {
+  if (searchTimer) clearTimeout(searchTimer)
+})
 
 function handleInstall(source: string): void {
   selectedSource.value = source

@@ -5,6 +5,7 @@ import { NDrawer, NDrawerContent, NButton, NIcon, NEmpty } from 'naive-ui'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import TaskItem from './TaskItem.vue'
 import { useTaskStore } from '../../stores/tasks'
+import { useNotify } from '../../composables/useNotify'
 
 defineProps<{
   show: boolean
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const taskStore = useTaskStore()
+const notify = useNotify()
 
 /** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
 const { width: windowWidth } = useWindowSize()
@@ -32,8 +34,13 @@ function handleCancel(taskId: string): void {
 }
 
 /** 重试失败的任务 */
-function handleRetry(taskId: string): void {
-  taskStore.retry(taskId)
+async function handleRetry(taskId: string): Promise<void> {
+  try {
+    await taskStore.retry(taskId)
+    notify.info('任务已重新开始执行')
+  } catch (e) {
+    notify.error(e instanceof Error ? e.message : '重试失败')
+  }
 }
 
 /** 清除已完成的任务，通过调用 store action 而非直接修改数组 */

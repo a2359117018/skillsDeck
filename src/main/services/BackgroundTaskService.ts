@@ -157,6 +157,14 @@ class BackgroundTaskService {
       throw new Error('Task not found or not in error state')
     }
 
+    // 检查同类型任务是否已在运行
+    const conflicting = Array.from(this.tasks.values()).find(
+      (t) => t.id !== taskId && t.type === task.type && (t.status === 'pending' || t.status === 'running')
+    )
+    if (conflicting) {
+      throw new Error(`A ${task.type} task is already ${conflicting.status}`)
+    }
+
     const { command, args } = this.resolveCommand(task.type)
     task.status = 'pending'
     task.error = undefined
