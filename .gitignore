@@ -5,7 +5,6 @@ out
 .eslintcache
 *.log*
 .idea
-build
 .vscode
 
 .worktrees/
