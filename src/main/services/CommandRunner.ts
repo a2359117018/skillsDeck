@@ -2,11 +2,10 @@ import { execa, type Options } from 'execa'
 import stripAnsiModule from 'strip-ansi'
 import os from 'node:os'
 import type { CommandResult } from '../../shared/types'
+import { COMMAND_TIMEOUT_MS } from '../../shared/constants'
 
 const stripAnsi =
   (stripAnsiModule as unknown as { default?: typeof stripAnsiModule }).default ?? stripAnsiModule
-
-const DEFAULT_TIMEOUT = 60000
 
 function toString(value: string | unknown[] | Uint8Array | undefined): string {
   if (typeof value === 'string') return value
@@ -47,7 +46,7 @@ class CommandRunner {
   private activeProcess: ReturnType<typeof execa> | null = null
 
   async run(command: string, args: string[], opts?: RunOptions): Promise<CommandResult> {
-    const timeout = opts?.timeout ?? DEFAULT_TIMEOUT
+    const timeout = opts?.timeout ?? COMMAND_TIMEOUT_MS
     const cwd = opts?.cwd ?? os.homedir()
 
     const execaOpts: Options = {

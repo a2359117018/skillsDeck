@@ -4,6 +4,7 @@ import type { BackgroundTask } from '../../shared/types'
 import type { Subprocess } from 'execa'
 import { getMainWindow } from './WindowManager'
 import { getSettings } from './StoreService'
+import { BACKGROUND_TASK_TIMEOUT_MS, TASK_HISTORY_LIMIT } from '../../shared/constants'
 
 type TaskType = BackgroundTask['type']
 
@@ -91,7 +92,7 @@ class BackgroundTaskService {
     const task = this.tasks.get(id)!
 
     const { command, args } = this.resolveCommand(type)
-    const child = execa(command, args, { timeout: 120000 })
+    const child = execa(command, args, { timeout: BACKGROUND_TASK_TIMEOUT_MS })
     this.processes.set(id, child)
 
     this.markRunning(id)
@@ -149,8 +150,8 @@ class BackgroundTaskService {
     const completed = all.filter(
       (t) => t.status === 'success' || t.status === 'error' || t.status === 'cancelled'
     )
-    if (completed.length > 50) {
-      const toRemove = completed.slice(0, completed.length - 50)
+    if (completed.length > TASK_HISTORY_LIMIT) {
+      const toRemove = completed.slice(0, completed.length - TASK_HISTORY_LIMIT)
       for (const t of toRemove) {
         this.tasks.delete(t.id)
       }
