@@ -27,6 +27,11 @@ class BackgroundTaskService {
         command = 'npm'
         args = ['install', '-g', 'skills']
         break
+      case 'skill-update':
+      case 'skill-update-all':
+        throw new Error(`${type} is managed by skills.ipc.ts, not BackgroundTaskService`)
+      default:
+        throw new Error(`Unknown task type: ${type}`)
     }
 
     const registry = getSettings().npmRegistry
@@ -143,6 +148,54 @@ class BackgroundTaskService {
       }
       this.cleanup(taskId)
     }
+  }
+
+  /** 重试失败的任务：将任务重置为 pending 并重新执行 */
+  retryBuiltIn(taskId: string): void {
+    const task = this.tasks.get(taskId)
+    if (!task || task.status !== 'error') {
+      throw new Error('Task not found or not in error state')
+    }
+
+    const { command, args } = this.resolveCommand(task.type)
+    task.status = 'pending'
+    task.error = undefined
+    task.stdout = ''
+    task.progress = -1
+    task.updatedAt = Date.now()
+    this.emitUpdate(task)
+
+    const child = execa(command, args, { timeout: BACKGROUND_TASK_TIMEOUT_MS })
+    this.processes.set(taskId, child)
+
+    this.markRunning(taskId)
+
+    child.stdout?.on('data', (data: Buffer) => {
+      task.stdout += data.toString()
+      task.updatedAt = Date.now()
+      this.emitUpdate(task)
+    })
+
+    child.stderr?.on('data', (data: Buffer) => {
+      task.stdout += data.toString()
+      task.updatedAt = Date.now()
+      this.emitUpdate(task)
+    })
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        this.markSuccess(taskId)
+      } else {
+        const detail = task.stdout.trim() ? `\n${task.stdout.trim()}` : ''
+        this.markError(taskId, `Exit code: ${code}${detail}`)
+      }
+      this.cleanup(taskId)
+    })
+
+    child.catch((error) => {
+      this.markError(taskId, error instanceof Error ? error.message : String(error))
+      this.cleanup(taskId)
+    })
   }
 
   getAll(): BackgroundTask[] {

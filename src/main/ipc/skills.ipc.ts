@@ -304,4 +304,39 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
 
     return { taskId }
   })
+
+  ipcMain.handle('tasks:retry-skill-update', async (_, { taskId }: { taskId: string }) => {
+    const task = backgroundTaskService.getStatus(taskId)
+    if (!task || task.status !== 'error') {
+      return { ok: false, error: 'Task not found or not in error state' }
+    }
+
+    if (task.type !== 'skill-update-all') {
+      return { ok: false, error: '单个技能更新不支持重试，请重新执行更新操作' }
+    }
+
+    task.status = 'pending'
+    task.error = undefined
+    task.stdout = ''
+    task.updatedAt = Date.now()
+    backgroundTaskService.markRunning(taskId)
+
+    skillsService
+      .updateAll()
+      .then((result) => {
+        if (result.success) {
+          backgroundTaskService.markSuccess(taskId)
+        } else {
+          backgroundTaskService.markError(taskId, result.stderr || '更新失败')
+        }
+      })
+      .catch((error) => {
+        backgroundTaskService.markError(
+          taskId,
+          error instanceof Error ? error.message : String(error)
+        )
+      })
+
+    return { ok: true }
+  })
 }

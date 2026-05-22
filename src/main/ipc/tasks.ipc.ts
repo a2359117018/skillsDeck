@@ -21,4 +21,13 @@ export function registerTasksIpc(): void {
   ipcMain.handle('tasks:get-all', () => {
     return backgroundTaskService.getAll()
   })
+
+  ipcMain.handle('tasks:retry', async (_, { taskId }: { taskId: string }) => {
+    try {
+      backgroundTaskService.retryBuiltIn(taskId)
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: toIpcError(error).message }
+    }
+  })
 }

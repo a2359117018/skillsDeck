@@ -79,6 +79,8 @@ export interface AppApi {
   tasks: {
     start: (opts: { type: BackgroundTask['type'] }) => Promise<{ taskId: string; error?: string }>
     cancel: (taskId: string) => Promise<void>
+    retry: (opts: { taskId: string }) => Promise<{ ok: boolean; error?: string }>
+    retrySkillUpdate: (opts: { taskId: string }) => Promise<{ ok: boolean; error?: string }>
     getAll: () => Promise<BackgroundTask[]>
     onUpdate: (callback: (task: BackgroundTask) => void) => () => void
   }

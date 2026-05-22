@@ -88,6 +88,10 @@ const api = {
       ipcRenderer.invoke('tasks:start', opts),
     cancel: (taskId: string): Promise<void> => ipcRenderer.invoke('tasks:cancel', taskId),
     getAll: (): Promise<unknown[]> => ipcRenderer.invoke('tasks:get-all'),
+    retry: (opts: { taskId: string }): Promise<{ ok: boolean; error?: string }> =>
+      ipcRenderer.invoke('tasks:retry', opts),
+    retrySkillUpdate: (opts: { taskId: string }): Promise<{ ok: boolean; error?: string }> =>
+      ipcRenderer.invoke('tasks:retry-skill-update', opts),
     onUpdate: (callback: (task: unknown) => void): (() => void) => {
       const listener = (_event: Electron.IpcRendererEvent, task: unknown): void => callback(task)
       ipcRenderer.on('tasks:update', listener)

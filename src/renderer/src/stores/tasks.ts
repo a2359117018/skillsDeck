@@ -43,6 +43,20 @@ export const useTaskStore = defineStore('tasks', () => {
     await window.api.tasks.cancel(taskId)
   }
 
+  async function retry(taskId: string): Promise<void> {
+    const task = tasks.value.find((t) => t.id === taskId)
+    if (!task) throw new Error('Task not found')
+
+    let result: { ok: boolean; error?: string }
+    if (task.type === 'skill-update' || task.type === 'skill-update-all') {
+      result = await window.api.tasks.retrySkillUpdate({ taskId })
+    } else {
+      result = await window.api.tasks.retry({ taskId })
+    }
+    if (!result.ok) throw new Error(result.error)
+    await sync()
+  }
+
   async function sync(): Promise<void> {
     tasks.value = await window.api.tasks.getAll()
   }
@@ -91,6 +105,7 @@ export const useTaskStore = defineStore('tasks', () => {
     hasActiveTasks,
     start,
     cancel,
+    retry,
     sync,
     subscribe,
     isRunning,

@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   cancel: [taskId: string]
+  retry: [taskId: string]
 }>()
 
 /** 任务类型到中文名称的映射 */
@@ -42,6 +43,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 const taskLabel = computed(() => TASK_LABELS[props.task.type] || props.task.type)
 const statusConfig = computed(() => STATUS_CONFIG[props.task.status] || STATUS_CONFIG.pending)
 const isActive = computed(() => props.task.status === 'running' || props.task.status === 'pending')
+const isFailed = computed(() => props.task.status === 'error')
 const progressValue = computed(() => (props.task.progress >= 0 ? props.task.progress : undefined))
 
 /** 格式化相对时间 */
@@ -82,6 +84,18 @@ const relativeTime = computed(() => {
       >
         <template #icon>
           <NIcon :size="14"><StopCircleOutline /></NIcon>
+        </template>
+      </NButton>
+      <NButton
+        v-if="isFailed"
+        size="small"
+        quaternary
+        circle
+        title="重试"
+        @click="emit('retry', task.id)"
+      >
+        <template #icon>
+          <NIcon :size="14"><ReloadOutline /></NIcon>
         </template>
       </NButton>
     </div>

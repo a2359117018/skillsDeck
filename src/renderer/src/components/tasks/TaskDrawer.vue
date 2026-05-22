@@ -31,6 +31,11 @@ function handleCancel(taskId: string): void {
   taskStore.cancel(taskId)
 }
 
+/** 重试失败的任务 */
+function handleRetry(taskId: string): void {
+  taskStore.retry(taskId)
+}
+
 /** 清除已完成的任务，通过调用 store action 而非直接修改数组 */
 function clearCompleted(): void {
   taskStore.clearCompleted()
@@ -76,7 +81,13 @@ const hasCompletedTasks = computed(() =>
       </div>
 
       <div v-else class="task-list">
-        <TaskItem v-for="task in sortedTasks" :key="task.id" :task="task" @cancel="handleCancel" />
+        <TaskItem
+          v-for="task in sortedTasks"
+          :key="task.id"
+          :task="task"
+          @cancel="handleCancel"
+          @retry="handleRetry"
+        />
       </div>
     </NDrawerContent>
   </NDrawer>
