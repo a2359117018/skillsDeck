@@ -331,7 +331,8 @@ onMounted(() => {
 <style scoped>
 /* Page Layout */
 .agent-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
   background: var(--color-canvas);
   padding: var(--space-xl);
 }

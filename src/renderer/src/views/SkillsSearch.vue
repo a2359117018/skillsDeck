@@ -15,6 +15,7 @@ const showInstallDialog = ref(false)
 const selectedSource = ref('')
 const hasSearched = ref(false)
 const activeTab = ref('search')
+const searchKeyword = ref('')
 
 /** Watch for global shortcut trigger and focus the search input */
 watch(
@@ -30,6 +31,7 @@ watch(
 const SUGGESTIONS = ['code-review', 'testing', 'debug', 'docs']
 
 function handleSearch(keyword: string): void {
+  searchKeyword.value = keyword
   hasSearched.value = true
   skillsStore.search(keyword)
 }
@@ -54,7 +56,7 @@ function handleLocalInstallComplete(): void {
     <NTabs v-model:value="activeTab" type="line">
       <NTabPane name="search" tab="搜索安装">
         <div class="tab-content">
-          <SkillSearchBar @search="handleSearch" />
+          <SkillSearchBar v-model="searchKeyword" @search="handleSearch" />
           <div class="search-scroll">
             <div v-if="skillsStore.searching" class="search-loading">
               <NSpin size="large" />
@@ -164,7 +166,10 @@ function handleLocalInstallComplete(): void {
 .tab-content {
   padding-top: var(--space-md);
   height: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   box-sizing: border-box;
 }
 

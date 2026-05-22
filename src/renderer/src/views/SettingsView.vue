@@ -654,6 +654,8 @@ async function handleUpdateAll(): Promise<void> {
 
 <style scoped>
 .settings-page {
+  height: 100%;
+  overflow-y: auto;
   padding: var(--space-xl);
   width: 100%;
 }

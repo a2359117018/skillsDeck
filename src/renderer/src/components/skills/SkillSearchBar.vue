@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { NInput, NIcon } from 'naive-ui'
+import { computed } from 'vue'
+import { NInput, NButton, NIcon } from 'naive-ui'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 
-const keyword = ref('')
-const emit = defineEmits<{ search: [keyword: string] }>()
+const props = defineProps<{ modelValue?: string }>()
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+  search: [keyword: string]
+}>()
+
+const keyword = computed({
+  get: () => props.modelValue ?? '',
+  set: (val: string) => emit('update:modelValue', val),
+})
 
 function handleSearch(): void {
   if (keyword.value.trim()) emit('search', keyword.value.trim())
@@ -32,6 +40,12 @@ function handleKeydown(e: KeyboardEvent): void {
           <NIcon :size="18" :color="'var(--color-muted)'"><SearchOutline /></NIcon>
         </template>
       </NInput>
+      <NButton type="primary" size="large" round class="search-btn" @click="handleSearch">
+        <template #icon>
+          <NIcon :size="18"><SearchOutline /></NIcon>
+        </template>
+        搜索
+      </NButton>
     </div>
   </div>
 </template>
@@ -39,10 +53,12 @@ function handleKeydown(e: KeyboardEvent): void {
 <style scoped>
 .search-bar-wrapper {
   padding: var(--space-sm) 0 var(--space-lg);
+  flex-shrink: 0;
 }
 
 .search-bar-container {
   display: flex;
+  gap: var(--space-md);
   width: 100%;
   align-items: center;
 }
@@ -53,5 +69,19 @@ function handleKeydown(e: KeyboardEvent): void {
 
 .search-input :deep(.n-input__input-el) {
   height: 40px;
+}
+
+.search-btn {
+  flex-shrink: 0;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-canvas);
+  font-weight: var(--weight-medium);
+  transition: all var(--transition-base);
+}
+
+.search-btn:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
 }
 </style>

@@ -125,11 +125,13 @@ const themeOverrides: GlobalThemeOverrides = {
                   </NButton>
                 </div>
               </NAlert>
-              <router-view v-slot="{ Component }">
-                <Transition name="fade">
-                  <component :is="Component" />
-                </Transition>
-              </router-view>
+              <div class="page-wrapper">
+                <router-view v-slot="{ Component }">
+                  <Transition name="fade">
+                    <component :is="Component" />
+                  </Transition>
+                </router-view>
+              </div>
             </main>
             <TaskDrawer v-model:show="taskDrawerVisible" />
           </div>
@@ -149,8 +151,10 @@ const themeOverrides: GlobalThemeOverrides = {
 
 .content-area {
   flex: 1;
-  height: 100vh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   background-color: var(--color-canvas);
 }
 
@@ -183,5 +187,11 @@ const themeOverrides: GlobalThemeOverrides = {
 .skip-link:focus {
   left: var(--space-md);
   top: var(--space-md);
+}
+
+.page-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 </style>
