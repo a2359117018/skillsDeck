@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { NInput, NButton, NIcon } from 'naive-ui'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 
-const props = defineProps<{ modelValue?: string }>()
+const props = defineProps<{ modelValue?: string; disabled?: boolean }>()
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   search: [keyword: string]
@@ -33,6 +33,7 @@ function handleKeydown(e: KeyboardEvent): void {
         size="large"
         clearable
         round
+        :disabled="disabled"
         class="search-input"
         @keydown="handleKeydown"
       >
@@ -40,7 +41,7 @@ function handleKeydown(e: KeyboardEvent): void {
           <NIcon :size="18" :color="'var(--color-muted)'"><SearchOutline /></NIcon>
         </template>
       </NInput>
-      <NButton type="primary" size="large" round class="search-btn" @click="handleSearch">
+      <NButton type="primary" size="large" round :disabled="disabled" class="search-btn" @click="handleSearch">
         <template #icon>
           <NIcon :size="18"><SearchOutline /></NIcon>
         </template>

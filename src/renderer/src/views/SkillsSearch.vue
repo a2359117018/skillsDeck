@@ -3,6 +3,7 @@ import { ref, watch, nextTick } from 'vue'
 import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
+import { useNetworkStatus } from '@renderer/composables/useNetworkStatus'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
 import SkillInstallDialog from '@renderer/components/skills/SkillInstallDialog.vue'
@@ -11,6 +12,7 @@ import ArchiveInstaller from '@renderer/components/skills/ArchiveInstaller.vue'
 import EmptyState from '@renderer/components/common/EmptyState.vue'
 
 const skillsStore = useSkillsStore()
+const { isOnline } = useNetworkStatus()
 const showInstallDialog = ref(false)
 const selectedSource = ref('')
 const hasSearched = ref(false)
@@ -66,8 +68,11 @@ function handleLocalInstallComplete(): void {
     <NTabs v-model:value="activeTab" type="line">
       <NTabPane name="search" tab="搜索安装">
         <div class="tab-content">
-          <SkillSearchBar v-model="searchKeyword" @search="handleSearch" />
+          <SkillSearchBar v-model="searchKeyword" :disabled="!isOnline" @search="handleSearch" />
           <div class="search-scroll">
+            <div v-if="!isOnline" class="offline-notice">
+              <NText depth="3">网络已断开，搜索功能不可用</NText>
+            </div>
             <div v-if="skillsStore.searching" class="search-loading">
               <NSpin size="large" />
             </div>
@@ -225,5 +230,13 @@ function handleLocalInstallComplete(): void {
   flex-wrap: wrap;
   gap: var(--space-xs);
   justify-content: center;
+}
+
+.offline-notice {
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
 }
 </style>

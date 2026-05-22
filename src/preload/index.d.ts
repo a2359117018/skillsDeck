@@ -76,6 +76,9 @@ export interface AppApi {
     getSettings: () => Promise<AppSettings>
     setSettings: (partial: Record<string, unknown>) => Promise<void>
   }
+  network: {
+    onStatusChange: (callback: (online: boolean) => void) => () => void
+  }
   tasks: {
     start: (opts: { type: BackgroundTask['type'] }) => Promise<{ taskId: string; error?: string }>
     cancel: (taskId: string) => Promise<void>

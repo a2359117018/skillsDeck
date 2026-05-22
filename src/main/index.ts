@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, net } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import fs from 'fs'
 import path from 'path'
@@ -7,6 +7,16 @@ import { createMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
 import { getSettings, setEnvStatus } from './services/StoreService'
+
+/** 定期向所有窗口广播网络状态 */
+function broadcastNetworkStatus(): void {
+  const online = net.isOnline()
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) {
+      win.webContents.send('network:status', online)
+    }
+  }
+}
 
 /** Remove leftover skills-* temp directories from previous sessions. */
 function cleanupOrphanedTempDirs(): void {
@@ -36,6 +46,9 @@ app.whenReady().then(() => {
 
   registerIpcHandlers()
   createMainWindow()
+
+  broadcastNetworkStatus()
+  setInterval(broadcastNetworkStatus, 30_000)
 
   const settings = getSettings()
   if (settings.autoCheckEnv) {

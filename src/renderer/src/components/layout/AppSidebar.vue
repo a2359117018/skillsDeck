@@ -7,11 +7,14 @@ import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import SettingsOutline from '@vicons/ionicons5/SettingsOutline'
 import RocketOutline from '@vicons/ionicons5/RocketOutline'
+import WifiOutline from '@vicons/ionicons5/WifiOutline'
 import { useTaskStore } from '../../stores/tasks'
+import { useNetworkStatus } from '../../composables/useNetworkStatus'
 
 const router = useRouter()
 const route = useRoute()
 const taskStore = useTaskStore()
+const { isOnline } = useNetworkStatus()
 
 interface NavItem {
   key: string
@@ -71,6 +74,11 @@ const emit = defineEmits<{
     </nav>
 
     <div class="sidebar-footer">
+      <div v-if="!isOnline" class="sidebar-network-offline" title="网络已断开">
+        <NIcon :size="16" aria-hidden="true">
+          <WifiOutline />
+        </NIcon>
+      </div>
       <button
         class="sidebar-item task-indicator"
         :class="{ 'has-active': taskStore.hasActiveTasks }"
@@ -189,5 +197,15 @@ const emit = defineEmits<{
 
 .task-indicator.has-active {
   color: var(--sidebar-icon-active-color);
+}
+
+.sidebar-network-offline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  padding: 6px 0;
+  color: var(--color-error);
+  opacity: 0.8;
 }
 </style>

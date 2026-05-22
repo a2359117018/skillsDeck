@@ -83,6 +83,13 @@ const api = {
     setSettings: (partial: Record<string, unknown>): Promise<void> =>
       ipcRenderer.invoke('store:set-settings', partial)
   },
+  network: {
+    onStatusChange: (callback: (online: boolean) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, online: boolean): void => callback(online)
+      ipcRenderer.on('network:status', listener)
+      return () => ipcRenderer.removeListener('network:status', listener)
+    }
+  },
   tasks: {
     start: (opts: { type: string }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('tasks:start', opts),
