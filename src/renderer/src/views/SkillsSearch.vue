@@ -30,10 +30,20 @@ watch(
 
 const SUGGESTIONS = ['code-review', 'testing', 'debug', 'docs']
 
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+function debouncedSearch(keyword: string): void {
+  if (searchTimer) clearTimeout(searchTimer)
+  if (!keyword.trim()) return
+  searchTimer = setTimeout(() => {
+    hasSearched.value = true
+    skillsStore.search(keyword)
+  }, 300)
+}
+
 function handleSearch(keyword: string): void {
   searchKeyword.value = keyword
-  hasSearched.value = true
-  skillsStore.search(keyword)
+  debouncedSearch(keyword)
 }
 
 function handleInstall(source: string): void {
