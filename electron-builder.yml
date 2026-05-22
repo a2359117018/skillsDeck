@@ -9,6 +9,18 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  # 排除 node_modules 中的垃圾文件，减小 asar 体积
+  - '!**/node_modules/**/{README*,readme*,CHANGELOG*,changelog*,HISTORY*,history*}'
+  - '!**/node_modules/**/{LICENSE*,license*,COPYING*}'
+  - '!**/node_modules/**/*.map'
+  - '!**/node_modules/**/coverage/**'
+  - '!**/node_modules/**/.cache/**'
+  - '!**/node_modules/**/{test,tests,__tests__,spec}/**'
+  - '!**/node_modules/**/*.{md,markdown,txt}'
+  - '!**/node_modules/**/docs/**'
+  - '!**/node_modules/**/.{eslintrc,prettierrc,babelrc,editorconfig}*'
+  - '!**/node_modules/**/tsconfig*.json'
+afterPack: build/afterPack.js
 asarUnpack:
   - resources/**
 win:
@@ -18,10 +30,10 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-  oneClick: false # Required for assisted installer + custom path
-  license: LICENSE # Apache 2.0 license page
-  allowToChangeInstallationDirectory: true # Enable custom install path selection
-  include: build/installer.nsh # Custom script for declaration page
+  oneClick: false
+  license: LICENSE
+  allowToChangeInstallationDirectory: true
+  include: build/installer.nsh
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
