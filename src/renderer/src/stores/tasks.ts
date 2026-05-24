@@ -13,7 +13,12 @@ export const useTaskStore = defineStore('tasks', () => {
 
   async function start(
     type: string,
-    opts?: TaskCallbacks & { packageRef?: string; global?: boolean }
+    opts?: TaskCallbacks & {
+      packageRef?: string
+      packageRefs?: string[]
+      agentFlag?: string
+      global?: boolean
+    }
   ): Promise<string> {
     let result: { taskId: string; error?: string }
 
@@ -24,6 +29,11 @@ export const useTaskStore = defineStore('tasks', () => {
       })
     } else if (type === 'skill-update-all') {
       result = await window.api.skills.updateAllBackground({ global: opts?.global })
+    } else if (type === 'skill-remove-batch') {
+      result = await window.api.skills.removeBatchBackground({
+        packageRefs: opts?.packageRefs || [],
+        agentFlag: opts?.agentFlag
+      })
     } else {
       result = await window.api.tasks.start({ type: type as BackgroundTask['type'] })
     }
@@ -50,6 +60,10 @@ export const useTaskStore = defineStore('tasks', () => {
     // 单个技能更新不存储 packageRef，无法重试
     if (task.type === 'skill-update') {
       throw new Error('单个技能更新不支持重试，请重新执行更新操作')
+    }
+
+    if (task.type === 'skill-remove-batch') {
+      throw new Error('批量删除不支持重试，请重新进入批量管理模式执行')
     }
 
     let result: { ok: boolean; error?: string }

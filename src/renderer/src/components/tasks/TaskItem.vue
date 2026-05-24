@@ -23,7 +23,8 @@ const TASK_LABELS: Record<string, string> = {
   'install-node': '安装 Node.js',
   'install-skills': '安装 skills 命令行工具',
   'skill-update': '更新技能',
-  'skill-update-all': '批量更新技能'
+  'skill-update-all': '批量更新技能',
+  'skill-remove-batch': '批量删除技能'
 }
 
 /** 任务状态配置 */
@@ -44,6 +45,7 @@ const taskLabel = computed(() => TASK_LABELS[props.task.type] || props.task.type
 const statusConfig = computed(() => STATUS_CONFIG[props.task.status] || STATUS_CONFIG.pending)
 const isActive = computed(() => props.task.status === 'running' || props.task.status === 'pending')
 const isFailed = computed(() => props.task.status === 'error')
+const canCancel = computed(() => isActive.value && props.task.type !== 'skill-remove-batch')
 const progressValue = computed(() => (props.task.progress >= 0 ? props.task.progress : undefined))
 
 /** 格式化相对时间 */
@@ -75,7 +77,7 @@ const relativeTime = computed(() => {
         {{ statusConfig.label }}
       </span>
       <NButton
-        v-if="isActive"
+        v-if="canCancel"
         size="small"
         quaternary
         circle
