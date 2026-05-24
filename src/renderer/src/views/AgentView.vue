@@ -747,6 +747,7 @@ onMounted(() => {
   width: 44px;
   height: 44px;
   color: var(--color-stone);
+  background: transparent;
 }
 
 :deep(.n-button.folder-btn:hover) {
