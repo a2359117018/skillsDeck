@@ -46,6 +46,10 @@ export interface AppApi {
     updateAllBackground: (opts?: {
       global?: boolean
     }) => Promise<{ taskId: string; error?: string }>
+    removeBatchBackground: (opts: {
+      packageRefs: string[]
+      agentFlag?: string
+    }) => Promise<{ taskId: string; error?: string }>
     parseGitHub: (url: string) => Promise<IpcResult<GitHubParseResult>>
     selectArchive: () => Promise<IpcResult<string>>
     extractArchive: (filePath: string) => Promise<IpcResult<ArchiveScanResult>>

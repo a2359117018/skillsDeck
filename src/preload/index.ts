@@ -36,6 +36,11 @@ const api = {
       global?: boolean
     }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('skills:update-all-background', opts),
+    removeBatchBackground: (opts: {
+      packageRefs: string[]
+      agentFlag?: string
+    }): Promise<{ taskId: string; error?: string }> =>
+      ipcRenderer.invoke('skills:remove-batch-background', opts),
     parseGitHub: (url: string): Promise<IpcResult<GitHubParseResult>> =>
       ipcRenderer.invoke('skills:parse-github', url),
     selectArchive: (): Promise<IpcResult<string>> => ipcRenderer.invoke('skills:select-archive'),

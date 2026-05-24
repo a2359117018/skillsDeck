@@ -9,7 +9,7 @@ export interface EnvStatus {
 
 export interface BackgroundTask {
   id: string
-  type: 'update-skills' | 'install-node' | 'install-skills' | 'skill-update' | 'skill-update-all'
+  type: 'update-skills' | 'install-node' | 'install-skills' | 'skill-update' | 'skill-update-all' | 'skill-remove-batch'
   status: 'pending' | 'running' | 'success' | 'error' | 'cancelled'
   progress: number
   stdout: string
