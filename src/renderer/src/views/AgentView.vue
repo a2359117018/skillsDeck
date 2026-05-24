@@ -57,14 +57,6 @@ function openAgentCard(agent: AgentScanResult): void {
   drawerVisible.value = true
 }
 
-/** 处理 Agent 卡片键盘事件，支持 Enter / Space 触发点击 */
-function handleAgentCardKeydown(agent: AgentScanResult, e: KeyboardEvent): void {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    openAgentCard(agent)
-  }
-}
-
 function closeDrawer(): void {
   drawerVisible.value = false
   selectedAgentFlag.value = null
@@ -178,7 +170,8 @@ onMounted(() => {
           tabindex="0"
           :aria-label="agent.agentName + '，' + agent.count + '个技能'"
           @click="openAgentCard(agent)"
-          @keydown="handleAgentCardKeydown(agent, $event)"
+          @keydown.enter.prevent="openAgentCard(agent)"
+          @keydown.space.prevent="openAgentCard(agent)"
         >
           <div class="agent-card-avatar">
             {{ getAgentInitials(agent.agentName) }}
@@ -188,18 +181,15 @@ onMounted(() => {
           </div>
           <div class="agent-card-info">
             <NText depth="3">{{ agent.count }} 个技能</NText>
-            <NButton
-              size="tiny"
-              quaternary
-              circle
-              title="打开技能文件夹"
+            <button
+              type="button"
               class="agent-folder-btn"
-              @click="openAgentFolder(agent, $event)"
+              aria-label="打开技能文件夹"
+              title="打开技能文件夹"
+              @click.stop="openAgentFolder(agent, $event)"
             >
-              <template #icon>
-                <NIcon :size="14" aria-hidden="true"><FolderOpenOutline /></NIcon>
-              </template>
-            </NButton>
+              <NIcon :size="14" aria-hidden="true"><FolderOpenOutline /></NIcon>
+            </button>
           </div>
         </div>
       </div>
@@ -291,6 +281,7 @@ onMounted(() => {
                     circle
                     size="small"
                     class="action-btn update"
+                    aria-label="更新技能"
                     @click="handleUpdate(skillName)"
                   >
                     <template #icon>
@@ -307,6 +298,7 @@ onMounted(() => {
                     circle
                     size="small"
                     class="action-btn delete"
+                    aria-label="删除技能"
                     :loading="removingSkill === skillName"
                     @click="handleRemove(skillName)"
                   >
@@ -361,7 +353,7 @@ onMounted(() => {
 .toolbar-badge {
   background: var(--color-brand-blue);
   color: var(--color-canvas);
-  padding: 2px 10px;
+  padding: var(--space-xxs) var(--space-sm);
   border-radius: var(--radius-full);
   font-size: var(--text-body-sm);
   font-weight: var(--weight-semibold);
@@ -412,9 +404,13 @@ onMounted(() => {
 
 /* Agent Cards */
 .agent-card {
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  padding: var(--space-md);
   border: 1px solid;
   transition:
     box-shadow var(--transition-base),
@@ -426,6 +422,7 @@ onMounted(() => {
 
 .agent-card:hover {
   box-shadow: var(--shadow-3);
+  border-color: var(--color-hairline-hover);
 }
 
 /* Card Color Themes */
@@ -434,7 +431,7 @@ onMounted(() => {
   border-color: var(--color-agent-coral-border);
 }
 .agent-card.color-0 .agent-card-avatar {
-  background: var(--color-brand-coral);
+  background: var(--color-avatar-coral);
 }
 .agent-card.color-0 .agent-folder-btn {
   color: var(--color-brand-coral);
@@ -445,7 +442,7 @@ onMounted(() => {
   border-color: var(--color-agent-blue-border);
 }
 .agent-card.color-1 .agent-card-avatar {
-  background: var(--color-brand-blue);
+  background: var(--color-avatar-blue);
 }
 .agent-card.color-1 .agent-folder-btn {
   color: var(--color-brand-blue);
@@ -456,7 +453,7 @@ onMounted(() => {
   border-color: var(--color-agent-magenta-border);
 }
 .agent-card.color-2 .agent-card-avatar {
-  background: var(--color-brand-magenta);
+  background: var(--color-avatar-magenta);
 }
 .agent-card.color-2 .agent-folder-btn {
   color: var(--color-brand-magenta);
@@ -467,7 +464,7 @@ onMounted(() => {
   border-color: var(--color-agent-purple-border);
 }
 .agent-card.color-3 .agent-card-avatar {
-  background: var(--color-brand-purple);
+  background: var(--color-avatar-purple);
 }
 .agent-card.color-3 .agent-folder-btn {
   color: var(--color-brand-purple);
@@ -507,7 +504,19 @@ onMounted(() => {
 }
 
 .agent-folder-btn {
-  transition: opacity var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
 }
 
 /* Drawer Wrapper */
@@ -552,7 +561,7 @@ onMounted(() => {
 .header-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-xxs);
 }
 
 .header-name {
@@ -563,9 +572,9 @@ onMounted(() => {
 
 .header-count {
   font-size: var(--text-caption);
-  color: var(--color-stone);
+  color: var(--color-brand-blue-deep);
   background: var(--color-brand-blue-tint);
-  padding: 2px 8px;
+  padding: var(--space-xxs) var(--space-xs);
   border-radius: var(--radius-full);
   width: fit-content;
 }
@@ -584,7 +593,7 @@ onMounted(() => {
 
 :deep(.n-button.header-icon-btn:hover) {
   background: var(--color-brand-blue-tint);
-  color: var(--color-brand-blue-600);
+  color: var(--color-interactive-accent);
 }
 
 /* Drawer Body - 卡片列表 */
@@ -613,7 +622,7 @@ onMounted(() => {
 }
 
 .skill-card:hover {
-  border-color: var(--color-brand-blue-600);
+  border-color: var(--color-interactive-accent);
   box-shadow: 0 2px 12px var(--color-brand-blue-tint);
 }
 
@@ -649,7 +658,7 @@ onMounted(() => {
 
 :deep(.n-button.action-btn.update:hover) {
   background: var(--color-brand-blue-tint);
-  color: var(--color-brand-blue-600);
+  color: var(--color-interactive-accent);
 }
 
 :deep(.n-button.action-btn.delete:hover) {

@@ -51,6 +51,12 @@
   --color-brand-magenta-light: #ff6ec7;
   --color-brand-coral-dark: #e64720;
 
+  /* Avatar dark variants — ensure white text passes WCAG AA (>= 4.5:1) */
+  --color-avatar-coral: #c4321a;
+  --color-avatar-blue: #1e40af;
+  --color-avatar-magenta: #c43a9a;
+  --color-avatar-purple: #7c3aed;
+
   /* Agent card tints (four-color cycling) */
   --color-agent-coral-bg: #fff5f2;
   --color-agent-coral-border: #ffe0d6;
@@ -63,7 +69,7 @@
 
   /* Agent drawer interactive tints */
   --color-brand-blue-tint: rgba(37, 99, 235, 0.08);
-  --color-brand-blue-600: #2563eb;
+  --color-interactive-accent: #2563eb;
 
   /* Semantic */
   --color-success-bg: #dcfce7;
@@ -189,7 +195,7 @@
 
   /* Agent drawer interactive tints */
   --color-brand-blue-tint: rgba(59, 130, 246, 0.12);
-  --color-brand-blue-600: #60a5fa;
+  --color-interactive-accent: #60a5fa;
 
   /* Semantic */
   --color-success-bg: #14532d;
