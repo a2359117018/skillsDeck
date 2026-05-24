@@ -32,8 +32,8 @@ const removingSkill = ref<string | null>(null)
 
 // Batch mode state
 const isBatchMode = ref(false)
-const isBatchRemoving = ref(false)
 const selectedSkillNames = ref<string[]>([])
+const pendingRemovalNames = ref<Set<string>>(new Set())
 
 /** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
 const { width: windowWidth } = useWindowSize()
@@ -48,8 +48,13 @@ const visibleAgentResults = computed(() =>
 
 const agentCount = computed(() => visibleAgentResults.value.length)
 
-const allSelected = computed(() => {
+const displayedAgentSkills = computed(() => {
   const skills = selectedAgent.value?.skills || []
+  return skills.filter((s) => !pendingRemovalNames.value.has(s))
+})
+
+const allSelected = computed(() => {
+  const skills = displayedAgentSkills.value
   return skills.length > 0 && skills.every((s) => selectedSkillNames.value.includes(s))
 })
 
@@ -93,7 +98,7 @@ function exitBatchMode(): void {
 
 /** Toggle selection of all skills in the current agent. */
 function toggleAll(): void {
-  const skills = selectedAgent.value?.skills || []
+  const skills = displayedAgentSkills.value
   const names = skills
   if (allSelected.value) {
     selectedSkillNames.value = selectedSkillNames.value.filter((n) => !names.includes(n))
@@ -139,43 +144,39 @@ async function handleUpdate(name: string): Promise<void> {
 
 /**
  * Remove all selected skills in the current agent in batch.
- * Executes serially to avoid file-lock conflicts. Reports success/failure counts.
+ * Uses optimistic deletion with a background task.
  */
 async function handleBatchRemove(): Promise<void> {
-  if (selectedSkillNames.value.length === 0 || isBatchRemoving.value) return
+  if (selectedSkillNames.value.length === 0) return
   const confirmed = await confirmRemoveBatch(selectedSkillNames.value)
   if (!confirmed) return
 
-  isBatchRemoving.value = true
   const names = [...selectedSkillNames.value]
-  const failedNames: string[] = []
-  let successCount = 0
   const agentFlag = selectedAgent.value?.agentFlag
 
-  for (const name of names) {
-    try {
-      const result = await skillsStore.remove(name, true, agentFlag)
-      if (result.success) {
-        successCount++
-      } else {
-        failedNames.push(name)
+  // 乐观删除：立即加入 pendingRemovalNames
+  pendingRemovalNames.value = new Set([...pendingRemovalNames.value, ...names])
+
+  taskStore
+    .start('skill-remove-batch', {
+      packageRefs: names,
+      agentFlag,
+      onSuccess: () => {
+        pendingRemovalNames.value = new Set()
+        skillsStore.fetchInstalled()
+      },
+      onError: (err) => {
+        notify.error(err)
+        pendingRemovalNames.value = new Set()
+        skillsStore.fetchInstalled()
       }
-    } catch {
-      failedNames.push(name)
-    }
-  }
+    })
+    .catch((e) => {
+      notify.error(e instanceof Error ? e.message : '启动删除失败')
+      pendingRemovalNames.value = new Set()
+      skillsStore.fetchInstalled()
+    })
 
-  if (successCount > 0) {
-    notify.success(`已删除 ${successCount} 个技能`)
-  }
-  if (failedNames.length > 0) {
-    const displayed = failedNames.slice(0, 5).join('、')
-    const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
-    notify.error(`删除失败：${displayed}${suffix}`)
-  }
-
-  await skillsStore.fetchInstalled()
-  isBatchRemoving.value = false
   exitBatchMode()
 }
 
@@ -377,7 +378,6 @@ onMounted(() => {
                 type="error"
                 size="small"
                 :disabled="selectedCount === 0"
-                :loading="isBatchRemoving"
                 @click="handleBatchRemove"
               >
                 <template #icon>
@@ -396,7 +396,7 @@ onMounted(() => {
         </div>
         <div class="drawer-body">
           <div
-            v-for="skillName in selectedAgent.skills"
+            v-for="skillName in displayedAgentSkills"
             :key="selectedAgent.agentFlag + '-' + skillName"
             class="skill-card"
             :class="{
