@@ -8,6 +8,7 @@ import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import CloseOutline from '@vicons/ionicons5/CloseOutline'
+import CheckmarkDoneOutline from '@vicons/ionicons5/CheckmarkDoneOutline'
 import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
@@ -313,7 +314,7 @@ onMounted(() => {
       @mask-click="closeDrawer"
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
-        <div class="drawer-header">
+        <div class="drawer-header" :class="{ 'drawer-header--batch': isBatchMode }">
           <template v-if="!isBatchMode">
             <div class="header-left">
               <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
@@ -362,6 +363,11 @@ onMounted(() => {
           </template>
           <template v-else>
             <div class="header-left">
+              <div class="batch-mode-indicator">
+                <NIcon :size="18" :color="'var(--color-brand-blue)'">
+                  <CheckmarkDoneOutline />
+                </NIcon>
+              </div>
               <div class="header-name">批量管理</div>
             </div>
             <div class="batch-toolbar-middle">
@@ -373,7 +379,9 @@ onMounted(() => {
               >
                 全选
               </NCheckbox>
-              <span class="batch-count">已选 {{ selectedCount }} 个</span>
+              <span v-if="selectedCount > 0" class="batch-count batch-count--active">
+                {{ selectedCount }}
+              </span>
             </div>
             <div class="header-actions">
               <NButton
@@ -386,14 +394,9 @@ onMounted(() => {
                 <template #icon>
                   <NIcon :size="16"><TrashOutline /></NIcon>
                 </template>
-                删除选中
+                删除
               </NButton>
-              <NButton secondary size="small" @click="exitBatchMode">
-                <template #icon>
-                  <NIcon :size="16"><CloseOutline /></NIcon>
-                </template>
-                完成
-              </NButton>
+              <NButton secondary size="small" @click="exitBatchMode"> 取消 </NButton>
             </div>
           </template>
         </div>
@@ -746,6 +749,23 @@ onMounted(() => {
   color: var(--color-interactive-accent);
 }
 
+.drawer-header--batch {
+  background: var(--color-brand-blue-tint);
+  border-bottom-color: var(--color-brand-blue-200);
+}
+
+.batch-mode-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-blue);
+  color: var(--color-canvas);
+  flex-shrink: 0;
+}
+
 .batch-entry-btn {
   font-size: var(--text-body-sm);
 }
@@ -753,13 +773,27 @@ onMounted(() => {
 .batch-toolbar-middle {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   flex: 1;
 }
 
 .batch-count {
   font-size: var(--text-body-sm);
   color: var(--color-stone);
+}
+
+.batch-count--active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-blue);
+  color: var(--color-canvas);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
 }
 
 /* Drawer Body - 卡片列表 */
