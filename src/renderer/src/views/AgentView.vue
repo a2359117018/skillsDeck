@@ -406,11 +406,26 @@ onMounted(() => {
             v-for="skillName in selectedAgent.skills"
             :key="selectedAgent.agentFlag + '-' + skillName"
             class="skill-card"
+            :class="{ 'skill-card--selected': isBatchMode && selectedSkillNames.includes(skillName) }"
+            @click="
+              (e) => {
+                if (!isBatchMode) return
+                if ((e.target as HTMLElement).closest('.skill-checkbox')) return
+                toggleSkill(skillName)
+              }
+            "
           >
             <div class="skill-left">
+              <div v-if="isBatchMode" class="skill-checkbox">
+                <NCheckbox
+                  :checked="selectedSkillNames.includes(skillName)"
+                  aria-label="选择技能"
+                  @update:checked="toggleSkill(skillName)"
+                />
+              </div>
               <div class="skill-name">{{ skillName }}</div>
             </div>
-            <div class="skill-actions">
+            <div v-if="!isBatchMode" class="skill-actions">
               <NTooltip>
                 <template #trigger>
                   <NButton
