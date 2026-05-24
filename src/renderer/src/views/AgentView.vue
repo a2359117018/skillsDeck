@@ -8,7 +8,6 @@ import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import CloseOutline from '@vicons/ionicons5/CloseOutline'
-import CheckmarkDoneOutline from '@vicons/ionicons5/CheckmarkDoneOutline'
 import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
@@ -314,7 +313,7 @@ onMounted(() => {
       @mask-click="closeDrawer"
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
-        <div class="drawer-header" :class="{ 'drawer-header--batch': isBatchMode }">
+        <div class="drawer-header">
           <template v-if="!isBatchMode">
             <div class="header-left">
               <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
@@ -330,7 +329,7 @@ onMounted(() => {
                     quaternary
                     circle
                     size="medium"
-                    class="header-icon-btn"
+                    class="folder-btn"
                     @click="openAgentFolder(selectedAgent!)"
                   >
                     <template #icon>
@@ -362,15 +361,7 @@ onMounted(() => {
             </div>
           </template>
           <template v-else>
-            <div class="header-left">
-              <div class="batch-mode-indicator">
-                <NIcon :size="18" :color="'var(--color-brand-blue)'">
-                  <CheckmarkDoneOutline />
-                </NIcon>
-              </div>
-              <div class="header-name">批量管理</div>
-            </div>
-            <div class="batch-toolbar-middle">
+            <div class="batch-toolbar-left">
               <NCheckbox
                 :checked="allSelected"
                 :indeterminate="someSelected"
@@ -379,9 +370,7 @@ onMounted(() => {
               >
                 全选
               </NCheckbox>
-              <span v-if="selectedCount > 0" class="batch-count batch-count--active">
-                {{ selectedCount }}
-              </span>
+              <span class="batch-count">已选 {{ selectedCount }} 个</span>
             </div>
             <div class="header-actions">
               <NButton
@@ -396,7 +385,12 @@ onMounted(() => {
                 </template>
                 删除
               </NButton>
-              <NButton secondary size="small" @click="exitBatchMode"> 取消 </NButton>
+              <NButton secondary size="small" @click="exitBatchMode">
+                <template #icon>
+                  <NIcon :size="16"><CloseOutline /></NIcon>
+                </template>
+                取消
+              </NButton>
             </div>
           </template>
         </div>
@@ -749,28 +743,22 @@ onMounted(() => {
   color: var(--color-interactive-accent);
 }
 
-.drawer-header--batch {
-  background: var(--color-brand-blue-tint);
-  border-bottom-color: var(--color-brand-blue-200);
+:deep(.n-button.folder-btn) {
+  width: 44px;
+  height: 44px;
+  color: var(--color-stone);
 }
 
-.batch-mode-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--color-brand-blue);
-  color: var(--color-canvas);
-  flex-shrink: 0;
+:deep(.n-button.folder-btn:hover) {
+  background: transparent;
+  color: var(--color-ink);
 }
 
 .batch-entry-btn {
   font-size: var(--text-body-sm);
 }
 
-.batch-toolbar-middle {
+.batch-toolbar-left {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -780,20 +768,6 @@ onMounted(() => {
 .batch-count {
   font-size: var(--text-body-sm);
   color: var(--color-stone);
-}
-
-.batch-count--active {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-brand-blue);
-  color: var(--color-canvas);
-  font-size: var(--text-micro);
-  font-weight: var(--weight-semibold);
 }
 
 /* Drawer Body - 卡片列表 */
