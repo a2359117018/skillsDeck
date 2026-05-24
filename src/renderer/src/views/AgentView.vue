@@ -81,6 +81,7 @@ function openAgentCard(agent: AgentScanResult): void {
 function closeDrawer(): void {
   drawerVisible.value = false
   selectedAgentFlag.value = null
+  pendingRemovalNames.value = new Set()
   exitBatchMode()
 }
 
