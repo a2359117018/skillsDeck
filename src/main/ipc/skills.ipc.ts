@@ -311,29 +311,34 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       if (hasPendingTask('skill-remove-batch')) {
         return { taskId: '', error: '批量删除任务正在进行中' }
       }
+      if (!Array.isArray(opts.packageRefs) || opts.packageRefs.length === 0) {
+        return { taskId: '', error: '未选择要删除的技能' }
+      }
       const taskId = backgroundTaskService.register('skill-remove-batch')
       backgroundTaskService.markRunning(taskId)
+      ;(async () => {
+        const failedNames: string[] = []
 
-      const failedNames: string[] = []
-
-      for (const packageRef of opts.packageRefs) {
-        try {
-          const result = await skillsService.remove(packageRef, opts.agentFlag, true)
-          if (!result.success) {
+        for (const packageRef of opts.packageRefs) {
+          try {
+            const result = await skillsService.remove(packageRef, opts.agentFlag, true)
+            if (!result.success) {
+              failedNames.push(packageRef)
+            }
+          } catch (error) {
+            console.error(`Failed to remove skill ${packageRef}:`, error)
             failedNames.push(packageRef)
           }
-        } catch {
-          failedNames.push(packageRef)
         }
-      }
 
-      if (failedNames.length === 0) {
-        backgroundTaskService.markSuccess(taskId)
-      } else {
-        const displayed = failedNames.slice(0, 5).join('、')
-        const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
-        backgroundTaskService.markError(taskId, `删除失败：${displayed}${suffix}`)
-      }
+        if (failedNames.length === 0) {
+          backgroundTaskService.markSuccess(taskId)
+        } else {
+          const displayed = failedNames.slice(0, 5).join('、')
+          const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
+          backgroundTaskService.markError(taskId, `删除失败：${displayed}${suffix}`)
+        }
+      })()
 
       return { taskId }
     }
