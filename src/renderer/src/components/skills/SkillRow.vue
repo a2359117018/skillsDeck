@@ -1,25 +1,48 @@
 <script setup lang="ts">
-import { NIcon, NButton, NText } from 'naive-ui'
+import { NIcon, NButton, NText, NCheckbox } from 'naive-ui'
 import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import type { InstalledSkill } from '../../../../shared/types'
 
-const props = defineProps<{ skill: InstalledSkill }>()
+const props = defineProps<{
+  skill: InstalledSkill
+  batchMode?: boolean
+  selected?: boolean
+}>()
 
 const emit = defineEmits<{
   update: [name: string]
   remove: [name: string]
   openLocation: [path: string]
   filterAgent: [agentFlag: string]
+  toggleSelect: [name: string]
 }>()
+
+function handleCardClick(event: MouseEvent): void {
+  if (!props.batchMode) return
+  const target = event.target as HTMLElement
+  if (target.closest('.skill-checkbox')) return
+  emit('toggleSelect', props.skill.name)
+}
 </script>
 
 <template>
-  <div class="skill-card">
+  <div
+    class="skill-card"
+    :class="{ 'skill-card--selected': props.batchMode && props.selected }"
+    @click="handleCardClick"
+  >
     <div class="skill-card-main">
+      <div v-if="props.batchMode" class="skill-checkbox">
+        <NCheckbox
+          :checked="props.selected"
+          aria-label="选择技能"
+          @update:checked="emit('toggleSelect', props.skill.name)"
+        />
+      </div>
       <NText class="skill-name">{{ props.skill.name }}</NText>
-      <div class="skill-actions">
+      <div v-if="!props.batchMode" class="skill-actions">
         <NButton
           quaternary
           circle
@@ -88,7 +111,8 @@ const emit = defineEmits<{
   background: var(--color-canvas);
   transition:
     box-shadow var(--transition-base),
-    border-color var(--transition-base);
+    border-color var(--transition-base),
+    background var(--transition-base);
 }
 
 .skill-card:hover {
@@ -96,11 +120,29 @@ const emit = defineEmits<{
   border-color: var(--color-muted);
 }
 
+.skill-card--selected {
+  border-color: var(--color-brand-blue);
+  background: var(--color-brand-blue-tint);
+}
+
+.skill-card--selected:hover {
+  border-color: var(--color-brand-blue);
+}
+
 .skill-card-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
+}
+
+.skill-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.skill-checkbox :deep(.n-checkbox-box-wrapper) {
+  margin: 0;
 }
 
 .skill-name {

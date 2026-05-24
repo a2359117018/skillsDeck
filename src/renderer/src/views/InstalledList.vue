@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { NInput, NIcon, NButton, NSpin } from 'naive-ui'
+import { NInput, NIcon, NButton, NSpin, NCheckbox } from 'naive-ui'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
+import CloseOutline from '@vicons/ionicons5/CloseOutline'
+import TrashOutline from '@vicons/ionicons5/TrashOutline'
 import { useSkillsStore } from '../stores/skills'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
@@ -18,13 +20,89 @@ const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
 const notify = useNotify()
 const router = useRouter()
-const { confirmUpdate, confirmRemove, confirmUpdateAll } = useConfirm()
+const { confirmUpdate, confirmRemove, confirmRemoveBatch, confirmUpdateAll } = useConfirm()
 
 const removeDialogState = ref<{
   visible: boolean
   skillName: string
   agents: InstalledSkillAgent[]
 }>({ visible: false, skillName: '', agents: [] })
+
+// Batch mode state
+const isBatchMode = ref(false)
+const selectedNames = ref<string[]>([])
+
+const allSelected = computed(() => {
+  const skills = skillsStore.filteredSkills
+  return skills.length > 0 && skills.every((s) => selectedNames.value.includes(s.name))
+})
+
+const someSelected = computed(() => {
+  return selectedNames.value.length > 0 && !allSelected.value
+})
+
+const selectedCount = computed(() => selectedNames.value.length)
+
+function enterBatchMode(): void {
+  isBatchMode.value = true
+  selectedNames.value = []
+}
+
+function exitBatchMode(): void {
+  isBatchMode.value = false
+  selectedNames.value = []
+}
+
+function toggleAll(): void {
+  const names = skillsStore.filteredSkills.map((s) => s.name)
+  if (allSelected.value) {
+    selectedNames.value = selectedNames.value.filter((n) => !names.includes(n))
+  } else {
+    selectedNames.value = Array.from(new Set([...selectedNames.value, ...names]))
+  }
+}
+
+function toggleSkill(name: string): void {
+  const idx = selectedNames.value.indexOf(name)
+  if (idx >= 0) {
+    selectedNames.value = selectedNames.value.filter((n) => n !== name)
+  } else {
+    selectedNames.value = [...selectedNames.value, name]
+  }
+}
+
+async function handleBatchRemove(): Promise<void> {
+  if (selectedNames.value.length === 0) return
+  const confirmed = await confirmRemoveBatch(selectedNames.value)
+  if (!confirmed) return
+
+  const names = [...selectedNames.value]
+  let successCount = 0
+  let failCount = 0
+
+  for (const name of names) {
+    try {
+      const result = await skillsStore.remove(name, true)
+      if (result.success) {
+        successCount++
+      } else {
+        failCount++
+      }
+    } catch {
+      failCount++
+    }
+  }
+
+  if (successCount > 0) {
+    notify.success(`已删除 ${successCount} 个技能`)
+  }
+  if (failCount > 0) {
+    notify.error(`${failCount} 个技能删除失败`)
+  }
+
+  await loadSkills()
+  exitBatchMode()
+}
 
 async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled()
@@ -143,6 +221,9 @@ function handleSearchInput(val: string): void {
 }
 
 function handleFilterAgent(agentFlag: string): void {
+  if (isBatchMode.value) {
+    exitBatchMode()
+  }
   skillsStore.toggleAgent(agentFlag)
 }
 </script>
@@ -152,43 +233,90 @@ function handleFilterAgent(agentFlag: string): void {
     <div class="container">
       <!-- Toolbar -->
       <div class="toolbar">
-        <h1 class="toolbar-title">
-          我的技能
-          <span class="toolbar-badge">{{ skillsStore.filteredSkills.length }}</span>
-        </h1>
-        <div class="toolbar-search">
-          <NInput
-            :value="skillsStore.searchKeyword"
-            placeholder="搜索技能..."
-            aria-label="搜索已安装技能"
-            clearable
-            size="large"
-            class="toolbar-search-input"
-            @update:value="handleSearchInput"
-          >
-            <template #prefix>
-              <NIcon :size="18" :color="'var(--color-muted)'">
-                <SearchOutline />
-              </NIcon>
-            </template>
-          </NInput>
-        </div>
-        <div class="toolbar-actions">
-          <NButton secondary size="small" :disabled="skillsStore.refreshing" @click="handleRefresh">
-            <template #icon>
-              <NIcon :size="16"><RefreshOutline /></NIcon>
-            </template>
-            刷新
-          </NButton>
-          <NButton
-            secondary
-            size="small"
-            :disabled="skillsStore.installedSkills.length === 0"
-            @click="handleUpdateAll"
-          >
-            全部更新
-          </NButton>
-        </div>
+        <template v-if="!isBatchMode">
+          <h1 class="toolbar-title">
+            我的技能
+            <span class="toolbar-badge">{{ skillsStore.filteredSkills.length }}</span>
+          </h1>
+          <div class="toolbar-search">
+            <NInput
+              :value="skillsStore.searchKeyword"
+              placeholder="搜索技能..."
+              aria-label="搜索已安装技能"
+              clearable
+              size="large"
+              class="toolbar-search-input"
+              @update:value="handleSearchInput"
+            >
+              <template #prefix>
+                <NIcon :size="18" :color="'var(--color-muted)'">
+                  <SearchOutline />
+                </NIcon>
+              </template>
+            </NInput>
+          </div>
+          <div class="toolbar-actions">
+            <NButton
+              secondary
+              size="small"
+              :disabled="skillsStore.refreshing"
+              @click="handleRefresh"
+            >
+              <template #icon>
+                <NIcon :size="16"><RefreshOutline /></NIcon>
+              </template>
+              刷新
+            </NButton>
+            <NButton
+              secondary
+              size="small"
+              :disabled="skillsStore.installedSkills.length === 0"
+              @click="handleUpdateAll"
+            >
+              全部更新
+            </NButton>
+            <NButton
+              secondary
+              size="small"
+              :disabled="skillsStore.installedSkills.length === 0"
+              @click="enterBatchMode"
+            >
+              批量管理
+            </NButton>
+          </div>
+        </template>
+        <template v-else>
+          <h1 class="toolbar-title">批量管理</h1>
+          <div class="batch-toolbar-middle">
+            <NCheckbox
+              :checked="allSelected"
+              :indeterminate="someSelected"
+              @update:checked="toggleAll"
+            >
+              全选
+            </NCheckbox>
+            <span class="batch-count">已选 {{ selectedCount }} 个</span>
+          </div>
+          <div class="toolbar-actions">
+            <NButton
+              type="error"
+              size="small"
+              :disabled="selectedCount === 0"
+              @click="handleBatchRemove"
+            >
+              <template #icon>
+                <NIcon :size="16"><TrashOutline /></NIcon>
+              </template>
+              删除选中
+            </NButton>
+            <NButton secondary size="small" @click="exitBatchMode">
+              <template #icon>
+                <NIcon :size="16"><CloseOutline /></NIcon>
+              </template>
+              完成
+            </NButton>
+          </div>
+        </template>
       </div>
 
       <!-- Agent Tag Bar -->
@@ -207,10 +335,13 @@ function handleFilterAgent(agentFlag: string): void {
             v-for="skill in skillsStore.filteredSkills"
             :key="skill.name"
             :skill="skill"
+            :batch-mode="isBatchMode"
+            :selected="selectedNames.includes(skill.name)"
             @update="handleUpdate"
             @remove="handleRemove"
             @open-location="handleOpenLocation"
             @filter-agent="handleFilterAgent"
+            @toggle-select="toggleSkill"
           />
         </TransitionGroup>
       </div>
@@ -292,6 +423,18 @@ function handleFilterAgent(agentFlag: string): void {
 .toolbar-actions {
   display: flex;
   gap: var(--space-sm);
+}
+
+.batch-toolbar-middle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.batch-count {
+  font-size: var(--text-body-sm);
+  color: var(--color-stone);
 }
 
 .page-loading {

@@ -5,6 +5,7 @@ export function useConfirm(): {
   confirmInstall: (name: string) => Promise<boolean>
   confirmUpdate: (name: string) => Promise<boolean>
   confirmRemove: (name: string) => Promise<boolean>
+  confirmRemoveBatch: (names: string[]) => Promise<boolean>
   confirmUpdateAll: (names: string[]) => Promise<boolean>
   confirmUpdateEnv: (name: string, version: string) => Promise<boolean>
 } {
@@ -45,6 +46,32 @@ export function useConfirm(): {
       dialog.warning({
         title: '删除确认',
         content: `删除「${name}」技能后无法恢复，确认删除吗？`,
+        positiveText: '删除',
+        negativeText: '取消',
+        onPositiveClick: () => resolve(true),
+        onNegativeClick: () => resolve(false),
+        onClose: () => resolve(false),
+        onMaskClick: () => resolve(false)
+      })
+    })
+  }
+
+  function confirmRemoveBatch(names: string[]): Promise<boolean> {
+    const maxShow = 10
+    const displayed = names.slice(0, maxShow).join('、')
+    const suffix =
+      names.length > maxShow ? `...等 ${names.length} 个技能` : `共 ${names.length} 个技能`
+
+    const contentVNode = h('div', [
+      h('p', { style: 'margin-bottom: 8px' }, '删除以下技能后无法恢复，确认删除吗？'),
+      h('p', { class: 'confirm-skill-list' }, displayed),
+      h('p', { class: 'confirm-skill-suffix' }, suffix)
+    ])
+
+    return new Promise((resolve) => {
+      dialog.warning({
+        title: '批量删除确认',
+        content: () => contentVNode,
         positiveText: '删除',
         negativeText: '取消',
         onPositiveClick: () => resolve(true),
@@ -110,5 +137,12 @@ export function useConfirm(): {
     })
   }
 
-  return { confirmInstall, confirmUpdate, confirmRemove, confirmUpdateAll, confirmUpdateEnv }
+  return {
+    confirmInstall,
+    confirmUpdate,
+    confirmRemove,
+    confirmRemoveBatch,
+    confirmUpdateAll,
+    confirmUpdateEnv
+  }
 }
