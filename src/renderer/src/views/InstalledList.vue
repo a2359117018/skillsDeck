@@ -62,7 +62,7 @@ function exitBatchMode(): void {
 
 /** Toggle selection of all skills currently in the filtered view. */
 function toggleAll(): void {
-  const names = skillsStore.filteredSkills.map((s) => s.name)
+  const names = displayedSkills.value.map((s) => s.name)
   if (allSelected.value) {
     selectedNames.value = selectedNames.value.filter((n) => !names.includes(n))
   } else {
@@ -91,25 +91,24 @@ async function handleBatchRemove(): Promise<void> {
   const names = [...selectedNames.value]
 
   // 乐观删除：立即加入 pendingRemovalNames
-  for (const name of names) {
-    pendingRemovalNames.value.add(name)
-  }
+  pendingRemovalNames.value = new Set([...pendingRemovalNames.value, ...names])
 
   taskStore
     .start('skill-remove-batch', {
       packageRefs: names,
       onSuccess: () => {
-        pendingRemovalNames.value.clear()
+        pendingRemovalNames.value = new Set()
         loadSkills()
       },
-      onError: () => {
-        pendingRemovalNames.value.clear()
+      onError: (err) => {
+        notify.error(err)
+        pendingRemovalNames.value = new Set()
         loadSkills()
       }
     })
     .catch((e) => {
-      notify.info(e instanceof Error ? e.message : '启动删除失败')
-      pendingRemovalNames.value.clear()
+      notify.error(e instanceof Error ? e.message : '启动删除失败')
+      pendingRemovalNames.value = new Set()
       loadSkills()
     })
 
@@ -248,7 +247,7 @@ function handleFilterAgent(agentFlag: string): void {
         <template v-if="!isBatchMode">
           <h1 class="toolbar-title">
             我的技能
-            <span class="toolbar-badge">{{ skillsStore.filteredSkills.length }}</span>
+            <span class="toolbar-badge">{{ displayedSkills.length }}</span>
           </h1>
           <div class="toolbar-search">
             <NInput
