@@ -748,6 +748,22 @@ onMounted(() => {
   color: var(--color-interactive-accent);
 }
 
+.batch-entry-btn {
+  font-size: var(--text-body-sm);
+}
+
+.batch-toolbar-middle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.batch-count {
+  font-size: var(--text-body-sm);
+  color: var(--color-stone);
+}
+
 /* Drawer Body - 卡片列表 */
 .drawer-body {
   flex: 1;
@@ -778,12 +794,31 @@ onMounted(() => {
   box-shadow: 0 2px 12px var(--color-brand-blue-tint);
 }
 
+.skill-card--selected {
+  border-color: var(--color-brand-blue);
+  background: var(--color-brand-blue-tint);
+}
+
+.skill-card--selected:hover {
+  border-color: var(--color-brand-blue);
+}
+
 .skill-left {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   min-width: 0;
   flex: 1;
+}
+
+.skill-checkbox {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.skill-checkbox :deep(.n-checkbox-box-wrapper) {
+  margin: 0;
 }
 
 .skill-name {
