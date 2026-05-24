@@ -313,47 +313,93 @@ onMounted(() => {
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
         <div class="drawer-header">
-          <div class="header-left">
-            <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
-            <div class="header-info">
-              <div class="header-name">{{ selectedAgent.agentName }}</div>
-              <div class="header-count">{{ selectedAgent.count }} 个技能</div>
+          <template v-if="!isBatchMode">
+            <div class="header-left">
+              <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
+              <div class="header-info">
+                <div class="header-name">{{ selectedAgent.agentName }}</div>
+                <div class="header-count">{{ selectedAgent.count }} 个技能</div>
+              </div>
             </div>
-          </div>
-          <div class="header-actions">
-            <NTooltip>
-              <template #trigger>
-                <NButton
-                  quaternary
-                  circle
-                  size="medium"
-                  class="header-icon-btn"
-                  @click="openAgentFolder(selectedAgent!)"
-                >
-                  <template #icon>
-                    <NIcon :size="18" aria-hidden="true"><FolderOpenOutline /></NIcon>
-                  </template>
-                </NButton>
-              </template>
-              打开文件夹
-            </NTooltip>
-            <NTooltip>
-              <template #trigger>
-                <NButton
-                  quaternary
-                  circle
-                  size="medium"
-                  class="header-icon-btn"
-                  @click="closeDrawer"
-                >
-                  <template #icon>
-                    <NIcon :size="18" aria-hidden="true"><CloseOutline /></NIcon>
-                  </template>
-                </NButton>
-              </template>
-              关闭
-            </NTooltip>
-          </div>
+            <div class="header-actions">
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    quaternary
+                    circle
+                    size="medium"
+                    class="header-icon-btn"
+                    @click="openAgentFolder(selectedAgent!)"
+                  >
+                    <template #icon>
+                      <NIcon :size="18" aria-hidden="true"><FolderOpenOutline /></NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                打开文件夹
+              </NTooltip>
+              <NButton
+                secondary
+                size="small"
+                class="batch-entry-btn"
+                @click="enterBatchMode"
+              >
+                批量管理
+              </NButton>
+              <NTooltip>
+                <template #trigger>
+                  <NButton
+                    quaternary
+                    circle
+                    size="medium"
+                    class="header-icon-btn"
+                    @click="closeDrawer"
+                  >
+                    <template #icon>
+                      <NIcon :size="18" aria-hidden="true"><CloseOutline /></NIcon>
+                    </template>
+                  </NButton>
+                </template>
+                关闭
+              </NTooltip>
+            </div>
+          </template>
+          <template v-else>
+            <div class="header-left">
+              <div class="header-name">批量管理</div>
+            </div>
+            <div class="batch-toolbar-middle">
+              <NCheckbox
+                :checked="allSelected"
+                :indeterminate="someSelected"
+                aria-label="全选当前 Agent 下的所有技能"
+                @update:checked="toggleAll"
+              >
+                全选
+              </NCheckbox>
+              <span class="batch-count">已选 {{ selectedCount }} 个</span>
+            </div>
+            <div class="header-actions">
+              <NButton
+                type="error"
+                size="small"
+                :disabled="selectedCount === 0"
+                :loading="isBatchRemoving"
+                @click="handleBatchRemove"
+              >
+                <template #icon>
+                  <NIcon :size="16"><TrashOutline /></NIcon>
+                </template>
+                删除选中
+              </NButton>
+              <NButton secondary size="small" @click="exitBatchMode">
+                <template #icon>
+                  <NIcon :size="16"><CloseOutline /></NIcon>
+                </template>
+                完成
+              </NButton>
+            </div>
+          </template>
         </div>
         <div class="drawer-body">
           <div
