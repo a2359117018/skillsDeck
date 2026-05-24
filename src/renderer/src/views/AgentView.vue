@@ -76,6 +76,7 @@ function openAgentCard(agent: AgentScanResult): void {
 function closeDrawer(): void {
   drawerVisible.value = false
   selectedAgentFlag.value = null
+  exitBatchMode()
 }
 
 /** Enter batch mode and clear any previous selection. */
