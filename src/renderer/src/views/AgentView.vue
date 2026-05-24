@@ -30,6 +30,11 @@ const selectedAgent = computed(
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
 
+// Batch mode state
+const isBatchMode = ref(false)
+const isBatchRemoving = ref(false)
+const selectedSkillNames = ref<string[]>([])
+
 /** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
 const { width: windowWidth } = useWindowSize()
 
@@ -42,6 +47,17 @@ const visibleAgentResults = computed(() =>
 )
 
 const agentCount = computed(() => visibleAgentResults.value.length)
+
+const allSelected = computed(() => {
+  const skills = selectedAgent.value?.skills || []
+  return skills.length > 0 && skills.every((s) => selectedSkillNames.value.includes(s))
+})
+
+const someSelected = computed(() => {
+  return selectedSkillNames.value.length > 0 && !allSelected.value
+})
+
+const selectedCount = computed(() => selectedSkillNames.value.length)
 
 function getAgentInitials(name: string): string {
   return name.slice(0, 2)
@@ -60,6 +76,39 @@ function openAgentCard(agent: AgentScanResult): void {
 function closeDrawer(): void {
   drawerVisible.value = false
   selectedAgentFlag.value = null
+}
+
+/** Enter batch mode and clear any previous selection. */
+function enterBatchMode(): void {
+  isBatchMode.value = true
+  selectedSkillNames.value = []
+}
+
+/** Exit batch mode and clear selection. */
+function exitBatchMode(): void {
+  isBatchMode.value = false
+  selectedSkillNames.value = []
+}
+
+/** Toggle selection of all skills in the current agent. */
+function toggleAll(): void {
+  const skills = selectedAgent.value?.skills || []
+  const names = skills
+  if (allSelected.value) {
+    selectedSkillNames.value = selectedSkillNames.value.filter((n) => !names.includes(n))
+  } else {
+    selectedSkillNames.value = Array.from(new Set([...selectedSkillNames.value, ...names]))
+  }
+}
+
+/** Toggle selection of a single skill by name. */
+function toggleSkill(name: string): void {
+  const idx = selectedSkillNames.value.indexOf(name)
+  if (idx >= 0) {
+    selectedSkillNames.value = selectedSkillNames.value.filter((n) => n !== name)
+  } else {
+    selectedSkillNames.value = [...selectedSkillNames.value, name]
+  }
 }
 
 function openAgentFolder(agent: AgentScanResult, e?: Event): void {
@@ -85,6 +134,48 @@ async function handleUpdate(name: string): Promise<void> {
     .catch((e) => {
       notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
+}
+
+/**
+ * Remove all selected skills in the current agent in batch.
+ * Executes serially to avoid file-lock conflicts. Reports success/failure counts.
+ */
+async function handleBatchRemove(): Promise<void> {
+  if (selectedSkillNames.value.length === 0 || isBatchRemoving.value) return
+  const confirmed = await confirmRemoveBatch(selectedSkillNames.value)
+  if (!confirmed) return
+
+  isBatchRemoving.value = true
+  const names = [...selectedSkillNames.value]
+  const failedNames: string[] = []
+  let successCount = 0
+  const agentFlag = selectedAgent.value?.agentFlag
+
+  for (const name of names) {
+    try {
+      const result = await skillsStore.remove(name, true, agentFlag)
+      if (result.success) {
+        successCount++
+      } else {
+        failedNames.push(name)
+      }
+    } catch {
+      failedNames.push(name)
+    }
+  }
+
+  if (successCount > 0) {
+    notify.success(`已删除 ${successCount} 个技能`)
+  }
+  if (failedNames.length > 0) {
+    const displayed = failedNames.slice(0, 5).join('、')
+    const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
+    notify.error(`删除失败：${displayed}${suffix}`)
+  }
+
+  await skillsStore.fetchInstalled()
+  isBatchRemoving.value = false
+  exitBatchMode()
 }
 
 async function handleRemove(name: string): Promise<void> {
