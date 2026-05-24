@@ -2,11 +2,17 @@
 
 ## 背景
 
-当前已安装技能页面的批量删除功能（`InstalledList.vue`）采用同步阻塞实现：用户选中多个技能后点击"删除选中"，前端通过 `for...of` 循环串行调用 `skillsStore.remove()`，每轮等待 CLI 命令执行完成。当批量删除数量较多时，UI 长时间处于 loading 状态，用户无法进行其他操作。
+当前有两个页面的批量删除功能均采用同步阻塞实现：
+
+1. **已安装技能页面**（`InstalledList.vue`）：用户选中多个技能后点击"删除选中"，前端通过 `for...of` 循环串行调用 `skillsStore.remove(name, true)`（全局删除），每轮等待 CLI 命令执行完成。
+
+2. **AI 工具管理 Drawer**（`AgentView.vue`）：用户在某 Agent 的 Drawer 中进入批量模式，选中技能后点击"删除"，前端同样通过 `for...of` 循环串行调用 `skillsStore.remove(name, true, agentFlag)`（针对特定 Agent 删除）。
+
+当批量删除数量较多时，UI 长时间处于 loading 状态，用户无法进行其他操作。
 
 ## 目标
 
-- 将批量删除从同步阻塞改为后台异步执行
+- 将 **已安装技能页面**（`InstalledList.vue`）和 **AI 工具管理 Drawer**（`AgentView.vue`）的批量删除从同步阻塞改为后台异步执行
 - 采用乐观删除策略：前端立即从列表移除选中项，提升操作流畅感
 - 移除批量删除相关的 loading 状态
 - 复用现有后台任务系统（`BackgroundTaskService` + `TaskDrawer`），保持交互一致性
@@ -15,10 +21,10 @@
 
 采用**方案 A：乐观删除 + 失败任务提示**。
 
-用户确认删除后：
-1. 前端立即从已安装列表中移除选中的 skills，并退出批量模式
-2. 向 Main 进程提交一个 `skill-remove-batch` 类型的后台任务
-3. Main 进程串行执行 `skills remove <name> -y -g` CLI 命令
+用户确认删除后（两个页面流程一致）：
+1. 前端立即从列表中移除选中的 skills，并退出批量模式
+2. 向 Main 进程提交一个 `skill-remove-batch` 类型的后台任务（AgentView.vue 额外传入 `agentFlag`）
+3. Main 进程串行执行 `skills remove <name> -y -g` CLI 命令（带 `agentFlag` 时只从该 Agent 删除）
 4. 任务完成后在 TaskDrawer 中展示结果（全部成功 / 部分失败 / 全部失败）
 
 ## 架构设计
@@ -32,6 +38,7 @@
 | `src/main/services/BackgroundTaskService.ts` | 不修改 | `resolveCommand` 无需新增 case，批量删除不走 execa |
 | `src/renderer/src/stores/tasks.ts` | 修改 | `start()` 方法新增 `skill-remove-batch` 分支；`retry()` 排除 `skill-remove-batch`；扩展 `opts` 类型支持 `packageRefs` |
 | `src/renderer/src/views/InstalledList.vue` | 修改 | 改造 `handleBatchRemove`，改为乐观删除 + 提交后台任务；移除 `isBatchRemoving` |
+| `src/renderer/src/views/AgentView.vue` | 修改 | 改造 Drawer 中的 `handleBatchRemove`，改为乐观删除 + 提交后台任务（带 `agentFlag`）；移除 `isBatchRemoving` |
 | `src/renderer/src/components/tasks/TaskItem.vue` | 修改 | `TASK_LABELS` 新增 `'skill-remove-batch': '批量删除技能'`；该类型任务隐藏取消按钮 |
 | `src/preload/index.ts` | 修改 | 暴露 `removeBatchBackground` IPC 方法 |
 | `src/preload/index.d.ts` | 修改 | 类型声明 `removeBatchBackground` |
@@ -39,18 +46,18 @@
 ### 数据流
 
 ```
-InstalledList.vue
+InstalledList.vue / AgentView.vue
   ├─ 用户确认删除
   ├─ 将 selectedNames 加入 pendingRemovalNames（乐观删除）
-  ├─ 调用 taskStore.start('skill-remove-batch', { packageRefs: [...], onSuccess, onError })
-  │     └─ window.api.skills.removeBatchBackground({ packageRefs })
+  ├─ 调用 taskStore.start('skill-remove-batch', { packageRefs: [...], agentFlag?, onSuccess, onError })
+  │     └─ window.api.skills.removeBatchBackground({ packageRefs, agentFlag })
   │           └─ Main: skills.ipc.ts
   │                 └─ backgroundTaskService.register('skill-remove-batch')
   │                 └─ 串行执行 skillsService.remove() for each packageRef
   │                 └─ backgroundTaskService.markSuccess / markError
   │           └─ Main 通过 'tasks:update' 推送任务状态
   │     └─ renderer stores/tasks.ts 订阅更新，更新 TaskDrawer
-  │     └─ onSuccess / onError callback: 清空 pendingRemovalNames，调用 loadSkills()
+  │     └─ onSuccess / onError callback: 清空 pendingRemovalNames，调用 loadSkills() / fetchInstalled()
   └─ 退出批量模式
 ```
 
@@ -75,11 +82,11 @@ export interface BackgroundTask {
 
 新增 `skills:remove-batch-background` handler：
 
-- 接收参数：`{ packageRefs: string[] }`（`packageRefs` 即 skill name 列表，与现有 `skills:remove` 的 `packageRef` 参数语义一致）
+- 接收参数：`{ packageRefs: string[]; agentFlag?: string }`（`packageRefs` 即 skill name 列表；`agentFlag` 可选，指定时只从该 Agent 中删除，与 `skills:remove` 的 `agent` 参数语义一致）
 - 使用 `hasPendingTask('skill-remove-batch')` 防止并发提交
 - 注册后台任务：`backgroundTaskService.register('skill-remove-batch')`
 - 标记为 running
-- 串行遍历 `packageRefs`，逐个调用 `skillsService.remove(packageRef, undefined, true)`
+- 串行遍历 `packageRefs`，逐个调用 `skillsService.remove(packageRef, agentFlag, true)`（`agentFlag` 为可选参数，有值时传给第二个参数）
 - `stdout` 累积每条 CLI 的输出日志（成功或失败）
 - 全部成功 → `markSuccess(taskId)`
 - 有失败 → `markError(taskId, 摘要错误信息)`，其中 `error` 字段包含失败 skill 名称列表（如 `"删除失败：skill-a, skill-b"`）
@@ -122,14 +129,55 @@ async function handleBatchRemove(): Promise<void> {
 }
 ```
 
-**乐观删除的实现策略**：
+### 3b. AgentView.vue Drawer 渲染层
 
-由于 `skillsList` 是从 `skillsStore` 的 `installedSkills` computed 而来，直接修改 store 不合适。采用以下策略：
+改造 `AgentView.vue` 中的 `handleBatchRemove`：
 
-- 在 `InstalledList.vue` 中维护 `pendingRemovalNames = ref<Set<string>>(new Set())`
-- 计算展示列表时：`displayedSkills = skillsList.value.filter(s => !pendingRemovalNames.value.has(s.name))`
+```typescript
+async function handleBatchRemove(): Promise<void> {
+  if (selectedSkillNames.value.length === 0) return
+
+  const confirmed = await confirmRemoveBatch(selectedSkillNames.value)
+  if (!confirmed) return
+
+  const names = [...selectedSkillNames.value]
+  const agentFlag = selectedAgent.value?.agentFlag
+
+  // 乐观删除：加入 pendingRemovalNames
+  for (const name of names) {
+    pendingRemovalNames.value.add(name)
+  }
+
+  await taskStore.start('skill-remove-batch', {
+    packageRefs: names,
+    agentFlag,
+    onSuccess: () => {
+      pendingRemovalNames.value.clear()
+      skillsStore.fetchInstalled()
+    },
+    onError: () => {
+      pendingRemovalNames.value.clear()
+      skillsStore.fetchInstalled()
+    }
+  })
+
+  exitBatchMode()
+}
+```
+
+**与 InstalledList.vue 的差异**：
+- 传入 `agentFlag`，后台任务只从该 Agent 中删除技能
+- 完成后调用 `skillsStore.fetchInstalled()` 而非 `loadSkills()`
+- `pendingRemovalNames` 过滤 `selectedAgent.value?.skills` 数组
+
+**乐观删除的实现策略（两页面通用）**：
+
+由于技能列表是从 `skillsStore` 的 computed 属性而来，直接修改 store 不合适。采用以下策略：
+
+- 在页面组件中维护 `pendingRemovalNames = ref<Set<string>>(new Set())`
+- 计算展示列表时过滤掉 pendingRemovalNames 中的项
 - 提交后台任务前将 `selectedNames` 加入 `pendingRemovalNames`
-- 任务完成后通过 `taskStore.start()` 的 `onSuccess` / `onError` callback 清空 `pendingRemovalNames`，并调用 `loadSkills()` 刷新真实状态
+- 任务完成后通过 `taskStore.start()` 的 `onSuccess` / `onError` callback 清空 `pendingRemovalNames`，并刷新真实状态
 
 ### 4. `tasks.ts` 改动
 
@@ -143,7 +191,7 @@ async function handleBatchRemove(): Promise<void> {
 }
 ```
 
-`opts` 类型扩展为 `TaskCallbacks & { packageRef?: string; packageRefs?: string[]; global?: boolean }`。
+`opts` 类型扩展为 `TaskCallbacks & { packageRef?: string; packageRefs?: string[]; agentFlag?: string; global?: boolean }`。
 
 `retry()` 方法中排除 `skill-remove-batch`：
 
@@ -172,14 +220,14 @@ if (task.type === 'skill-remove-batch') {
 `preload/index.ts`：
 
 ```typescript
-removeBatchBackground: (opts: { packageRefs: string[] }) =>
+removeBatchBackground: (opts: { packageRefs: string[]; agentFlag?: string }) =>
   ipcRenderer.invoke('skills:remove-batch-background', opts),
 ```
 
 `preload/index.d.ts`：
 
 ```typescript
-removeBatchBackground: (opts: { packageRefs: string[] }) => Promise<{ taskId: string; error?: string }>
+removeBatchBackground: (opts: { packageRefs: string[]; agentFlag?: string }) => Promise<{ taskId: string; error?: string }>
 ```
 
 ## 错误处理
