@@ -30,11 +30,11 @@ const removeDialogState = ref<{
 
 // Batch mode state
 const isBatchMode = ref(false)
-const isBatchRemoving = ref(false)
 const selectedNames = ref<string[]>([])
+const pendingRemovalNames = ref<Set<string>>(new Set())
 
 const allSelected = computed(() => {
-  const skills = skillsStore.filteredSkills
+  const skills = displayedSkills.value
   return skills.length > 0 && skills.every((s) => selectedNames.value.includes(s.name))
 })
 
@@ -43,6 +43,10 @@ const someSelected = computed(() => {
 })
 
 const selectedCount = computed(() => selectedNames.value.length)
+
+const displayedSkills = computed(() =>
+  skillsStore.filteredSkills.filter((s) => !pendingRemovalNames.value.has(s.name))
+)
 
 /** Enter batch management mode, clearing any previous selection. */
 function enterBatchMode(): void {
@@ -77,43 +81,38 @@ function toggleSkill(name: string): void {
 }
 
 /**
- * Remove all selected skills in batch.
- * Executes serially to avoid file-lock conflicts. Reports success/failure counts.
+ * Remove all selected skills in batch via background task with optimistic deletion.
  */
 async function handleBatchRemove(): Promise<void> {
-  if (selectedNames.value.length === 0 || isBatchRemoving.value) return
+  if (selectedNames.value.length === 0) return
   const confirmed = await confirmRemoveBatch(selectedNames.value)
   if (!confirmed) return
 
-  isBatchRemoving.value = true
   const names = [...selectedNames.value]
-  const failedNames: string[] = []
-  let successCount = 0
 
+  // 乐观删除：立即加入 pendingRemovalNames
   for (const name of names) {
-    try {
-      const result = await skillsStore.remove(name, true)
-      if (result.success) {
-        successCount++
-      } else {
-        failedNames.push(name)
+    pendingRemovalNames.value.add(name)
+  }
+
+  taskStore
+    .start('skill-remove-batch', {
+      packageRefs: names,
+      onSuccess: () => {
+        pendingRemovalNames.value.clear()
+        loadSkills()
+      },
+      onError: () => {
+        pendingRemovalNames.value.clear()
+        loadSkills()
       }
-    } catch {
-      failedNames.push(name)
-    }
-  }
+    })
+    .catch((e) => {
+      notify.info(e instanceof Error ? e.message : '启动删除失败')
+      pendingRemovalNames.value.clear()
+      loadSkills()
+    })
 
-  if (successCount > 0) {
-    notify.success(`已删除 ${successCount} 个技能`)
-  }
-  if (failedNames.length > 0) {
-    const displayed = failedNames.slice(0, 5).join('、')
-    const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
-    notify.error(`删除失败：${displayed}${suffix}`)
-  }
-
-  await loadSkills()
-  isBatchRemoving.value = false
   exitBatchMode()
 }
 
@@ -315,7 +314,6 @@ function handleFilterAgent(agentFlag: string): void {
               type="error"
               size="small"
               :disabled="selectedCount === 0"
-              :loading="isBatchRemoving"
               @click="handleBatchRemove"
             >
               <template #icon>
@@ -337,16 +335,13 @@ function handleFilterAgent(agentFlag: string): void {
       <AgentTagBar />
 
       <!-- Skill List -->
-      <div
-        v-if="skillsStore.fetching && skillsStore.filteredSkills.length === 0"
-        class="page-loading"
-      >
+      <div v-if="skillsStore.fetching && displayedSkills.length === 0" class="page-loading">
         <NSpin size="large" />
       </div>
-      <div v-else-if="skillsStore.filteredSkills.length > 0" class="skill-list">
+      <div v-else-if="displayedSkills.length > 0" class="skill-list">
         <TransitionGroup name="list" tag="div">
           <SkillRow
-            v-for="skill in skillsStore.filteredSkills"
+            v-for="skill in displayedSkills"
             :key="skill.name"
             :skill="skill"
             :batch-mode="isBatchMode"
