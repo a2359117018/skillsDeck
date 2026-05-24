@@ -30,6 +30,7 @@ const removeDialogState = ref<{
 
 // Batch mode state
 const isBatchMode = ref(false)
+const isBatchRemoving = ref(false)
 const selectedNames = ref<string[]>([])
 
 const allSelected = computed(() => {
@@ -43,16 +44,19 @@ const someSelected = computed(() => {
 
 const selectedCount = computed(() => selectedNames.value.length)
 
+/** Enter batch management mode, clearing any previous selection. */
 function enterBatchMode(): void {
   isBatchMode.value = true
   selectedNames.value = []
 }
 
+/** Exit batch management mode and clear selection. */
 function exitBatchMode(): void {
   isBatchMode.value = false
   selectedNames.value = []
 }
 
+/** Toggle selection of all skills currently in the filtered view. */
 function toggleAll(): void {
   const names = skillsStore.filteredSkills.map((s) => s.name)
   if (allSelected.value) {
@@ -62,6 +66,7 @@ function toggleAll(): void {
   }
 }
 
+/** Toggle selection of a single skill by name. */
 function toggleSkill(name: string): void {
   const idx = selectedNames.value.indexOf(name)
   if (idx >= 0) {
@@ -71,14 +76,19 @@ function toggleSkill(name: string): void {
   }
 }
 
+/**
+ * Remove all selected skills in batch.
+ * Executes serially to avoid file-lock conflicts. Reports success/failure counts.
+ */
 async function handleBatchRemove(): Promise<void> {
-  if (selectedNames.value.length === 0) return
+  if (selectedNames.value.length === 0 || isBatchRemoving.value) return
   const confirmed = await confirmRemoveBatch(selectedNames.value)
   if (!confirmed) return
 
+  isBatchRemoving.value = true
   const names = [...selectedNames.value]
+  const failedNames: string[] = []
   let successCount = 0
-  let failCount = 0
 
   for (const name of names) {
     try {
@@ -86,21 +96,24 @@ async function handleBatchRemove(): Promise<void> {
       if (result.success) {
         successCount++
       } else {
-        failCount++
+        failedNames.push(name)
       }
     } catch {
-      failCount++
+      failedNames.push(name)
     }
   }
 
   if (successCount > 0) {
     notify.success(`已删除 ${successCount} 个技能`)
   }
-  if (failCount > 0) {
-    notify.error(`${failCount} 个技能删除失败`)
+  if (failedNames.length > 0) {
+    const displayed = failedNames.slice(0, 5).join('、')
+    const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
+    notify.error(`删除失败：${displayed}${suffix}`)
   }
 
   await loadSkills()
+  isBatchRemoving.value = false
   exitBatchMode()
 }
 
@@ -302,6 +315,7 @@ function handleFilterAgent(agentFlag: string): void {
               type="error"
               size="small"
               :disabled="selectedCount === 0"
+              :loading="isBatchRemoving"
               @click="handleBatchRemove"
             >
               <template #icon>
