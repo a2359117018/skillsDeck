@@ -338,12 +338,7 @@ onMounted(() => {
                 </template>
                 打开文件夹
               </NTooltip>
-              <NButton
-                secondary
-                size="small"
-                class="batch-entry-btn"
-                @click="enterBatchMode"
-              >
+              <NButton secondary size="small" class="batch-entry-btn" @click="enterBatchMode">
                 批量管理
               </NButton>
               <NTooltip>
@@ -406,7 +401,9 @@ onMounted(() => {
             v-for="skillName in selectedAgent.skills"
             :key="selectedAgent.agentFlag + '-' + skillName"
             class="skill-card"
-            :class="{ 'skill-card--selected': isBatchMode && selectedSkillNames.includes(skillName) }"
+            :class="{
+              'skill-card--selected': isBatchMode && selectedSkillNames.includes(skillName)
+            }"
             @click="
               (e) => {
                 if (!isBatchMode) return
