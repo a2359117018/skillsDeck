@@ -2,7 +2,7 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWindowSize } from '@vueuse/core'
-import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin } from 'naive-ui'
+import { NDrawer, NTooltip, NText, NButton, NIcon, NInput, NSpin, NCheckbox } from 'naive-ui'
 import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
@@ -20,7 +20,7 @@ const skillsStore = useSkillsStore()
 const taskStore = useTaskStore()
 const notify = useNotify()
 const router = useRouter()
-const { confirmUpdate, confirmRemove } = useConfirm()
+const { confirmUpdate, confirmRemove, confirmRemoveBatch } = useConfirm()
 
 const agentSearchKeyword = ref('')
 const selectedAgentFlag = ref<string | null>(null)
