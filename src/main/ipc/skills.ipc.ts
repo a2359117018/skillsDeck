@@ -125,6 +125,14 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     }
   )
 
+  ipcMain.handle('skills:read-doc', async (_, name: string) => {
+    try {
+      return { ok: true, data: await skillsService.readDoc(name) }
+    } catch (e) {
+      return { ok: false, error: serializeError(e) }
+    }
+  })
+
   ipcMain.handle('skills:parse-github', async (_, url: string) => {
     const mainWindow = getMainWindow()
     let zipPath = ''

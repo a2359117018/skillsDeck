@@ -1,6 +1,17 @@
-import type { CommandResult } from '../../shared/types'
+import type { CommandResult, SkillDoc } from '../../shared/types'
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
+import agentsData from '../../shared/agents.json'
 import { commandRunner } from './CommandRunner'
 import { getSettings } from './StoreService'
+
+interface AgentDef {
+  name: string
+  agentFlag: string
+  projectPath: string
+  globalPath: string
+}
 
 class SkillsService {
   async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
@@ -34,11 +45,74 @@ class SkillsService {
     return commandRunner.run('skills', args)
   }
 
+  /**
+   * 删除技能，直接根据 agents.json 中的路径操作文件系统，
+   * 绕过 skills CLI 的 remove 命令（该命令对 universal agent 存在假成功 bug）。
+   */
   async remove(name: string, agent?: string, global?: boolean): Promise<CommandResult> {
-    const args = this.buildArgs('remove', name, '-y')
-    if (global) args.push('-g')
-    if (agent) args.push('-a', agent)
-    return commandRunner.run('skills', args)
+    const agents = agentsData as AgentDef[]
+    const targets = agent ? agents.filter((a) => a.agentFlag === agent) : agents
+
+    let removed = 0
+    const errors: string[] = []
+
+    for (const target of targets) {
+      const basePath = this.expandPath(global ? target.globalPath : target.projectPath)
+      const skillPath = path.join(basePath, name)
+
+      try {
+        const stat = await fs.promises.lstat(skillPath)
+        if (stat.isDirectory() || stat.isSymbolicLink()) {
+          await fs.promises.rm(skillPath, { recursive: true, force: true })
+          removed++
+        }
+      } catch (err) {
+        const code = (err as NodeJS.ErrnoException).code
+        if (code !== 'ENOENT') {
+          errors.push(`${target.agentFlag}: ${(err as Error).message}`)
+        }
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      stdout: removed > 0 ? `Successfully removed ${removed} skill(s)` : 'No matching skills found',
+      stderr: errors.join('\n'),
+      exitCode: errors.length === 0 ? 0 : 1
+    }
+  }
+
+  async readDoc(name: string): Promise<SkillDoc> {
+    const agents = agentsData as AgentDef[]
+
+    for (const agent of agents) {
+      const globalPath = this.expandPath(agent.globalPath)
+      const projectPath = this.expandPath(agent.projectPath)
+
+      for (const basePath of [globalPath, projectPath]) {
+        const skillPath = path.join(basePath, name)
+        const skillMdPath = path.join(skillPath, 'SKILL.md')
+
+        try {
+          const content = await fs.promises.readFile(skillMdPath, 'utf-8')
+          return { content }
+        } catch (err) {
+          const code = (err as NodeJS.ErrnoException).code
+          if (code !== 'ENOENT') {
+            throw new Error(`读取技能文档失败: ${(err as Error).message}`)
+          }
+        }
+      }
+    }
+
+    throw new Error(`未找到技能 "${name}" 的 SKILL.md`)
+  }
+
+  private expandPath(p: string): string {
+    if (p.startsWith('~')) {
+      return path.join(os.homedir(), p.slice(2))
+    }
+    return path.resolve(p)
   }
 
   private buildArgs(subcommand: string, ...parts: string[]): string[] {

@@ -3,6 +3,7 @@ import { NIcon, NButton, NText, NCheckbox } from 'naive-ui'
 import FolderOpenOutline from '@vicons/ionicons5/FolderOpenOutline'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import TrashOutline from '@vicons/ionicons5/TrashOutline'
+import InformationCircleOutline from '@vicons/ionicons5/InformationCircleOutline'
 import type { InstalledSkill } from '../../../../shared/types'
 
 const props = defineProps<{
@@ -17,6 +18,7 @@ const emit = defineEmits<{
   openLocation: [path: string]
   filterAgent: [agentFlag: string]
   toggleSelect: [name: string]
+  viewDetail: [name: string]
 }>()
 
 function handleCardClick(event: MouseEvent): void {
@@ -43,6 +45,19 @@ function handleCardClick(event: MouseEvent): void {
       </div>
       <NText class="skill-name">{{ props.skill.name }}</NText>
       <div v-if="!props.batchMode" class="skill-actions">
+        <NButton
+          quaternary
+          circle
+          size="small"
+          class="action-btn"
+          title="查看详情"
+          aria-label="查看详情"
+          @click="emit('viewDetail', props.skill.name)"
+        >
+          <template #icon>
+            <NIcon :size="16"><InformationCircleOutline /></NIcon>
+          </template>
+        </NButton>
         <NButton
           quaternary
           circle
@@ -159,15 +174,6 @@ function handleCardClick(event: MouseEvent): void {
 
 .action-btn {
   border-radius: var(--radius-full);
-  transition: background var(--transition-fast);
-}
-
-.action-btn:hover {
-  background: var(--color-surface);
-}
-
-.action-btn--danger:hover {
-  background: var(--color-error-bg);
 }
 
 .skill-agents {

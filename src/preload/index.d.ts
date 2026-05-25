@@ -4,14 +4,14 @@ import type {
   AppSettings,
   CommandResult,
   SkillSearchResponse,
-  CommandErrorInfo,
   InstalledSkill,
   AgentScanResult,
   BackgroundTask,
   LocalInstallResult,
   GitHubParseResult,
   ArchiveScanResult,
-  IpcResult
+  IpcResult,
+  SkillDoc
 } from '../shared/types'
 
 export interface AppApi {
@@ -57,6 +57,7 @@ export interface AppApi {
       skillDirs: string[]
       agents: string[]
     }) => Promise<IpcResult<LocalInstallResult>>
+    readDoc: (name: string) => Promise<IpcResult<SkillDoc>>
     cancelGitHubDownload: () => Promise<void>
     cleanupTemp: (tempDirs: string[]) => Promise<void>
     onGitHubDownloadProgress: (callback: (percent: number) => void) => () => void

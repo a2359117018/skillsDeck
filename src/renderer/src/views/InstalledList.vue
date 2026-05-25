@@ -13,6 +13,7 @@ import { useNotify } from '../composables/useNotify'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
 import SkillRemoveDialog from '../components/skills/SkillRemoveDialog.vue'
+import SkillDetailModal from '../components/skills/SkillDetailModal.vue'
 import EmptyState from '../components/common/EmptyState.vue'
 import type { InstalledSkillAgent } from '../../../shared/types'
 
@@ -27,6 +28,11 @@ const removeDialogState = ref<{
   skillName: string
   agents: InstalledSkillAgent[]
 }>({ visible: false, skillName: '', agents: [] })
+
+const detailModalState = ref<{
+  visible: boolean
+  skillName: string
+}>({ visible: false, skillName: '' })
 
 // Batch mode state
 const isBatchMode = ref(false)
@@ -237,6 +243,10 @@ function handleFilterAgent(agentFlag: string): void {
   }
   skillsStore.toggleAgent(agentFlag)
 }
+
+function handleViewDetail(name: string): void {
+  detailModalState.value = { visible: true, skillName: name }
+}
 </script>
 
 <template>
@@ -349,6 +359,7 @@ function handleFilterAgent(agentFlag: string): void {
             @remove="handleRemove"
             @open-location="handleOpenLocation"
             @filter-agent="handleFilterAgent"
+            @view-detail="handleViewDetail"
             @toggle-select="toggleSkill"
           />
         </TransitionGroup>
@@ -372,6 +383,12 @@ function handleFilterAgent(agentFlag: string): void {
         :skill-name="removeDialogState.skillName"
         :agents="removeDialogState.agents"
         @done="handleRemoveDialogDone"
+      />
+
+      <!-- Skill Detail Modal -->
+      <SkillDetailModal
+        v-model:show="detailModalState.visible"
+        :skill-name="detailModalState.skillName"
       />
     </div>
   </main>

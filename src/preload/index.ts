@@ -1,6 +1,12 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { LocalInstallResult, GitHubParseResult, ArchiveScanResult, IpcResult } from '../shared/types'
+import type {
+  LocalInstallResult,
+  GitHubParseResult,
+  ArchiveScanResult,
+  IpcResult,
+  SkillDoc
+} from '../shared/types'
 
 const api = {
   /** 从拖拽的 File 对象获取本地文件路径（contextIsolation 兼容） */
@@ -50,6 +56,8 @@ const api = {
       skillDirs: string[]
       agents: string[]
     }): Promise<IpcResult<LocalInstallResult>> => ipcRenderer.invoke('skills:install-local', opts),
+    readDoc: (name: string): Promise<IpcResult<SkillDoc>> =>
+      ipcRenderer.invoke('skills:read-doc', name),
     cancelGitHubDownload: (): Promise<void> => ipcRenderer.invoke('skills:cancel-github-download'),
     cleanupTemp: (tempDirs: string[]): Promise<void> =>
       ipcRenderer.invoke('skills:cleanup-temp', tempDirs),
@@ -90,7 +98,8 @@ const api = {
   },
   network: {
     onStatusChange: (callback: (online: boolean) => void): (() => void) => {
-      const listener = (_event: Electron.IpcRendererEvent, online: boolean): void => callback(online)
+      const listener = (_event: Electron.IpcRendererEvent, online: boolean): void =>
+        callback(online)
       ipcRenderer.on('network:status', listener)
       return () => ipcRenderer.removeListener('network:status', listener)
     }
