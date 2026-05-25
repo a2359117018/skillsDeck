@@ -350,8 +350,8 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
       return { ok: false, error: 'Task not found or not in error state' }
     }
 
-    if (task.type !== 'skill-update-all') {
-      return { ok: false, error: '单个技能更新不支持重试，请重新执行更新操作' }
+    if (task && task.type !== 'skill-update-all') {
+      return { ok: false, error: '该任务类型不支持重试' }
     }
 
     task.status = 'pending'

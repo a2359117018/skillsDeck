@@ -147,6 +147,14 @@ class BackgroundTaskService {
         this.emitUpdate(task)
       }
       this.cleanup(taskId)
+    } else {
+      // For non-builtin tasks without a subprocess, mark as cancelled directly
+      const task = this.tasks.get(taskId)
+      if (task && (task.status === 'pending' || task.status === 'running')) {
+        task.status = 'cancelled'
+        task.updatedAt = Date.now()
+        this.emitUpdate(task)
+      }
     }
   }
 
