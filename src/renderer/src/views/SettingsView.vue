@@ -411,7 +411,7 @@ async function handleUpdateAll(): Promise<void> {
               </div>
             </div>
           </NFormItem>
-          <NFormItem label="npm 镜像源（加速包下载）">
+          <NFormItem label="npm 镜像源">
             <div class="proxy-field">
               <NSelect
                 v-model:value="selectedRegistry"

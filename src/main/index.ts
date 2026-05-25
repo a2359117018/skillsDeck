@@ -6,7 +6,7 @@ import os from 'os'
 import { createMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
-import { getSettings, setEnvStatus } from './services/StoreService'
+import { getSettings, setEnvStatus, migrateProxySettings } from './services/StoreService'
 
 /** 定期向所有窗口广播网络状态 */
 function broadcastNetworkStatus(): void {
@@ -38,6 +38,7 @@ function cleanupOrphanedTempDirs(): void {
 
 app.whenReady().then(() => {
   cleanupOrphanedTempDirs()
+  migrateProxySettings()
   electronApp.setAppUserModelId('com.skilldeck.app')
 
   app.on('browser-window-created', (_, window) => {

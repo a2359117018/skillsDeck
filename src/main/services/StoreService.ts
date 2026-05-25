@@ -6,9 +6,11 @@ interface StoreSchema {
   envStatus: EnvStatus | null
 }
 
+export const DEFAULT_PROXY_URL = 'https://gh-proxy.org'
+
 const DEFAULT_SETTINGS: AppSettings = {
   autoCheckEnv: true,
-  proxyUrl: '',
+  proxyUrl: DEFAULT_PROXY_URL,
   npmRegistry: 'https://registry.npmmirror.com/'
 }
 
@@ -85,5 +87,27 @@ export function setEnvStatus(status: EnvStatus): void {
     getStore().set('envStatus', status)
   } catch {
     inMemoryFallback.envStatus = status
+  }
+}
+
+const PROXY_MIGRATED_KEY = 'proxyMigrated'
+
+/**
+ * 一次性迁移：将未配置过代理的老用户自动设置为默认代理。
+ * 仅在 proxyUrl 为空字符串且从未执行过迁移时触发。
+ */
+export function migrateProxySettings(): void {
+  try {
+    const store = getStore()
+    const migrated = store.get(PROXY_MIGRATED_KEY)
+    if (migrated) return
+
+    const settings = store.get('settings')
+    if (settings.proxyUrl === '') {
+      store.set('settings', { ...settings, proxyUrl: DEFAULT_PROXY_URL })
+    }
+    store.set(PROXY_MIGRATED_KEY, true)
+  } catch {
+    // 内存回退模式下不做迁移
   }
 }
