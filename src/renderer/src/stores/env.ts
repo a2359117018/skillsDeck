@@ -25,7 +25,7 @@ export const useEnvStore = defineStore('env', () => {
 
   async function check(): Promise<void> {
     try {
-      await statusCache.ensure()
+      await statusCache.refresh()
       error.value = null
     } catch (e) {
       error.value = e instanceof Error ? e.message : '环境检测失败，请检查网络连接'
