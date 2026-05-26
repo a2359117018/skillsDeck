@@ -25,7 +25,6 @@ import CheckmarkOutline from '@vicons/ionicons5/CheckmarkOutline'
 import CloseOutline from '@vicons/ionicons5/CloseOutline'
 import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import { useSettingsStore } from '../stores/settings'
-import { useSkillsStore } from '../stores/skills'
 import { useEnvStore } from '../stores/env'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
@@ -36,11 +35,10 @@ interface ProxyOption extends SelectOption {
 }
 
 const settingsStore = useSettingsStore()
-const skillsStore = useSkillsStore()
 const envStore = useEnvStore()
 const taskStore = useTaskStore()
 const notify = useNotify()
-const { confirmUpdateAll, confirmUpdateEnv } = useConfirm()
+const { confirmUpdateEnv } = useConfirm()
 
 const envDownloading = ref(false)
 const envDownloadProgress = ref(0)
@@ -84,6 +82,11 @@ const registryOptions = [
   { label: '自定义...', value: CUSTOM_REGISTRY_VALUE, icon: PencilOutline }
 ]
 
+const closeActionOptions = [
+  { label: '最小化到系统托盘', value: 'tray' },
+  { label: '退出应用', value: 'quit' }
+]
+
 const selectedRegistry = ref('')
 const customRegistryUrl = ref('')
 
@@ -123,6 +126,10 @@ onMounted(() => {
       npmRegistry: effectiveRegistryUrl.value
     }
     isLoaded.value = true
+
+    window.api.app.getVersion().then((v) => {
+      appVersion.value = v
+    })
   })
 })
 
@@ -255,6 +262,11 @@ async function handleCancelInstallNode(): Promise<void> {
 
 const skillsInstalling = ref(false)
 
+const appVersion = ref('')
+const updateChecking = ref(false)
+const updateDownloading = ref(false)
+const updateDownloaded = ref(false)
+
 async function handleInstallSkills(): Promise<void> {
   skillsInstalling.value = true
   try {
@@ -296,28 +308,50 @@ async function handleUpdateSkills(): Promise<void> {
     })
 }
 
-async function handleUpdateAll(): Promise<void> {
-  const names = skillsStore.installedSkills.map((s) => s.name)
-  if (names.length === 0) {
-    notify.info('没有可更新的技能')
-    return
+async function handleCheckUpdate(): Promise<void> {
+  updateChecking.value = true
+  updateDownloaded.value = false
+  updateDownloading.value = false
+
+  const cleanupAvailable = window.api.updater.onUpdateAvailable(() => {
+    updateChecking.value = false
+    updateDownloading.value = true
+  })
+
+  const cleanupNotAvailable = window.api.updater.onUpdateNotAvailable(() => {
+    updateChecking.value = false
+    notify.info('已是最新版本')
+  })
+
+  const cleanupDownloaded = window.api.updater.onUpdateDownloaded(() => {
+    updateDownloading.value = false
+    updateDownloaded.value = true
+    updateChecking.value = false
+    notify.success('更新已下载，点击安装')
+  })
+
+  const cleanupError = window.api.updater.onError((message) => {
+    updateChecking.value = false
+    updateDownloading.value = false
+    notify.error(`检查更新失败: ${message}`)
+  })
+
+  try {
+    await window.api.updater.check()
+  } catch {
+    updateChecking.value = false
+  } finally {
+    cleanupAvailable()
+    cleanupNotAvailable()
+    cleanupDownloaded()
+    cleanupError()
   }
-  const confirmed = await confirmUpdateAll(names)
-  if (!confirmed) return
-  taskStore
-    .start('skill-update-all', {
-      global: true,
-      onSuccess: () => {
-        notify.success('全部更新成功')
-      },
-      onError: (err) => {
-        notify.error(`更新失败: ${err}`)
-      }
-    })
-    .catch((e) => {
-      notify.info(e instanceof Error ? e.message : '启动更新失败')
-    })
 }
+
+async function handleInstallUpdate(): Promise<void> {
+  await window.api.updater.installUpdate()
+}
+
 </script>
 
 <template>
@@ -366,6 +400,15 @@ async function handleUpdateAll(): Promise<void> {
         <NForm label-placement="left" label-width="140" class="settings-form">
           <NFormItem label="启动时检查运行环境">
             <NSwitch v-model:value="settingsStore.autoCheckEnv" />
+          </NFormItem>
+          <NFormItem label="关闭按钮行为">
+            <NSelect
+              v-model:value="settingsStore.closeAction"
+              :options="closeActionOptions"
+              placeholder="未设置（首次关闭时询问）"
+              clearable
+              class="settings-select"
+            />
           </NFormItem>
         </NForm>
       </div>
@@ -444,28 +487,6 @@ async function handleUpdateAll(): Promise<void> {
                 </NText>
               </div>
             </div>
-          </NFormItem>
-        </NForm>
-      </div>
-
-      <!-- 管理操作 -->
-      <div class="settings-section">
-        <div class="section-header">
-          <span class="section-title">管理操作</span>
-          <span class="section-line" />
-        </div>
-        <NForm label-placement="left" label-width="140" class="settings-form">
-          <NFormItem label="技能维护">
-            <NButton
-              round
-              :disabled="skillsStore.installedSkills.length === 0"
-              @click="handleUpdateAll"
-            >
-              <template #icon>
-                <NIcon :size="14"><RefreshOutline /></NIcon>
-              </template>
-              更新全部技能 ({{ skillsStore.installedSkills.length }})
-            </NButton>
           </NFormItem>
         </NForm>
       </div>
@@ -564,58 +585,89 @@ async function handleUpdateAll(): Promise<void> {
               </div>
             </div>
           </div>
-        </div>
 
-        <div v-if="envDownloading" class="env-actions">
-          <div class="env-download-progress">
-            <div class="env-progress-header">
-              <NText depth="3" class="env-progress-label">正在下载 Node.js</NText>
-              <NText depth="3" class="env-progress-percent">{{ envDownloadProgress }}%</NText>
+          <div v-if="envDownloading" class="env-actions">
+            <div class="env-download-progress">
+              <div class="env-progress-header">
+                <NText depth="3" class="env-progress-label">正在下载 Node.js</NText>
+                <NText depth="3" class="env-progress-percent">{{ envDownloadProgress }}%</NText>
+              </div>
+              <NProgress
+                type="line"
+                :percentage="envDownloadProgress"
+                indicator-placement="inside"
+                :height="8"
+                :border-radius="4"
+                :fill-border-radius="4"
+              />
+              <NButton size="small" round @click="handleCancelInstallNode"> 取消下载 </NButton>
             </div>
-            <NProgress
-              type="line"
-              :percentage="envDownloadProgress"
-              indicator-placement="inside"
-              :height="8"
-              :border-radius="4"
-              :fill-border-radius="4"
-            />
-            <NButton size="small" round @click="handleCancelInstallNode"> 取消下载 </NButton>
+          </div>
+
+          <div class="env-toolbar">
+            <div class="env-toolbar-left">
+              <NButton
+                v-if="!envStore.status?.nodeInstalled && !envDownloading"
+                type="primary"
+                round
+                @click="handleInstallNode"
+              >
+                <template #icon>
+                  <NIcon :size="14"><DownloadOutline /></NIcon>
+                </template>
+                去安装 Node.js（运行环境）
+              </NButton>
+              <NButton
+                v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
+                type="primary"
+                round
+                :loading="skillsInstalling"
+                @click="handleInstallSkills"
+              >
+                <template #icon>
+                  <NIcon :size="14"><DownloadOutline /></NIcon>
+                </template>
+                安装 skills CLI（技能管理工具）
+              </NButton>
+              <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
+                <template #icon>
+                  <NIcon :size="14"><RefreshOutline /></NIcon>
+                </template>
+                重新检测环境
+              </NButton>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="env-toolbar">
-          <div class="env-toolbar-left">
-            <NButton
-              v-if="!envStore.status?.nodeInstalled && !envDownloading"
-              type="primary"
-              round
-              @click="handleInstallNode"
-            >
-              <template #icon>
-                <NIcon :size="14"><DownloadOutline /></NIcon>
-              </template>
-              去安装 Node.js（运行环境）
-            </NButton>
-            <NButton
-              v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
-              type="primary"
-              round
-              :loading="skillsInstalling"
-              @click="handleInstallSkills"
-            >
-              <template #icon>
-                <NIcon :size="14"><DownloadOutline /></NIcon>
-              </template>
-              安装 skills CLI（技能管理工具）
-            </NButton>
-            <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
-              <template #icon>
-                <NIcon :size="14"><RefreshOutline /></NIcon>
-              </template>
-              重新检测环境
-            </NButton>
-          </div>
+      <!-- 关于 -->
+      <div class="settings-section">
+        <div class="section-header">
+          <span class="section-title">关于</span>
+          <span class="section-line" />
+        </div>
+        <div class="about-row">
+          <NText class="about-version">SkillDeck v{{ appVersion }}</NText>
+          <NButton
+            v-if="updateDownloaded"
+            type="primary"
+            round
+            @click="handleInstallUpdate"
+          >
+            安装更新
+          </NButton>
+          <NButton
+            v-else
+            round
+            :loading="updateChecking || updateDownloading"
+            :disabled="updateChecking || updateDownloading"
+            @click="handleCheckUpdate"
+          >
+            <template #icon>
+              <NIcon :size="14"><RefreshOutline /></NIcon>
+            </template>
+            {{ updateDownloading ? '下载中...' : '检查更新' }}
+          </NButton>
         </div>
       </div>
     </NCard>
@@ -971,5 +1023,19 @@ async function handleUpdateAll(): Promise<void> {
 .env-checks-wrapper--missing {
   background: var(--color-warning-bg);
   border-color: var(--color-warning-border);
+}
+
+/* About section */
+.about-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.about-version {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-stone);
 }
 </style>
