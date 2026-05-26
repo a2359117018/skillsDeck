@@ -60,7 +60,6 @@ export function createMainWindow(): BrowserWindow {
   mainWindow.on('close', (event) => {
     const settings = getSettings()
     if (settings.closeAction === 'quit') {
-      mainWindow = null
       return
     }
     if (settings.closeAction === 'tray') {

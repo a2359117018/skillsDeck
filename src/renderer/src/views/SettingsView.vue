@@ -308,44 +308,65 @@ async function handleUpdateSkills(): Promise<void> {
     })
 }
 
-async function handleCheckUpdate(): Promise<void> {
+function handleCheckUpdate(): void {
   updateChecking.value = true
   updateDownloaded.value = false
   updateDownloading.value = false
 
-  const cleanupAvailable = window.api.updater.onUpdateAvailable(() => {
-    updateChecking.value = false
-    updateDownloading.value = true
-  })
+  const cleanups: (() => void)[] = []
+  let settled = false
 
-  const cleanupNotAvailable = window.api.updater.onUpdateNotAvailable(() => {
-    updateChecking.value = false
-    notify.info('已是最新版本')
-  })
-
-  const cleanupDownloaded = window.api.updater.onUpdateDownloaded(() => {
-    updateDownloading.value = false
-    updateDownloaded.value = true
-    updateChecking.value = false
-    notify.success('更新已下载，点击安装')
-  })
-
-  const cleanupError = window.api.updater.onError((message) => {
-    updateChecking.value = false
-    updateDownloading.value = false
-    notify.error(`检查更新失败: ${message}`)
-  })
-
-  try {
-    await window.api.updater.check()
-  } catch {
-    updateChecking.value = false
-  } finally {
-    cleanupAvailable()
-    cleanupNotAvailable()
-    cleanupDownloaded()
-    cleanupError()
+  /** Remove all updater listeners. Safe to call multiple times. */
+  function removeAll(): void {
+    if (settled) return
+    settled = true
+    for (const fn of cleanups) fn()
   }
+
+  cleanups.push(
+    window.api.updater.onUpdateAvailable(() => {
+      updateChecking.value = false
+      updateDownloading.value = true
+    })
+  )
+
+  cleanups.push(
+    window.api.updater.onUpdateNotAvailable(() => {
+      updateChecking.value = false
+      notify.info('已是最新版本')
+      removeAll()
+    })
+  )
+
+  cleanups.push(
+    window.api.updater.onDownloadProgress(() => {
+      // download progress updates don't end the cycle
+    })
+  )
+
+  cleanups.push(
+    window.api.updater.onUpdateDownloaded(() => {
+      updateDownloading.value = false
+      updateDownloaded.value = true
+      updateChecking.value = false
+      notify.success('更新已下载，点击安装')
+      removeAll()
+    })
+  )
+
+  cleanups.push(
+    window.api.updater.onError((message) => {
+      updateChecking.value = false
+      updateDownloading.value = false
+      notify.error(`检查更新失败: ${message}`)
+      removeAll()
+    })
+  )
+
+  window.api.updater.check().catch(() => {
+    updateChecking.value = false
+    removeAll()
+  })
 }
 
 async function handleInstallUpdate(): Promise<void> {

@@ -22,6 +22,12 @@ export function useClosePrompt(): void {
         },
         onNegativeClick: () => {
           window.api.close.action({ action: 'quit', remember: true })
+        },
+        onClose: () => {
+          window.api.close.action({ action: 'tray', remember: true })
+        },
+        onMaskClick: () => {
+          window.api.close.action({ action: 'tray', remember: true })
         }
       })
     })
