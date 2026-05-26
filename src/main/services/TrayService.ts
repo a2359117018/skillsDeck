@@ -1,0 +1,56 @@
+import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron'
+import icon from '../../../resources/icon.png?asset'
+
+let tray: Tray | null = null
+
+/**
+ * Create and manage the system tray icon.
+ * Shows a context menu with "显示 SkillDeck" and "退出".
+ * @param getMainWindow - Function to retrieve the main browser window
+ * @returns The created Tray instance
+ */
+export function createTray(getMainWindow: () => BrowserWindow | null): Tray {
+  const trayIcon = nativeImage.createFromPath(icon)
+  tray = new Tray(trayIcon.resize({ width: 16, height: 16 }))
+  tray.setToolTip('SkillDeck')
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '显示 SkillDeck',
+      click: () => {
+        const win = getMainWindow()
+        if (win) {
+          win.show()
+          win.focus()
+        }
+      }
+    },
+    { type: 'separator' },
+    {
+      label: '退出',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setContextMenu(contextMenu)
+
+  tray.on('click', () => {
+    const win = getMainWindow()
+    if (win) {
+      win.show()
+      win.focus()
+    }
+  })
+
+  return tray
+}
+
+/** Destroy the tray icon (called on app quit). */
+export function destroyTray(): void {
+  if (tray) {
+    tray.destroy()
+    tray = null
+  }
+}
