@@ -44,10 +44,16 @@ const envDownloading = ref(false)
 const envDownloadProgress = ref(0)
 
 const isLoaded = ref(false)
-const originalSettings = ref({
+const originalSettings = ref<{
+  autoCheckEnv: boolean
+  proxyUrl: string
+  npmRegistry: string
+  closeAction: 'ask' | 'tray' | 'quit'
+}>({
   autoCheckEnv: true,
   proxyUrl: '',
-  npmRegistry: ''
+  npmRegistry: '',
+  closeAction: 'ask'
 })
 
 const CUSTOM_PROXY_VALUE = '__custom__'
@@ -124,7 +130,8 @@ onMounted(() => {
     originalSettings.value = {
       autoCheckEnv: settingsStore.autoCheckEnv,
       proxyUrl: effectiveProxyUrl.value,
-      npmRegistry: effectiveRegistryUrl.value
+      npmRegistry: effectiveRegistryUrl.value,
+      closeAction: settingsStore.closeAction
     }
     isLoaded.value = true
 
@@ -200,7 +207,8 @@ const hasUnsavedChanges = computed(() => {
   return (
     settingsStore.autoCheckEnv !== originalSettings.value.autoCheckEnv ||
     effectiveProxyUrl.value !== originalSettings.value.proxyUrl ||
-    effectiveRegistryUrl.value !== originalSettings.value.npmRegistry
+    effectiveRegistryUrl.value !== originalSettings.value.npmRegistry ||
+    settingsStore.closeAction !== originalSettings.value.closeAction
   )
 })
 
@@ -224,12 +232,14 @@ async function handleSave(): Promise<void> {
   await settingsStore.save({
     autoCheckEnv: settingsStore.autoCheckEnv,
     proxyUrl: effectiveProxyUrl.value,
-    npmRegistry: effectiveRegistryUrl.value
+    npmRegistry: effectiveRegistryUrl.value,
+    closeAction: settingsStore.closeAction
   })
   originalSettings.value = {
     autoCheckEnv: settingsStore.autoCheckEnv,
     proxyUrl: effectiveProxyUrl.value,
-    npmRegistry: effectiveRegistryUrl.value
+    npmRegistry: effectiveRegistryUrl.value,
+    closeAction: settingsStore.closeAction
   }
   notify.success('设置已保存')
 }
