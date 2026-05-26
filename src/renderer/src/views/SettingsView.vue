@@ -525,12 +525,17 @@ async function handleInstallUpdate(): Promise<void> {
               !envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled
           }"
         >
-          <NText
-            depth="3"
-            style="display: block; margin-bottom: var(--space-md); font-size: var(--text-body-sm)"
-          >
-            需要 Node.js 和 skills CLI 才能安装和管理技能
-          </NText>
+          <div class="env-checks-header">
+            <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
+              <template #icon>
+                <NIcon :size="14"><RefreshOutline /></NIcon>
+              </template>
+              检测环境
+            </NButton>
+            <NText depth="3" class="env-checks-desc">
+              需要 Node.js 和 skills CLI 才能安装和管理技能
+            </NText>
+          </div>
           <div class="env-checks">
             <div class="env-check-item">
               <div
@@ -649,12 +654,6 @@ async function handleInstallUpdate(): Promise<void> {
                   <NIcon :size="14"><DownloadOutline /></NIcon>
                 </template>
                 安装 skills CLI（技能管理工具）
-              </NButton>
-              <NButton size="small" round :disabled="envStore.refreshing" @click="handleEnvRecheck">
-                <template #icon>
-                  <NIcon :size="14"><RefreshOutline /></NIcon>
-                </template>
-                重新检测环境
               </NButton>
             </div>
           </div>
@@ -1039,6 +1038,17 @@ async function handleInstallUpdate(): Promise<void> {
   transition:
     background var(--transition-base),
     border-color var(--transition-base);
+}
+
+.env-checks-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.env-checks-desc {
+  font-size: var(--text-body-sm);
 }
 
 .env-checks-wrapper--missing {
