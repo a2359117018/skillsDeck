@@ -7,6 +7,7 @@ import { registerEnvIpc } from './env.ipc'
 import { registerStoreIpc } from './store.ipc'
 import { registerAgentsIpc } from './agents.ipc'
 import { registerTasksIpc } from './tasks.ipc'
+import { registerUpdaterIpc } from './updater.ipc'
 import { getMainWindow } from '../services/WindowManager'
 
 function resolvePath(p: string): string {
@@ -51,4 +52,5 @@ export function registerIpcHandlers(): void {
   registerShellIpc()
   registerAgentsIpc()
   registerTasksIpc()
+  registerUpdaterIpc()
 }
