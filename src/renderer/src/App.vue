@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, onUnmounted } from 'vue'
+import { onMounted, ref, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   NConfigProvider,
   NMessageProvider,
   NNotificationProvider,
   NDialogProvider,
-  NAlert,
-  NButton,
+  createDiscreteApi,
   type GlobalThemeOverrides
 } from 'naive-ui'
 import AppSidebar from './components/layout/AppSidebar.vue'
@@ -15,6 +14,8 @@ import TaskDrawer from './components/tasks/TaskDrawer.vue'
 import { useEnvStore } from './stores/env'
 import { useSkillsStore } from './stores/skills'
 import { useClosePrompt } from './composables/useClosePrompt'
+
+const { dialog } = createDiscreteApi(['dialog'])
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
 const envStore = useEnvStore()
@@ -24,15 +25,6 @@ const route = useRoute()
 
 const isMainWindow = windowType === 'main'
 const taskDrawerVisible = ref(false)
-
-const envOk = computed(() => {
-  const s = envStore.status
-  return s?.nodeInstalled && s?.npmInstalled && s?.skillsInstalled
-})
-
-const envBannerVisible = computed(
-  () => isMainWindow && !envStore.fetching && envStore.status !== null && !envOk.value
-)
 
 /**
  * Global keyboard shortcut handler.
@@ -59,9 +51,62 @@ if (isMainWindow) {
   useClosePrompt()
 }
 
+/** Check environment and prompt install if missing. Recurses after each install. */
+async function promptEnvInstall(): Promise<void> {
+  await envStore.check()
+  const s = envStore.status
+  if (!s) return
+
+  if (!s.nodeInstalled) {
+    dialog.warning({
+      title: '缺少运行环境',
+      content: '未检测到 Node.js，需要安装后才能使用技能管理功能。',
+      positiveText: '安装 Node.js',
+      negativeText: '稍后',
+      onPositiveClick: async () => {
+        try {
+          const result = await window.api.env.installNode()
+          if (!result.success) throw new Error(result.error)
+          await promptEnvInstall()
+        } catch (e) {
+          dialog.error({
+            title: '安装失败',
+            content: e instanceof Error ? e.message : 'Node.js 安装失败，请稍后重试',
+            positiveText: '知道了'
+          })
+        }
+      }
+    })
+    return
+  }
+
+  if (!s.skillsInstalled) {
+    dialog.info({
+      title: '缺少技能管理工具',
+      content: '未检测到 skills CLI，需要安装后才能管理技能。',
+      positiveText: '安装 skills CLI',
+      negativeText: '稍后',
+      onPositiveClick: async () => {
+        try {
+          const result = await window.api.env.installSkills()
+          if (!result.success) throw new Error(result.error || '安装失败')
+          await promptEnvInstall()
+        } catch (e) {
+          dialog.error({
+            title: '安装失败',
+            content: e instanceof Error ? e.message : 'skills CLI 安装失败，请稍后重试',
+            positiveText: '知道了'
+          })
+        }
+      }
+    })
+    return
+  }
+}
+
 onMounted(() => {
   if (isMainWindow) {
-    envStore.check()
+    promptEnvInstall()
   }
   window.addEventListener('keydown', handleKeydown)
 })
@@ -69,10 +114,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
 })
-
-function goToSettings(): void {
-  router.push({ name: 'settings' })
-}
 
 function openTaskDrawer(): void {
   taskDrawerVisible.value = true
@@ -122,14 +163,6 @@ const themeOverrides: GlobalThemeOverrides = {
             <a href="#main-content" class="skip-link">跳转到主内容</a>
             <AppSidebar @open-tasks="openTaskDrawer" />
             <main id="main-content" class="content-area">
-              <NAlert v-if="envBannerVisible" type="warning" :show-icon="false" class="env-banner">
-                <div class="env-banner-inner">
-                  <span>缺少必要的运行组件，部分功能可能无法使用</span>
-                  <NButton size="small" round type="warning" @click="goToSettings">
-                    前往设置
-                  </NButton>
-                </div>
-              </NAlert>
               <div class="page-wrapper">
                 <router-view v-slot="{ Component }">
                   <Transition name="fade">
@@ -161,17 +194,6 @@ const themeOverrides: GlobalThemeOverrides = {
   min-height: 0;
   overflow: hidden;
   background-color: var(--color-canvas);
-}
-
-.env-banner :deep(.n-alert-body) {
-  padding: 10px 16px;
-}
-
-.env-banner-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 .skip-link {

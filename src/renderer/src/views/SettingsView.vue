@@ -419,25 +419,6 @@ async function handleInstallUpdate(): Promise<void> {
       </div>
     </div>
 
-    <!-- Guided setup banner for first-time users -->
-    <div
-      v-if="!envStore.status?.nodeInstalled || !envStore.status?.skillsInstalled"
-      class="setup-welcome-banner"
-    >
-      <div class="setup-welcome-title">首次使用？请先完成运行环境配置，然后设置你的偏好选项。</div>
-      <div class="setup-welcome-checklist">
-        <span class="setup-step" :class="{ 'setup-step--done': envStore.status?.nodeInstalled }">
-          1. 安装 Node.js
-        </span>
-        <span class="setup-step-divider">→</span>
-        <span class="setup-step" :class="{ 'setup-step--done': envStore.status?.skillsInstalled }">
-          2. 安装 skills CLI
-        </span>
-        <span class="setup-step-divider">→</span>
-        <span class="setup-step">3. 保存设置</span>
-      </div>
-    </div>
-
     <NCard class="settings-card">
       <NAlert v-if="hasUnsavedChanges" type="warning" :show-icon="false" class="unsaved-banner">
         您有未保存的更改
@@ -980,44 +961,6 @@ async function handleInstallUpdate(): Promise<void> {
 
 .unsaved-banner :deep(.n-alert-body) {
   padding: 10px 16px;
-}
-
-/* Guided setup welcome banner */
-.setup-welcome-banner {
-  margin-bottom: var(--space-xl);
-  padding: var(--space-lg) var(--space-xl);
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  border: 1px solid var(--color-hairline);
-  color: var(--color-ink);
-}
-
-.setup-welcome-title {
-  font-size: var(--text-body-md);
-  font-weight: var(--weight-semibold);
-  margin-bottom: var(--space-sm);
-}
-
-.setup-welcome-checklist {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: var(--text-body-sm);
-}
-
-.setup-step {
-  font-weight: var(--weight-medium);
-  opacity: 0.85;
-}
-
-.setup-step--done {
-  text-decoration: line-through;
-  opacity: 0.55;
-}
-
-.setup-step-divider {
-  opacity: 0.6;
 }
 
 /* Environment checks wrapper with warning styling when missing */
