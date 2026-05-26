@@ -2,6 +2,7 @@ import { BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
+import { getSettings } from './StoreService'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
@@ -55,6 +56,25 @@ export function createMainWindow(): BrowserWindow {
     })
   )
   loadWindow(mainWindow)
+
+  mainWindow.on('close', (event) => {
+    const settings = getSettings()
+    if (settings.closeAction === 'quit') {
+      mainWindow = null
+      return
+    }
+    if (settings.closeAction === 'tray') {
+      event.preventDefault()
+      mainWindow?.hide()
+      return
+    }
+    // No preference stored — prevent close, ask renderer to show prompt
+    event.preventDefault()
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('close:prompt')
+    }
+  })
+
   mainWindow.on('closed', () => {
     mainWindow = null
   })

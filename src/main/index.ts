@@ -1,12 +1,12 @@
-import { app, BrowserWindow, net } from 'electron'
+import { app, BrowserWindow, ipcMain, net } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import { createMainWindow } from './services/WindowManager'
+import { createMainWindow, getMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
-import { getSettings, setEnvStatus, migrateProxySettings } from './services/StoreService'
+import { getSettings, setSettings, setEnvStatus, migrateProxySettings } from './services/StoreService'
 
 /** 定期向所有窗口广播网络状态 */
 function broadcastNetworkStatus(): void {
@@ -46,6 +46,22 @@ app.whenReady().then(() => {
   })
 
   registerIpcHandlers()
+
+  ipcMain.handle(
+    'close:action',
+    (_, opts: { action: 'tray' | 'quit'; remember: boolean }) => {
+      if (opts.remember) {
+        setSettings({ closeAction: opts.action })
+      }
+      const win = getMainWindow()
+      if (opts.action === 'tray') {
+        win?.hide()
+      } else {
+        win?.destroy()
+      }
+    }
+  )
+
   createMainWindow()
 
   broadcastNetworkStatus()
