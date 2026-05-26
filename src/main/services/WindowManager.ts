@@ -67,7 +67,7 @@ export function createMainWindow(): BrowserWindow {
       mainWindow?.hide()
       return
     }
-    // No preference stored — prevent close, ask renderer to show prompt
+    // 'ask' or undefined — prevent close, ask renderer to show prompt
     event.preventDefault()
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('close:prompt')

@@ -83,6 +83,7 @@ const registryOptions = [
 ]
 
 const closeActionOptions = [
+  { label: '每次询问', value: 'ask' },
   { label: '最小化到系统托盘', value: 'tray' },
   { label: '退出应用', value: 'quit' }
 ]
@@ -426,8 +427,6 @@ async function handleInstallUpdate(): Promise<void> {
             <NSelect
               v-model:value="settingsStore.closeAction"
               :options="closeActionOptions"
-              placeholder="未设置（首次关闭时询问）"
-              clearable
               class="settings-select"
             />
           </NFormItem>
