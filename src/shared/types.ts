@@ -70,6 +70,7 @@ export interface AppSettings {
   autoCheckEnv: boolean
   proxyUrl?: string
   npmRegistry?: string
+  closeAction?: 'tray' | 'quit'
 }
 
 export interface SkillSearchResult {
