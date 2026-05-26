@@ -1,13 +1,14 @@
 import { onMounted, onUnmounted } from 'vue'
-import { useDialog } from 'naive-ui'
+import { createDiscreteApi } from 'naive-ui'
+
+const { dialog } = createDiscreteApi(['dialog'])
 
 /**
  * Listens for `close:prompt` IPC from main process and shows a dialog
- * asking the user to minimize to tray or quit. The dialog always assumes
- * "remember my choice" is true — since the user can change this later in Settings.
+ * asking the user to minimize to tray or quit. Uses createDiscreteApi
+ * because this composable runs in App.vue which owns NDialogProvider.
  */
 export function useClosePrompt(): void {
-  const dialog = useDialog()
   let cleanup: (() => void) | null = null
 
   onMounted(() => {
