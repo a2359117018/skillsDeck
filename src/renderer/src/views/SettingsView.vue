@@ -422,7 +422,7 @@ async function handleInstallUpdate(): Promise<void> {
           <NFormItem label="启动时检查运行环境">
             <NSwitch v-model:value="settingsStore.autoCheckEnv" />
           </NFormItem>
-          <NFormItem label="关闭按钮行为">
+          <NFormItem label="关闭时">
             <NSelect
               v-model:value="settingsStore.closeAction"
               :options="closeActionOptions"
