@@ -55,10 +55,13 @@ function handleKeydown(e: KeyboardEvent): void {
   }
 }
 
+if (isMainWindow) {
+  useClosePrompt()
+}
+
 onMounted(() => {
   if (isMainWindow) {
     envStore.check()
-    useClosePrompt()
   }
   window.addEventListener('keydown', handleKeydown)
 })
