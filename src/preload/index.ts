@@ -121,6 +121,52 @@ const api = {
   },
   window: {
     openSettings: (): Promise<void> => ipcRenderer.invoke('window:open-settings')
+  },
+  app: {
+    getVersion: (): Promise<string> => ipcRenderer.invoke('app:get-version')
+  },
+  updater: {
+    check: (): Promise<void> => ipcRenderer.invoke('updater:check'),
+    installUpdate: (): Promise<void> => ipcRenderer.invoke('updater:install-update'),
+    onUpdateAvailable: (callback: (info: { version: string }) => void): (() => void) => {
+      const listener = (
+        _event: Electron.IpcRendererEvent,
+        info: { version: string }
+      ): void => callback(info)
+      ipcRenderer.on('updater:update-available', listener)
+      return () => ipcRenderer.removeListener('updater:update-available', listener)
+    },
+    onUpdateNotAvailable: (callback: () => void): (() => void) => {
+      const listener = (): void => callback()
+      ipcRenderer.on('updater:update-not-available', listener)
+      return () => ipcRenderer.removeListener('updater:update-not-available', listener)
+    },
+    onDownloadProgress: (callback: (percent: number) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, percent: number): void =>
+        callback(percent)
+      ipcRenderer.on('updater:download-progress', listener)
+      return () => ipcRenderer.removeListener('updater:download-progress', listener)
+    },
+    onUpdateDownloaded: (callback: () => void): (() => void) => {
+      const listener = (): void => callback()
+      ipcRenderer.on('updater:update-downloaded', listener)
+      return () => ipcRenderer.removeListener('updater:update-downloaded', listener)
+    },
+    onError: (callback: (message: string) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, message: string): void =>
+        callback(message)
+      ipcRenderer.on('updater:error', listener)
+      return () => ipcRenderer.removeListener('updater:error', listener)
+    }
+  },
+  close: {
+    onPrompt: (callback: () => void): (() => void) => {
+      const listener = (): void => callback()
+      ipcRenderer.on('close:prompt', listener)
+      return () => ipcRenderer.removeListener('close:prompt', listener)
+    },
+    action: (opts: { action: 'tray' | 'quit'; remember: boolean }): Promise<void> =>
+      ipcRenderer.invoke('close:action', opts)
   }
 }
 

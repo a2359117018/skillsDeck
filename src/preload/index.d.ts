@@ -94,6 +94,22 @@ export interface AppApi {
   window: {
     openSettings: () => Promise<void>
   }
+  app: {
+    getVersion: () => Promise<string>
+  }
+  updater: {
+    check: () => Promise<void>
+    installUpdate: () => Promise<void>
+    onUpdateAvailable: (callback: (info: { version: string }) => void) => () => void
+    onUpdateNotAvailable: (callback: () => void) => () => void
+    onDownloadProgress: (callback: (percent: number) => void) => () => void
+    onUpdateDownloaded: (callback: () => void) => () => void
+    onError: (callback: (message: string) => void) => () => void
+  }
+  close: {
+    onPrompt: (callback: () => void) => () => void
+    action: (opts: { action: 'tray' | 'quit'; remember: boolean }) => Promise<void>
+  }
 }
 
 declare global {
