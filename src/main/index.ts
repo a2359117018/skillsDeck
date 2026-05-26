@@ -7,6 +7,8 @@ import { createMainWindow, getMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
 import { getSettings, setSettings, setEnvStatus, migrateProxySettings } from './services/StoreService'
+import { createTray, destroyTray } from './services/TrayService'
+import { initAutoUpdater } from './services/UpdateService'
 
 /** 定期向所有窗口广播网络状态 */
 function broadcastNetworkStatus(): void {
@@ -64,6 +66,9 @@ app.whenReady().then(() => {
 
   createMainWindow()
 
+  createTray(getMainWindow)
+  initAutoUpdater(getMainWindow)
+
   broadcastNetworkStatus()
   setInterval(broadcastNetworkStatus, 30_000)
 
@@ -83,6 +88,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    destroyTray()
     app.quit()
   }
 })

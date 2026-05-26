@@ -14,6 +14,7 @@ import AppSidebar from './components/layout/AppSidebar.vue'
 import TaskDrawer from './components/tasks/TaskDrawer.vue'
 import { useEnvStore } from './stores/env'
 import { useSkillsStore } from './stores/skills'
+import { useClosePrompt } from './composables/useClosePrompt'
 
 const windowType = new URLSearchParams(window.location.search).get('window') || 'main'
 const envStore = useEnvStore()
@@ -57,6 +58,7 @@ function handleKeydown(e: KeyboardEvent): void {
 onMounted(() => {
   if (isMainWindow) {
     envStore.check()
+    useClosePrompt()
   }
   window.addEventListener('keydown', handleKeydown)
 })
