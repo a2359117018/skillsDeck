@@ -12,6 +12,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const autoCheckEnv = ref(true)
   const proxyUrl = ref('')
   const npmRegistry = ref('')
+  const closeAction = ref<'tray' | 'quit' | undefined>(undefined)
   const error = ref<string | null>(null)
   const fetching = computed(() => settingsCache.loading.value)
   const loading = fetching
@@ -24,6 +25,7 @@ export const useSettingsStore = defineStore('settings', () => {
       autoCheckEnv.value = data.autoCheckEnv
       proxyUrl.value = data.proxyUrl || ''
       npmRegistry.value = data.npmRegistry || ''
+      closeAction.value = data.closeAction
       error.value = null
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : '设置加载失败'
@@ -34,6 +36,7 @@ export const useSettingsStore = defineStore('settings', () => {
     autoCheckEnv?: boolean
     proxyUrl?: string
     npmRegistry?: string
+    closeAction?: 'tray' | 'quit'
   }): Promise<void> {
     try {
       await window.api.store.setSettings(partial)
@@ -50,6 +53,7 @@ export const useSettingsStore = defineStore('settings', () => {
     autoCheckEnv,
     proxyUrl,
     npmRegistry,
+    closeAction,
     loading,
     fetching,
     refreshing,
