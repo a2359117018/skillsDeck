@@ -13,6 +13,7 @@ import {
   NText,
   NProgress,
   NAlert,
+  useDialog,
   type SelectOption
 } from 'naive-ui'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
@@ -23,7 +24,6 @@ import PencilOutline from '@vicons/ionicons5/PencilOutline'
 import CheckmarkCircleOutline from '@vicons/ionicons5/CheckmarkCircleOutline'
 import CheckmarkOutline from '@vicons/ionicons5/CheckmarkOutline'
 import CloseOutline from '@vicons/ionicons5/CloseOutline'
-import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import { useSettingsStore } from '../stores/settings'
 import { useEnvStore } from '../stores/env'
 import { useTaskStore } from '../stores/tasks'
@@ -38,6 +38,7 @@ const settingsStore = useSettingsStore()
 const envStore = useEnvStore()
 const taskStore = useTaskStore()
 const notify = useNotify()
+const dialog = useDialog()
 const { confirmUpdateEnv } = useConfirm()
 
 const envDownloading = ref(false)
@@ -295,7 +296,26 @@ async function handleInstallSkills(): Promise<void> {
 async function handleEnvRecheck(): Promise<void> {
   try {
     await envStore.check()
-    notify.success('环境检测完成')
+    const s = envStore.status
+    if (!s?.nodeInstalled) {
+      dialog.warning({
+        title: '缺少运行环境',
+        content: '未检测到 Node.js，需要安装后才能使用技能管理功能。',
+        positiveText: '安装 Node.js',
+        negativeText: '稍后',
+        onPositiveClick: () => handleInstallNode()
+      })
+    } else if (!s?.skillsInstalled) {
+      dialog.info({
+        title: '缺少技能管理工具',
+        content: '未检测到 skills CLI，需要安装后才能管理技能。',
+        positiveText: '安装 skills CLI',
+        negativeText: '稍后',
+        onPositiveClick: () => handleInstallSkills()
+      })
+    } else {
+      notify.success('环境检测完成，所有组件就绪')
+    }
   } catch {
     notify.error('环境检测失败，请重试')
   }
@@ -638,34 +658,6 @@ async function handleInstallUpdate(): Promise<void> {
               <NButton size="small" round @click="handleCancelInstallNode"> 取消下载 </NButton>
             </div>
           </div>
-
-          <div class="env-toolbar">
-            <div class="env-toolbar-left">
-              <NButton
-                v-if="!envStore.status?.nodeInstalled && !envDownloading"
-                type="primary"
-                round
-                @click="handleInstallNode"
-              >
-                <template #icon>
-                  <NIcon :size="14"><DownloadOutline /></NIcon>
-                </template>
-                去安装 Node.js（运行环境）
-              </NButton>
-              <NButton
-                v-else-if="envStore.status?.nodeInstalled && !envStore.status?.skillsInstalled"
-                type="primary"
-                round
-                :loading="skillsInstalling"
-                @click="handleInstallSkills"
-              >
-                <template #icon>
-                  <NIcon :size="14"><DownloadOutline /></NIcon>
-                </template>
-                安装 skills CLI（技能管理工具）
-              </NButton>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -957,17 +949,6 @@ async function handleInstallUpdate(): Promise<void> {
   margin-top: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.env-toolbar {
-  margin-top: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--color-hairline);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
