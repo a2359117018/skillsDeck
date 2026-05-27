@@ -112,7 +112,7 @@ function handleLocalInstallComplete(): void {
             <EmptyState
               v-else
               :icon="SearchOutline"
-              title="搜索技能"
+              title="安装技能"
               description="输入关键词查找 AI 编程技能，如代码审查、测试生成、文档编写"
             >
               <template #actions>

@@ -372,7 +372,7 @@ function handleViewDetail(name: string): void {
       >
         <template #actions>
           <NButton type="primary" size="small" round @click="router.push({ name: 'search' })">
-            搜索技能
+            安装技能
           </NButton>
         </template>
       </EmptyState>

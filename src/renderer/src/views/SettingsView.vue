@@ -729,9 +729,6 @@ async function handleInstallUpdate(): Promise<void> {
   transition: box-shadow var(--transition-base);
 }
 
-.settings-card:hover {
-  box-shadow: var(--shadow-3);
-}
 
 .settings-card :deep(.n-card__content) {
   padding: var(--space-xl);
@@ -825,14 +822,11 @@ async function handleInstallUpdate(): Promise<void> {
 
 .settings-fab :deep(.n-button) {
   box-shadow: var(--shadow-3);
-  transition:
-    box-shadow var(--transition-base),
-    transform var(--transition-base);
+  transition: box-shadow var(--transition-base);
 }
 
 .settings-fab :deep(.n-button:hover) {
   box-shadow: var(--shadow-4);
-  transform: translateY(-1px);
 }
 
 .settings-fab :deep(.n-button:active) {

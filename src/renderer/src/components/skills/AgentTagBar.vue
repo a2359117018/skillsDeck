@@ -159,7 +159,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 }
 
 .agent-tag-pill:hover {
-  border-color: var(--color-ink);
+  border-color: var(--color-hairline-hover);
   color: var(--color-ink);
 }
 
@@ -170,8 +170,7 @@ const hasActiveFilter = computed(() => skillsStore.selectedAgents.length > 0)
 }
 
 .agent-tag-pill--active:hover {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  /* active 状态已充分表达，hover 无需额外变化 */
 }
 
 .agent-tag-count {

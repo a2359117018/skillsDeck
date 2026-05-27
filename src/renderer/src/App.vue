@@ -130,7 +130,10 @@ const themeOverrides: GlobalThemeOverrides = {
   },
   Button: {
     borderRadius: '9999px',
-    fontWeight: '500'
+    fontWeight: '500',
+    /* quaternary 按钮 hover 仅颜色变化，不添加背景 */
+    colorQuaternaryHover: 'transparent',
+    colorQuaternaryPressed: 'transparent'
   },
   Tag: {
     borderRadius: '9999px'

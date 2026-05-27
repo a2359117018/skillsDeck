@@ -295,7 +295,7 @@ onMounted(() => {
       >
         <template #actions>
           <NButton type="primary" size="small" round @click="router.push({ name: 'search' })">
-            搜索技能
+            安装技能
           </NButton>
         </template>
       </EmptyState>
@@ -569,7 +569,6 @@ onMounted(() => {
 }
 
 .agent-card:hover {
-  box-shadow: var(--shadow-3);
   border-color: var(--color-hairline-hover);
 }
 
@@ -740,8 +739,7 @@ onMounted(() => {
 }
 
 :deep(.n-button.header-icon-btn:hover) {
-  background: var(--color-brand-blue-tint);
-  color: var(--color-interactive-accent);
+  color: var(--color-ink);
 }
 
 :deep(.n-button.folder-btn) {
@@ -798,8 +796,7 @@ onMounted(() => {
 }
 
 .skill-card:hover {
-  border-color: var(--color-interactive-accent);
-  box-shadow: 0 2px 12px var(--color-brand-blue-tint);
+  border-color: var(--color-hairline-hover);
 }
 
 .skill-card--selected {
@@ -852,12 +849,10 @@ onMounted(() => {
 }
 
 :deep(.n-button.action-btn.update:hover) {
-  background: var(--color-brand-blue-tint);
-  color: var(--color-interactive-accent);
+  color: var(--color-brand-blue);
 }
 
 :deep(.n-button.action-btn.delete:hover) {
-  background: var(--color-error-bg);
   color: var(--color-error);
 }
 </style>

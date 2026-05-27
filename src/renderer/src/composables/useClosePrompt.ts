@@ -1,5 +1,5 @@
-import { onUnmounted } from 'vue'
-import { createDiscreteApi } from 'naive-ui'
+import { ref, h, onUnmounted } from 'vue'
+import { createDiscreteApi, NCheckbox } from 'naive-ui'
 
 const { dialog } = createDiscreteApi(['dialog'])
 
@@ -9,23 +9,29 @@ const { dialog } = createDiscreteApi(['dialog'])
  * because this composable runs in App.vue which owns NDialogProvider.
  */
 export function useClosePrompt(): void {
+  const rememberChoice = ref(false)
+
   const cleanup = window.api.close.onPrompt(() => {
-    dialog.warning({
+    rememberChoice.value = false
+    dialog.create({
       title: '关闭 SkillDeck',
-      content: '你希望应用如何？',
+      content: () =>
+        h('div', { style: 'display: flex; flex-direction: column; gap: 12px' }, [
+          h('span', null, '你希望应用如何？'),
+          h(NCheckbox, {
+            checked: rememberChoice.value,
+            'onUpdate:checked': (val: boolean) => {
+              rememberChoice.value = val
+            }
+          }, { default: () => '记住选择' })
+        ]),
       positiveText: '最小化到托盘',
       negativeText: '退出应用',
       onPositiveClick: () => {
-        window.api.close.action({ action: 'tray', remember: true })
+        window.api.close.action({ action: 'tray', remember: rememberChoice.value })
       },
       onNegativeClick: () => {
-        window.api.close.action({ action: 'quit', remember: true })
-      },
-      onClose: () => {
-        window.api.close.action({ action: 'tray', remember: true })
-      },
-      onMaskClick: () => {
-        window.api.close.action({ action: 'tray', remember: true })
+        window.api.close.action({ action: 'quit', remember: rememberChoice.value })
       }
     })
   })

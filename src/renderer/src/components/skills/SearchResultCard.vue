@@ -49,8 +49,7 @@ const detailUrl = `https://skills.sh/${props.result.id}`
 }
 
 .result-card:hover {
-  border-color: var(--color-muted);
-  box-shadow: var(--shadow-2);
+  border-color: var(--color-hairline-hover);
 }
 
 .result-card-header {

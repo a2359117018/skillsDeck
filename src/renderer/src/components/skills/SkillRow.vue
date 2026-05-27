@@ -131,8 +131,8 @@ function handleCardClick(event: MouseEvent): void {
 }
 
 .skill-card:hover {
-  box-shadow: var(--shadow-2);
-  border-color: var(--color-muted);
+  background-color: var(--color-surface);
+  border-color: var(--color-hairline-hover);
 }
 
 .skill-card--selected {
@@ -204,9 +204,9 @@ function handleCardClick(event: MouseEvent): void {
 }
 
 .agent-tag--clickable:hover {
-  background: var(--color-muted);
+  background: var(--color-surface);
   color: var(--color-ink);
-  border-color: var(--color-muted);
+  border-color: var(--color-hairline-hover);
 }
 
 .agent-tag:focus-visible {

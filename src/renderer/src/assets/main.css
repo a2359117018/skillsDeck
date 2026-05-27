@@ -36,6 +36,10 @@ body {
   border-radius: inherit;
 }
 
+.n-checkbox:focus-visible {
+  outline: none;
+}
+
 /* useConfirm 对话框内联样式替换为 CSS 类 */
 .confirm-skill-list {
   color: var(--color-stone);

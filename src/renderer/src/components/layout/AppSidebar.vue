@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import CubeOutline from '@vicons/ionicons5/CubeOutline'
-import SearchOutline from '@vicons/ionicons5/SearchOutline'
+import CloudDownloadOutline from '@vicons/ionicons5/CloudDownloadOutline'
 import GitMergeOutline from '@vicons/ionicons5/GitMergeOutline'
 import SettingsOutline from '@vicons/ionicons5/SettingsOutline'
 import RocketOutline from '@vicons/ionicons5/RocketOutline'
@@ -23,7 +23,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { key: 'search', icon: SearchOutline, label: '搜索技能' },
+  { key: 'search', icon: CloudDownloadOutline, label: '技能安装' },
   { key: 'installed', icon: CubeOutline, label: '已安装' },
   { key: 'agent-view', icon: GitMergeOutline, label: 'AI 工具' },
   { key: 'settings', icon: SettingsOutline, label: '设置' }

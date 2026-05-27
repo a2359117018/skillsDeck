@@ -1,4 +1,5 @@
-import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron'
+import { Tray, Menu, nativeImage, BrowserWindow } from 'electron'
+import { requestForceQuit } from './WindowManager'
 import icon from '../../../resources/icon.png?asset'
 
 let tray: Tray | null = null
@@ -29,7 +30,7 @@ export function createTray(getMainWindow: () => BrowserWindow | null): Tray {
     {
       label: '退出',
       click: () => {
-        app.quit()
+        requestForceQuit()
       }
     }
   ])

@@ -1,4 +1,4 @@
-import { BrowserWindow, shell } from 'electron'
+import { BrowserWindow, shell, app } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
@@ -6,6 +6,13 @@ import { getSettings } from './StoreService'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
+let forceQuitRequested = false
+
+/** 托盘"退出"调用此函数跳过 close 拦截直接退出 */
+export function requestForceQuit(): void {
+  forceQuitRequested = true
+  app.quit()
+}
 
 function createWindowOptions(opts: {
   width: number
@@ -58,6 +65,10 @@ export function createMainWindow(): BrowserWindow {
   loadWindow(mainWindow)
 
   mainWindow.on('close', (event) => {
+    if (forceQuitRequested) {
+      forceQuitRequested = false
+      return
+    }
     const settings = getSettings()
     if (settings.closeAction === 'quit') {
       return
