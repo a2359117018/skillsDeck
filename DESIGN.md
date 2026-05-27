@@ -288,6 +288,19 @@ Section headers in settings use a label treatment: `--text-caption` size, weight
 
 > NaiveUI 组件的主题覆盖完整映射详见 [references/naiveui-theme.md](references/naiveui-theme.md)。本章节只描述视觉语义和设计意图。
 
+### Layout
+
+- **App Shell:** Flex 水平排列。左侧为固定宽度的 sidebar (`--sidebar-width`: 72px)，右侧为 flex column 的页面容器。
+- **Page Container:** `width: 100%` + padding 填满内容区。禁止给页面容器设固定像素宽度。文本块可用 `max-width: 75ch` 限制行宽。
+- **Card Grid:** CSS grid + `repeat(auto-fill, minmax(280px, 1fr))`。不使用 flex wrap。
+- **Spacing Strategy:** Flex/grid 容器使用 `gap` + spacing token 控制间距，避免在子元素上用 margin 拆分。
+- **Minimum Window:** 1200×800。布局在此尺寸下必须可用。
+
+### Toolbar
+
+- **Structure:** Flex row + gap。必须 `flex-wrap: wrap` 以适应不同窗口宽度。
+- **Search Inputs:** 当位于 toolbar 内时使用 pill shape (`--radius-full`) 和 `--color-surface` 背景。
+
 ### Buttons
 
 - **Shape:** Pill (`--radius-full`: 9999px). Every button in the system shares this shape regardless of size or variant.
