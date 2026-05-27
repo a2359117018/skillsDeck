@@ -127,7 +127,7 @@ function toggleGlobal(val: boolean): void {
 
 .agent-section {
   margin-top: var(--space-md);
-  transition: opacity 0.2s ease;
+  transition: opacity var(--transition-slow);
 }
 
 .agent-section.disabled {
@@ -167,7 +167,7 @@ function toggleGlobal(val: boolean): void {
 }
 
 .expand-icon {
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-slow);
   color: var(--color-muted);
 }
 

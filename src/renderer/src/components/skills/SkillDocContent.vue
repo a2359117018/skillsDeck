@@ -67,8 +67,8 @@ const renderedMarkdown = computed(() => {
 
 /* 代码块 — 深色背景，形成视觉锚点 */
 .markdown-body :deep(pre) {
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--color-terminal-bg);
+  color: var(--color-terminal-text);
   padding: var(--space-sm);
   border-radius: var(--radius-md);
   overflow-x: auto;
@@ -117,7 +117,7 @@ const renderedMarkdown = computed(() => {
 }
 
 .markdown-body :deep(blockquote) {
-  border-left: 2px solid var(--color-muted);
+  border-left: 1px solid var(--color-muted);
   margin: var(--space-sm) 0;
   padding: var(--space-xs) var(--space-sm);
   color: var(--color-stone);

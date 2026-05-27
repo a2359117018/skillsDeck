@@ -4,6 +4,7 @@ import os from 'os'
 import decompress from 'decompress'
 import type { ArchiveScanResult } from '../../shared/types'
 import { localSkillInstaller } from './LocalSkillInstaller'
+import { isPathInside } from '../utils/pathSecurity'
 
 const SUPPORTED_EXTENSIONS = ['.zip', '.tar.gz', '.tgz']
 
@@ -28,11 +29,11 @@ export class ArchiveSkillInstaller {
 
   async extractAndScan(filePath: string): Promise<ArchiveScanResult> {
     const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'skills-archive-'))
-    const resolvedTemp = path.resolve(tempDir)
     try {
       const files = await decompress(filePath, tempDir)
       for (const f of files) {
-        if (!path.resolve(tempDir, f.path).startsWith(resolvedTemp + path.sep)) {
+        const extractedPath = path.resolve(tempDir, f.path)
+        if (!isPathInside(tempDir, extractedPath)) {
           throw new Error('Archive contains entries outside the target directory')
         }
       }

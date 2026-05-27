@@ -24,9 +24,27 @@ export function registerTasksIpc(): void {
 
   ipcMain.handle('tasks:retry', async (_, { taskId }: { taskId: string }) => {
     const task = backgroundTaskService.getStatus(taskId)
-    if (task && !['update-skills', 'install-node', 'install-skills'].includes(task.type)) {
+    if (task && !['update-skills', 'install-node', 'install-skills', 'skill-update', 'skill-update-all', 'skill-remove-batch'].includes(task.type)) {
       return { ok: false, error: '该任务类型不支持重试' }
     }
+    try {
+      backgroundTaskService.retryBuiltIn(taskId)
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: toIpcError(error).message }
+    }
+  })
+
+  ipcMain.handle('tasks:retry-skill-update', async (_, { taskId }: { taskId: string }) => {
+    const task = backgroundTaskService.getStatus(taskId)
+    if (!task || task.status !== 'error') {
+      return { ok: false, error: 'Task not found or not in error state' }
+    }
+
+    if (task.type !== 'skill-update-all') {
+      return { ok: false, error: '该任务类型不支持重试' }
+    }
+
     try {
       backgroundTaskService.retryBuiltIn(taskId)
       return { ok: true }

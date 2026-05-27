@@ -10,6 +10,8 @@ import { backgroundTaskService } from '../services/BackgroundTaskService'
 import { githubSkillInstaller } from '../services/GitHubSkillInstaller'
 import { archiveSkillInstaller } from '../services/ArchiveSkillInstaller'
 import { localSkillInstaller } from '../services/LocalSkillInstaller'
+import { isPathInside } from '../utils/pathSecurity'
+import { validateInstallSource } from '../utils/validation'
 
 function serializeError(e: unknown): CommandErrorInfo {
   if (e instanceof CommandError) {
@@ -45,9 +47,10 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     'skills:install',
     async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
       try {
+        const source = validateInstallSource(opts.source)
         return {
           ok: true,
-          data: await skillsService.install(opts.source, opts.agents, opts.global)
+          data: await skillsService.install(source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -72,18 +75,14 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         }
       }
       try {
+        const source = validateInstallSource(opts.source)
         const onOutput = (text: string): void => {
           if (mainWindow.isDestroyed()) return
           mainWindow.webContents.send('skills:install-output', text)
         }
         return {
           ok: true,
-          data: await skillsService.installStreaming(
-            onOutput,
-            opts.source,
-            opts.agents,
-            opts.global
-          )
+          data: await skillsService.installStreaming(onOutput, source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -246,144 +245,45 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     const tmpDir = os.tmpdir()
     for (const dir of tempDirs) {
       const resolved = path.resolve(dir)
-      if (resolved.startsWith(tmpDir) && path.basename(resolved).startsWith('skills-')) {
+      if (isPathInside(tmpDir, resolved) && path.basename(resolved).startsWith('skills-')) {
         await localSkillInstaller.cleanupTempDir(resolved)
       }
     }
   })
 
-  function hasPendingTask(type: string): boolean {
-    return Array.from(backgroundTaskService.getAll()).some(
-      (t) => t.type === type && (t.status === 'pending' || t.status === 'running')
-    )
-  }
-
   ipcMain.handle(
     'skills:update-background',
     async (_, opts: { packageRef: string; global?: boolean }) => {
-      if (hasPendingTask('skill-update')) {
-        return { taskId: '', error: '更新任务正在进行中' }
+      try {
+        const taskId = await backgroundTaskService.startTask('skill-update', opts)
+        return { taskId }
+      } catch (e) {
+        return { taskId: '', error: e instanceof Error ? e.message : String(e) }
       }
-      const taskId = backgroundTaskService.register('skill-update')
-      backgroundTaskService.markRunning(taskId)
-
-      skillsService
-        .update(opts.packageRef, opts.global)
-        .then((result) => {
-          if (result.success) {
-            backgroundTaskService.markSuccess(taskId)
-          } else {
-            backgroundTaskService.markError(taskId, result.stderr || '更新失败')
-          }
-        })
-        .catch((error) => {
-          backgroundTaskService.markError(
-            taskId,
-            error instanceof Error ? error.message : String(error)
-          )
-        })
-
-      return { taskId }
     }
   )
 
   ipcMain.handle('skills:update-all-background', async (_, opts?: { global?: boolean }) => {
-    if (hasPendingTask('skill-update-all')) {
-      return { taskId: '', error: '全部更新任务正在进行中' }
+    try {
+      const taskId = await backgroundTaskService.startTask('skill-update-all', opts)
+      return { taskId }
+    } catch (e) {
+      return { taskId: '', error: e instanceof Error ? e.message : String(e) }
     }
-    const taskId = backgroundTaskService.register('skill-update-all')
-    backgroundTaskService.markRunning(taskId)
-
-    skillsService
-      .updateAll(opts?.global)
-      .then((result) => {
-        if (result.success) {
-          backgroundTaskService.markSuccess(taskId)
-        } else {
-          backgroundTaskService.markError(taskId, result.stderr || '更新失败')
-        }
-      })
-      .catch((error) => {
-        backgroundTaskService.markError(
-          taskId,
-          error instanceof Error ? error.message : String(error)
-        )
-      })
-
-    return { taskId }
   })
 
   ipcMain.handle(
     'skills:remove-batch-background',
     async (_, opts: { packageRefs: string[]; agentFlag?: string }) => {
-      if (hasPendingTask('skill-remove-batch')) {
-        return { taskId: '', error: '批量删除任务正在进行中' }
-      }
-      if (!Array.isArray(opts.packageRefs) || opts.packageRefs.length === 0) {
-        return { taskId: '', error: '未选择要删除的技能' }
-      }
-      const taskId = backgroundTaskService.register('skill-remove-batch')
-      backgroundTaskService.markRunning(taskId)
-      ;(async () => {
-        const failedNames: string[] = []
-
-        for (const packageRef of opts.packageRefs) {
-          try {
-            const result = await skillsService.remove(packageRef, opts.agentFlag, true)
-            if (!result.success) {
-              failedNames.push(packageRef)
-            }
-          } catch (error) {
-            console.error(`Failed to remove skill ${packageRef}:`, error)
-            failedNames.push(packageRef)
-          }
+      try {
+        if (!Array.isArray(opts.packageRefs) || opts.packageRefs.length === 0) {
+          return { taskId: '', error: '未选择要删除的技能' }
         }
-
-        if (failedNames.length === 0) {
-          backgroundTaskService.markSuccess(taskId)
-        } else {
-          const displayed = failedNames.slice(0, 5).join('、')
-          const suffix = failedNames.length > 5 ? ` 等 ${failedNames.length} 个技能` : ''
-          backgroundTaskService.markError(taskId, `删除失败：${displayed}${suffix}`)
-        }
-      })()
-
-      return { taskId }
+        const taskId = await backgroundTaskService.startTask('skill-remove-batch', opts)
+        return { taskId }
+      } catch (e) {
+        return { taskId: '', error: e instanceof Error ? e.message : String(e) }
+      }
     }
   )
-
-  ipcMain.handle('tasks:retry-skill-update', async (_, { taskId }: { taskId: string }) => {
-    const task = backgroundTaskService.getStatus(taskId)
-    if (!task || task.status !== 'error') {
-      return { ok: false, error: 'Task not found or not in error state' }
-    }
-
-    if (task && task.type !== 'skill-update-all') {
-      return { ok: false, error: '该任务类型不支持重试' }
-    }
-
-    task.status = 'pending'
-    task.error = undefined
-    task.stdout = ''
-    task.updatedAt = Date.now()
-    backgroundTaskService.markRunning(taskId)
-
-    skillsService
-      .updateAll()
-      .then((result) => {
-        if (result.success) {
-          backgroundTaskService.markSuccess(taskId)
-        } else {
-          backgroundTaskService.markError(taskId, result.stderr || '更新失败')
-        }
-      })
-      .catch((error) => {
-        backgroundTaskService.markError(
-          taskId,
-          error instanceof Error ? error.message : String(error)
-        )
-      })
-
-    return { ok: true }
-  })
 }

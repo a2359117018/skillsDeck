@@ -19,6 +19,7 @@ export interface BackgroundTask {
   status: 'pending' | 'running' | 'success' | 'error' | 'cancelled'
   progress: number
   stdout: string
+  stderr: string
   error?: string
   createdAt: number
   updatedAt: number
