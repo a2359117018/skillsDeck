@@ -6,6 +6,7 @@ import os from 'os'
 import { createMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
+import { registerSkillTaskExecutors } from './services/SkillTaskExecutors'
 import { getSettings, setEnvStatus } from './services/StoreService'
 
 /** Remove leftover skills-* temp directories from previous sessions. */
@@ -35,6 +36,7 @@ app.whenReady().then(() => {
   })
 
   registerIpcHandlers()
+  registerSkillTaskExecutors()
   createMainWindow()
 
   const settings = getSettings()

@@ -7,9 +7,91 @@ import { getSettings } from './StoreService'
 
 type TaskType = BackgroundTask['type']
 
+/** Task executor contract — registered by domain modules */
+export interface TaskExecutor {
+  /** Execute the task. Must call markSuccess/markError on completion. */
+  execute(taskId: string, payload: unknown): Promise<void>
+}
+
 class BackgroundTaskService {
   private tasks = new Map<string, BackgroundTask>()
   private processes = new Map<string, Subprocess>()
+  private executors = new Map<string, TaskExecutor>()
+  private payloads = new Map<string, unknown>()
+
+  registerExecutor(type: TaskType, executor: TaskExecutor): void {
+    this.executors.set(type, executor)
+  }
+
+  async startTask(type: TaskType, payload: unknown): Promise<string> {
+    const existing = Array.from(this.tasks.values()).find(
+      (t) => t.type === type && (t.status === 'pending' || t.status === 'running')
+    )
+    if (existing) {
+      throw new Error(`A ${type} task is already ${existing.status}`)
+    }
+
+    const id = this.register(type)
+    const executor = this.executors.get(type)
+    if (!executor) {
+      this.tasks.delete(id)
+      throw new Error(`No executor registered for task type: ${type}`)
+    }
+
+    this.payloads.set(id, payload)
+    this.markRunning(id)
+
+    executor.execute(id, payload).catch((error) => {
+      const task = this.tasks.get(id)
+      if (task && task.status === 'running') {
+        this.markError(id, error instanceof Error ? error.message : String(error))
+      }
+      this.cleanup(id)
+    })
+
+    return id
+  }
+
+  retryBuiltIn(taskId: string): void {
+    const task = this.tasks.get(taskId)
+    if (!task || task.status !== 'error') {
+      throw new Error('Task not found or not in error state')
+    }
+
+    const conflicting = Array.from(this.tasks.values()).find(
+      (t) =>
+        t.id !== taskId &&
+        t.type === task.type &&
+        (t.status === 'pending' || t.status === 'running')
+    )
+    if (conflicting) {
+      throw new Error(`A ${task.type} task is already ${conflicting.status}`)
+    }
+
+    const executor = this.executors.get(task.type)
+    if (!executor) {
+      throw new Error(`No executor registered for task type: ${task.type}`)
+    }
+
+    task.status = 'pending'
+    task.error = undefined
+    task.stdout = ''
+    task.stderr = ''
+    task.progress = -1
+    task.updatedAt = Date.now()
+    this.emitUpdate(task)
+
+    this.markRunning(taskId)
+
+    const payload = this.payloads.get(taskId)
+    executor.execute(taskId, payload).catch((error) => {
+      const task = this.tasks.get(taskId)
+      if (task && task.status === 'running') {
+        this.markError(taskId, error instanceof Error ? error.message : String(error))
+      }
+      this.cleanup(taskId)
+    })
+  }
 
   private resolveCommand(type: TaskType): { command: string; args: string[] } {
     let command: string
@@ -26,6 +108,8 @@ class BackgroundTaskService {
         command = 'npm'
         args = ['install', '-g', 'skills']
         break
+      default:
+        throw new Error(`No builtin command for task type: ${type}`)
     }
 
     const registry = getSettings().npmRegistry
@@ -165,6 +249,7 @@ class BackgroundTaskService {
 
   private cleanup(taskId: string): void {
     this.processes.delete(taskId)
+    this.payloads.delete(taskId)
   }
 
   private emitUpdate(task: BackgroundTask): void {
