@@ -11,6 +11,7 @@ import { githubSkillInstaller } from '../services/GitHubSkillInstaller'
 import { archiveSkillInstaller } from '../services/ArchiveSkillInstaller'
 import { localSkillInstaller } from '../services/LocalSkillInstaller'
 import { isPathInside } from '../utils/pathSecurity'
+import { validateInstallSource } from '../utils/validation'
 
 function serializeError(e: unknown): CommandErrorInfo {
   if (e instanceof CommandError) {
@@ -46,9 +47,10 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     'skills:install',
     async (_, opts: { source: string; agents: string[]; global?: boolean }) => {
       try {
+        const source = validateInstallSource(opts.source)
         return {
           ok: true,
-          data: await skillsService.install(opts.source, opts.agents, opts.global)
+          data: await skillsService.install(source, opts.agents, opts.global)
         }
       } catch (e) {
         return { ok: false, error: serializeError(e) }
@@ -73,6 +75,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
         }
       }
       try {
+        const source = validateInstallSource(opts.source)
         const onOutput = (text: string): void => {
           if (mainWindow.isDestroyed()) return
           mainWindow.webContents.send('skills:install-output', text)
@@ -81,7 +84,7 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
           ok: true,
           data: await skillsService.installStreaming(
             onOutput,
-            opts.source,
+            source,
             opts.agents,
             opts.global
           )
