@@ -44,6 +44,7 @@ class BackgroundTaskService {
       status: 'pending',
       progress: -1,
       stdout: '',
+      stderr: '',
       createdAt: Date.now(),
       updatedAt: Date.now()
     }
@@ -103,7 +104,7 @@ class BackgroundTaskService {
     })
 
     child.stderr?.on('data', (data: Buffer) => {
-      task.stdout += data.toString()
+      task.stderr += data.toString()
       task.updatedAt = Date.now()
       this.emitUpdate(task)
     })
@@ -112,8 +113,8 @@ class BackgroundTaskService {
       if (code === 0) {
         this.markSuccess(id)
       } else {
-        const detail = task.stdout.trim() ? `\n${task.stdout.trim()}` : ''
-        this.markError(id, `Exit code: ${code}${detail}`)
+        const detail = task.stderr.trim() || task.stdout.trim()
+        this.markError(id, `Exit code: ${code}${detail ? `\n${detail}` : ''}`)
       }
       this.cleanup(id)
     })
