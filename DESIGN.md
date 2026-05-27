@@ -2,102 +2,149 @@
 name: SkillDeck
 description: Desktop GUI for managing AI agent skills across 50+ coding agents
 colors:
-  carbon-ink: '#0a0a0a'
-  text-primary: '#1a1a1a'
-  text-secondary: '#6b7280'
-  text-muted: '#9ca3af'
-  canvas: '#ffffff'
-  surface: '#f7f8fa'
-  hairline: '#e5e7eb'
-  ember-coral: '#ff5530'
-  steel-blue: '#1456f0'
-  neon-magenta: '#ea5ec1'
-  ion-purple: '#a855f7'
-  ember-coral-light: '#ff7a59'
-  ember-coral-dark: '#e64720'
-  steel-blue-200: '#dbeafe'
-  steel-blue-deep: '#1e40af'
-  neon-magenta-light: '#ff6ec7'
-  success-bg: '#dcfce7'
-  success-text: '#166534'
-  error: '#d45656'
-  error-bg: '#fef2f2'
-  sidebar-dark-start: '#0a0a0a'
-  sidebar-dark-end: '#1a1a2e'
+  color-primary: '#0a0a0a'
+  color-ink: '#1a1a1a'
+  color-stone: '#6b7280'
+  color-muted: '#757575'
+  color-canvas: '#ffffff'
+  color-surface: '#f7f8fa'
+  color-hairline: '#e5e7eb'
+  color-hairline-hover: '#d1d5db'
+  color-brand-coral: '#ff5530'
+  color-brand-blue: '#1456f0'
+  color-brand-magenta: '#ea5ec1'
+  color-brand-purple: '#a855f7'
+  color-brand-blue-200: '#dbeafe'
+  color-brand-blue-deep: '#1e40af'
+  color-brand-coral-light: '#ff7a59'
+  color-brand-magenta-light: '#ff6ec7'
+  color-brand-coral-dark: '#e64720'
+  color-avatar-coral: '#c4321a'
+  color-avatar-blue: '#1e40af'
+  color-avatar-magenta: '#c43a9a'
+  color-avatar-purple: '#7c3aed'
+  color-agent-coral-bg: '#fff5f2'
+  color-agent-coral-border: '#ffe0d6'
+  color-agent-blue-bg: '#eff6ff'
+  color-agent-blue-border: '#dbeafe'
+  color-agent-magenta-bg: '#fdf2f8'
+  color-agent-magenta-border: '#fce7f3'
+  color-agent-purple-bg: '#faf5ff'
+  color-agent-purple-border: '#f3e8ff'
+  color-brand-blue-tint: 'rgba(37, 99, 235, 0.08)'
+  color-interactive-accent: '#2563eb'
+  color-success-bg: '#dcfce7'
+  color-success-text: '#166534'
+  color-warning: '#f0a020'
+  color-warning-bg: '#fffbeb'
+  color-warning-border: 'rgba(240, 160, 32, 0.35)'
+  color-error: '#d45656'
+  color-error-bg: '#fef2f2'
+  sidebar-bg: '#111111'
+  sidebar-icon-color: 'rgba(255, 255, 255, 0.7)'
+  sidebar-icon-hover-color: 'rgba(255, 255, 255, 0.85)'
+  sidebar-icon-active-color: '#ffffff'
+  sidebar-item-hover-bg: 'rgba(255, 255, 255, 0.05)'
+  sidebar-item-active-bg: 'rgba(255, 255, 255, 0.1)'
+  sidebar-divider-color: 'rgba(255, 255, 255, 0.12)'
+  color-terminal-bg: '#1e1e1e'
+  color-terminal-text: '#d4d4d4'
 typography:
-  display:
+  text-hero:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
     fontSize: '2rem'
     fontWeight: 700
     lineHeight: 1.25
-  headline:
+  text-heading-lg:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
     fontSize: '1.5rem'
     fontWeight: 700
     lineHeight: 1.25
-  title:
+  text-heading-md:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
     fontSize: '1.25rem'
     fontWeight: 600
     lineHeight: 1.25
-  body:
+  text-heading-sm:
+    fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: '1.125rem'
+    fontWeight: 600
+    lineHeight: 1.25
+  text-body-lg:
+    fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: '1.0625rem'
+    fontWeight: 400
+    lineHeight: 1.5
+  text-body-md:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
     fontSize: '1rem'
     fontWeight: 400
     lineHeight: 1.5
-  label:
+  text-body-sm:
+    fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: '0.875rem'
+    fontWeight: 400
+    lineHeight: 1.5
+  text-caption:
     fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
     fontSize: '0.8125rem'
     fontWeight: 500
     lineHeight: 1.5
     letterSpacing: '0.5px'
+  text-micro:
+    fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: '0.75rem'
+    fontWeight: 400
+    lineHeight: 1.5
 rounded:
-  xs: '4px'
-  sm: '6px'
-  md: '8px'
-  lg: '12px'
-  xl: '16px'
-  xxl: '20px'
-  hero: '32px'
-  full: '9999px'
+  radius-xs: '4px'
+  radius-sm: '6px'
+  radius-md: '8px'
+  radius-lg: '12px'
+  radius-xl: '16px'
+  radius-xxl: '20px'
+  radius-hero: '32px'
+  radius-full: '9999px'
 spacing:
-  xxs: '4px'
-  xs: '8px'
-  sm: '12px'
-  md: '16px'
-  lg: '20px'
-  xl: '24px'
-  xxl: '32px'
-  xxxl: '48px'
+  space-xxs: '4px'
+  space-xs: '8px'
+  space-sm: '12px'
+  space-md: '16px'
+  space-lg: '20px'
+  space-xl: '24px'
+  space-xxl: '32px'
+  space-xxxl: '48px'
+  space-section: '64px'
+  space-section-lg: '80px'
 components:
   button-primary:
-    backgroundColor: '{colors.carbon-ink}'
-    textColor: '{colors.canvas}'
-    rounded: '{rounded.full}'
+    backgroundColor: '{colors.color-primary}'
+    textColor: '{colors.color-canvas}'
+    rounded: '{rounded.radius-full}'
     padding: '8px 20px'
   button-primary-hover:
-    backgroundColor: '{colors.text-primary}'
+    backgroundColor: '{colors.color-ink}'
   button-secondary:
-    backgroundColor: '{colors.canvas}'
-    textColor: '{colors.text-primary}'
-    rounded: '{rounded.full}'
+    backgroundColor: '{colors.color-canvas}'
+    textColor: '{colors.color-ink}'
+    rounded: '{rounded.radius-full}'
   chip:
-    backgroundColor: '{colors.surface}'
-    textColor: '{colors.text-secondary}'
-    rounded: '{rounded.full}'
+    backgroundColor: '{colors.color-surface}'
+    textColor: '{colors.color-stone}'
+    rounded: '{rounded.radius-full}'
     padding: '4px 12px'
   card:
-    backgroundColor: '{colors.canvas}'
-    rounded: '{rounded.xl}'
+    backgroundColor: '{colors.color-canvas}'
+    rounded: '{rounded.radius-xl}'
     padding: '16px'
   input:
-    backgroundColor: '{colors.canvas}'
-    textColor: '{colors.text-primary}'
-    rounded: '{rounded.md}'
+    backgroundColor: '{colors.color-canvas}'
+    textColor: '{colors.color-ink}'
+    rounded: '{rounded.radius-md}'
     height: '40px'
   nav-sidebar:
-    backgroundColor: '{colors.sidebar-dark-start}'
-    width: '60px'
+    backgroundColor: '{colors.sidebar-bg}'
+    width: '72px'
 ---
 
 # Design System: SkillDeck
@@ -114,8 +161,8 @@ The dark sidebar is the constant: it anchors navigation and signals "this is a t
 
 **Key Characteristics:**
 
-- Dark sidebar + light canvas: two-zone architecture with distinct purposes
-- Pill-shaped controls: every button is a rounded pill (9999px radius), forming a consistent tactile vocabulary
+- Dark sidebar (`--sidebar-bg`: #111111) + light canvas (`--color-canvas`: #ffffff): two-zone architecture with distinct purposes
+- Pill-shaped controls: every button is a rounded pill (`--radius-full`: 9999px), forming a consistent tactile vocabulary
 - Tonal layering over shadows: surfaces differentiate by background color value, not by drop shadows
 - Single font family: DM Sans carries every role from page titles to button labels
 - Four-brand-color agent system: coral, blue, magenta, purple distinguish agents visually
@@ -126,45 +173,72 @@ The palette is split into two zones: the dark command strip (sidebar) and the br
 
 ### Primary
 
-- **Ember Coral** (#ff5530): The primary brand accent. Used for the sidebar active indicator bar and the FAB hover state. Appears on approximately 5% of any given screen. Its rarity is intentional.
+- **Ember Coral** (`--color-brand-coral`, #ff5530): The primary brand accent. Used for the sidebar active indicator bar and the FAB hover state. Appears on approximately 5% of any given screen. Its rarity is intentional.
 
 ### Secondary
 
-- **Steel Blue** (#1456f0): The work accent. Used for toolbar badges (skill count, agent count), external links, search results, and agent card color theme 1. Carries the "clickable" or "active" signal in the content area.
-- **Steel Blue Deep** (#1e40af): Used for text on light blue badges (install count chips).
-- **Steel Blue 200** (#dbeafe): Light tint for hover states, drop zone backgrounds, and subtle blue backgrounds.
+- **Steel Blue** (`--color-brand-blue`, #1456f0): The work accent. Used for toolbar badges (skill count, agent count), external links, search results, and agent card color theme 1. Carries the "clickable" or "active" signal in the content area.
+- **Steel Blue Deep** (`--color-brand-blue-deep`, #1e40af): Used for text on light blue badges (install count chips).
+- **Steel Blue 200** (`--color-brand-blue-200`, #dbeafe): Light tint for hover states, drop zone backgrounds, and subtle blue backgrounds.
 
 ### Tertiary
 
-- **Neon Magenta** (#ea5ec1): Agent card color theme 2. Used structurally to distinguish agent groups.
-- **Ion Purple** (#a855f7): Agent card color theme 3. Used structurally to distinguish agent groups.
+- **Neon Magenta** (`--color-brand-magenta`, #ea5ec1): Agent card color theme 2. Used structurally to distinguish agent groups.
+- **Ion Purple** (`--color-brand-purple`, #a855f7): Agent card color theme 3. Used structurally to distinguish agent groups.
 
 ### Neutral
 
-- **Carbon Ink** (#0a0a0a): Primary action buttons, sidebar background start, active text. The deepest value in the system.
-- **Text Primary** (#1a1a1a): All body text, headings, and labels. Never pure black.
-- **Text Secondary** (#6b7280): Supporting text, descriptions, secondary information. Visible but clearly subordinate.
-- **Text Muted** (#9ca3af): Captions, metadata, timestamps. The lightest readable text. Must maintain at least 4.5:1 contrast against canvas.
-- **Canvas** (#ffffff): The default background for the content area and cards.
-- **Surface** (#f7f8fa): Elevated or grouped surfaces. Sidebar section backgrounds, input backgrounds, skill list area backgrounds.
-- **Hairline** (#e5e7eb): Borders, dividers, card outlines. The structural line color.
+- **Carbon Ink** (`--color-primary`, #0a0a0a): Primary action buttons, active text. The deepest value in the system.
+- **Text Primary** (`--color-ink`, #1a1a1a): All body text, headings, and labels. Never pure black.
+- **Text Secondary** (`--color-stone`, #6b7280): Supporting text, descriptions, secondary information. Visible but clearly subordinate.
+- **Text Muted** (`--color-muted`, #757575): Captions, metadata, timestamps. The lightest readable text. Must maintain at least 4.5:1 contrast against canvas. This value was deepened from #9ca3af to pass WCAG AA.
+- **Canvas** (`--color-canvas`, #ffffff): The default background for the content area and cards.
+- **Surface** (`--color-surface`, #f7f8fa): Elevated or grouped surfaces. Sidebar section backgrounds, input backgrounds, skill list area backgrounds.
+- **Hairline** (`--color-hairline`, #e5e7eb): Borders, dividers, card outlines. The structural line color.
+- **Hairline Hover** (`--color-hairline-hover`, #d1d5db): Border color on hover states.
 
 ### Semantic
 
-- **Success Background** (#dcfce7) + **Success Text** (#166534): Environment check pass states.
-- **Error** (#d45656) + **Error Background** (#fef2f2): Error states, destructive action buttons, environment check fail states.
+- **Success Background** (`--color-success-bg`, #dcfce7) + **Success Text** (`--color-success-text`, #166534): Environment check pass states.
+- **Error** (`--color-error`, #d45656) + **Error Background** (`--color-error-bg`, #fef2f2): Error states, destructive action buttons, environment check fail states.
+- **Warning** (`--color-warning`, #f0a020) + **Warning Background** (`--color-warning-bg`, #fffbeb) + **Warning Border** (`--color-warning-border`, rgba(240, 160, 32, 0.35)): Warning states and alerts.
 
 ### Sidebar Zone
 
-- **Sidebar Dark Start** (#0a0a0a) to **Sidebar Dark End** (#1a1a2e): A subtle vertical gradient on the sidebar. The shift from pure dark to dark-navy adds depth without decoration.
-- **Sidebar Icon Default** (rgba(255,255,255,0.55)): Resting state for navigation icons.
-- **Sidebar Icon Hover** (rgba(255,255,255,0.85)): Hover state, sufficient contrast against the dark background.
-- **Sidebar Icon Active** (#ffffff): The active navigation item. Pure white for maximum signal.
-- **Sidebar Divider** (rgba(255,255,255,0.12)): Subtle separator between navigation groups.
+- **Sidebar Background** (`--sidebar-bg`, #111111): Flat dark background for the sidebar. No gradient.
+- **Sidebar Icon Default** (`--sidebar-icon-color`, rgba(255,255,255,0.7)): Resting state for navigation icons.
+- **Sidebar Icon Hover** (`--sidebar-icon-hover-color`, rgba(255,255,255,0.85)): Hover state, sufficient contrast against the dark background.
+- **Sidebar Icon Active** (`--sidebar-icon-active-color`, #ffffff): The active navigation item. Pure white for maximum signal.
+- **Sidebar Item Hover** (`--sidebar-item-hover-bg`, rgba(255,255,255,0.05)): Hover background for sidebar items.
+- **Sidebar Item Active** (`--sidebar-item-active-bg`, rgba(255,255,255,0.1)): Active background for sidebar items.
+- **Sidebar Divider** (`--sidebar-divider-color`, rgba(255,255,255,0.12)): Subtle separator between navigation groups.
 
-**The One Signal Rule.** Ember Coral appears on exactly one element per screen (the active sidebar indicator, or a FAB). It is never used for cards, badges, or decorative fills. When you see coral, it means "you are here."
+### Agent Card Tints (Four-Color Cycling)
 
-**The Four-Color Agent Rule.** Steel Blue, Neon Magenta, Ion Purple, and Ember Coral are assigned to agent cards by index (modulo 4). These colors serve a structural purpose: making the agent grid scannable. They are never used for status, priority, or data encoding.
+These tokens assign background and border colors to agent cards by index (modulo 4):
+
+- Coral: `--color-agent-coral-bg` (#fff5f2) / `--color-agent-coral-border` (#ffe0d6)
+- Blue: `--color-agent-blue-bg` (#eff6ff) / `--color-agent-blue-border` (#dbeafe)
+- Magenta: `--color-agent-magenta-bg` (#fdf2f8) / `--color-agent-magenta-border` (#fce7f3)
+- Purple: `--color-agent-purple-bg` (#faf5ff) / `--color-agent-purple-border` (#f3e8ff)
+
+### Avatar Dark Variants
+
+Darkened brand colors for avatar backgrounds with white text (WCAG AA compliant):
+
+- `--color-avatar-coral` (#c4321a)
+- `--color-avatar-blue` (#1e40af)
+- `--color-avatar-magenta` (#c43a9a)
+- `--color-avatar-purple` (#7c3aed)
+
+### Terminal
+
+- **Terminal Background** (`--color-terminal-bg`, #1e1e1e): Dark terminal output background.
+- **Terminal Text** (`--color-terminal-text`, #d4d4d4): Monospace terminal text color.
+
+**The One Signal Rule.** `--color-brand-coral` appears on exactly one element per screen (the active sidebar indicator, or a FAB). It is never used for cards, badges, or decorative fills. When you see coral, it means "you are here."
+
+**The Four-Color Agent Rule.** `--color-brand-blue`, `--color-brand-magenta`, `--color-brand-purple`, and `--color-brand-coral` are assigned to agent cards by index (modulo 4). These colors serve a structural purpose: making the agent grid scannable. They are never used for status, priority, or data encoding.
 
 ## 3. Typography
 
@@ -176,34 +250,35 @@ The palette is split into two zones: the dark command strip (sidebar) and the br
 
 ### Hierarchy
 
-- **Display** (700, 2rem / 32px, line-height 1.25): Page-level hero text. Reserved for the largest title on any screen. Currently unused in production.
-- **Headline** (700, 1.5rem / 24px, line-height 1.25): Page titles ("我的技能", "Agent 管理", "设置"). The typographic anchor of each page.
-- **Title** (600, 1.25rem / 20px, line-height 1.25): Section titles and card names. Used inside settings sections.
-- **Body** (400, 1rem / 16px, line-height 1.5): Default text for all readable content. Skill names, descriptions, form labels. Max line length 65-75ch for prose blocks.
-- **Body Small** (400, 0.875rem / 14px, line-height 1.5): Supporting content, toolbar text, env check labels.
-- **Caption** (400, 0.8125rem / 13px, line-height 1.5): Metadata, version numbers, secondary labels. The smallest size used for regular content.
-- **Micro** (400, 0.75rem / 12px, line-height 1.5): Badge text, count indicators, timestamps. The minimum readable size.
+- **Display** (`--text-hero`, 700, 2rem / 32px, line-height 1.25): Page-level hero text. Reserved for the largest title on any screen. Currently unused in production.
+- **Headline** (`--text-heading-lg`, 700, 1.5rem / 24px, line-height 1.25): Page titles ("我的技能", "Agent 管理", "设置"). The typographic anchor of each page.
+- **Title** (`--text-heading-md`, 600, 1.25rem / 20px, line-height 1.25): Section titles and card names. Used inside settings sections.
+- **Body** (`--text-body-md`, 400, 1rem / 16px, line-height 1.5): Default text for all readable content. Skill names, descriptions, form labels. Max line length 65-75ch for prose blocks.
+- **Body Small** (`--text-body-sm`, 400, 0.875rem / 14px, line-height 1.5): Supporting content, toolbar text, env check labels.
+- **Caption** (`--text-caption`, 400, 0.8125rem / 13px, line-height 1.5): Metadata, version numbers, secondary labels. The smallest size used for regular content.
+- **Micro** (`--text-micro`, 400, 0.75rem / 12px, line-height 1.5): Badge text, count indicators, timestamps. The minimum readable size.
 
 ### Label Convention
 
-Section headers in settings use a label treatment: 0.8125rem, weight 500, text-secondary color, uppercase with 0.5px letter-spacing. This creates a clear "section marker" that is distinct from body text without adding visual weight.
+Section headers in settings use a label treatment: `--text-caption` size, weight 500 (`--weight-medium`), `--color-stone` color, uppercase with 0.5px letter-spacing. This creates a clear "section marker" that is distinct from body text without adding visual weight.
 
-**The Single Family Rule.** DM Sans handles every typographic role. No secondary font is introduced for emphasis. Hierarchy is achieved exclusively through size (0.75rem to 2rem, a 2.67x range) and weight (400 to 700, three steps).
+**The Single Family Rule.** DM Sans handles every typographic role. No secondary font is introduced for emphasis. Hierarchy is achieved exclusively through size (`--text-micro` to `--text-hero`, a 2.67x range) and weight (`--weight-regular` to `--weight-bold`, three steps).
 
 ## 4. Elevation
 
 **Direction: Tonal layering.** Depth is conveyed through background color value, not through drop shadows. The hierarchy from back to front:
 
-1. **Canvas** (#ffffff): The base layer. Page backgrounds, card backgrounds at rest.
-2. **Surface** (#f7f8fa): One step above canvas. Grouped areas, input backgrounds, panel bodies, env check chips.
-3. **Hairline borders** (#e5e7eb): Structural boundaries between surfaces, not elevation.
+1. **Canvas** (`--color-canvas`, #ffffff): The base layer. Page backgrounds, card backgrounds at rest.
+2. **Surface** (`--color-surface`, #f7f8fa): One step above canvas. Grouped areas, input backgrounds, panel bodies, env check chips.
+3. **Hairline borders** (`--color-hairline`, #e5e7eb): Structural boundaries between surfaces, not elevation.
 
-### Current Shadow Vocabulary (transitional)
+### Shadow Vocabulary (transitional)
 
-- **Shadow 1** (`0 1px 2px rgba(36,36,36,0.06)`): Card rest state. Nearly invisible, adds subtle separation.
-- **Shadow 2** (`rgba(36,36,36,0.06) 0 2px 6px -2px`): Skill row hover.
-- **Shadow 3** (`rgba(36,36,36,0.08) 0 4px 12px -2px`): Card hover, settings card rest.
-- **Shadow 4** (`rgba(36,36,36,0.08) 0 12px 16px -4px`): FAB, elevated modals.
+- **Shadow 1** (`--shadow-1`, `0 1px 2px rgba(36,36,36,0.06)`): Card rest state. Nearly invisible, adds subtle separation.
+- **Shadow 2** (`--shadow-2`, `rgba(36,36,36,0.06) 0 2px 6px -2px`): Skill row hover.
+- **Shadow 3** (`--shadow-3`, `rgba(36,36,36,0.08) 0 4px 12px -2px`): Card hover, settings card rest.
+- **Shadow 4** (`--shadow-4`, `rgba(36,36,36,0.08) 0 12px 16px -4px`): FAB, elevated modals.
+- **Shadow 0** (`--shadow-0`, `none`): Explicit no-shadow.
 
 **The Flat-by-Default Rule.** At rest, surfaces are flat. Shadows appear only as a hover response. A card at rest has a hairline border and canvas background; on hover it gains shadow-2 and a muted border. The target system replaces shadows entirely with tonal shifts: hover states deepen the background from canvas to surface rather than adding shadow.
 
@@ -211,88 +286,147 @@ Section headers in settings use a label treatment: 0.8125rem, weight 500, text-s
 
 ## 5. Components
 
+> NaiveUI 组件的主题覆盖完整映射详见 [references/naiveui-theme.md](references/naiveui-theme.md)。本章节只描述视觉语义和设计意图。
+
 ### Buttons
 
-- **Shape:** Pill (radius 9999px). Every button in the system shares this shape regardless of size or variant.
-- **Primary:** Carbon Ink background, Canvas text, weight 500. Hover darkens to Text Primary.
-- **Secondary:** Canvas background, Text Primary text, weight 500, with a 1px hairline border. Hover adds surface background.
-- **Ghost/Quaternary:** Transparent background, icon-only (24px touch target), Text Secondary color. Hover adds surface background circle.
-- **Danger:** Error border and text, transparent background. Hover adds Error Background.
+- **Shape:** Pill (`--radius-full`: 9999px). Every button in the system shares this shape regardless of size or variant.
+- **Primary:** `--color-primary` background, `--color-canvas` text, weight 500. Hover darkens to `--color-ink`.
+- **Secondary:** `--color-canvas` background, `--color-ink` text, weight 500, with a 1px `--color-hairline` border. Hover adds `--color-surface` background.
+- **Ghost/Quaternary:** Transparent background, icon-only (24px touch target), `--color-stone` color. Hover adds `--color-surface` background circle.
+- **Danger:** `--color-error` border and text, transparent background. Hover adds `--color-error-bg`.
 - **Sizes:** `tiny` (icon buttons in rows), `small` (toolbar actions), `medium` (primary actions), `large` (search, FAB).
-- **Focus:** Not currently implemented. Target: 2px solid Ember Coral outline with 2px offset on focus-visible.
+- **Focus:** 2px solid `--color-brand-coral` outline with 2px offset on focus-visible.
 
 ### Chips / Tags
 
-- **Shape:** Pill (radius 9999px).
-- **Default:** Surface background, Text Secondary text, 1px Hairline border.
-- **Active/Selected:** Carbon Ink background, Canvas text, no border. Hover darkens to Text Primary.
-- **Agent Tag (in skill rows):** Same as default chip but clickable. Hover inverts to muted background with Text Primary text.
-- **Badge (counts):** Steel Blue background, Canvas text, used for toolbar count indicators.
+- **Shape:** Pill (`--radius-full`: 9999px).
+- **Default:** `--color-surface` background, `--color-stone` text, 1px `--color-hairline` border.
+- **Active/Selected:** `--color-primary` background, `--color-canvas` text, no border. Hover darkens to `--color-ink`.
+- **Agent Tag (in skill rows):** Same as default chip but clickable. Hover inverts to muted background with `--color-ink` text.
+- **Badge (counts):** `--color-brand-blue` background, `--color-canvas` text, used for toolbar count indicators.
 
-### Cards
+### Cards / Containers
 
-- **Corner Style:** XL (16px radius).
-- **Background:** Canvas at rest. Surface for grouped areas.
-- **Border:** 1px Hairline. Hover shifts to Text Muted border.
-- **Shadow Strategy:** Shadow-1 at rest, Shadow-2 or Shadow-3 on hover (transitional, migrating to tonal shifts).
-- **Internal Padding:** sm (12px) to md (16px).
-- **Agent Cards:** Use brand-color backgrounds (Steel Blue 200, equivalent pink/lavender tints) with corresponding brand-color avatar. Each card has a distinct color theme (modulo 4).
+- **Corner Style:** XL (`--radius-xl`: 16px).
+- **Background:** `--color-canvas` at rest. `--color-surface` for grouped areas.
+- **Border:** 1px `--color-hairline`. Hover shifts to `--color-muted` border.
+- **Shadow Strategy:** `--shadow-1` at rest, `--shadow-2` or `--shadow-3` on hover (transitional, migrating to tonal shifts).
+- **Internal Padding:** `--space-sm` (12px) to `--space-md` (16px).
+- **Agent Cards:** Use brand-color backgrounds (`--color-agent-blue-bg`, equivalent pink/lavender tints) with corresponding brand-color avatar. Each card has a distinct color theme (modulo 4).
 
 ### Inputs / Fields
 
-- **Style:** Canvas background, 1px Hairline border, MD (8px) radius, 40px height.
-- **Search Inputs:** Pill shape (9999px radius), Surface background when inside toolbar.
-- **Focus:** Not currently styled beyond NaiveUI defaults. Target: Steel Blue border on focus.
-- **Prefix Icons:** 16-18px, Text Muted color.
+- **Style:** `--color-canvas` background, 1px `--color-hairline` border, MD (`--radius-md`: 8px) radius, 40px height.
+- **Search Inputs:** Pill shape (`--radius-full`: 9999px), `--color-surface` background when inside toolbar.
+- **Focus:** `--color-brand-blue` border on focus.
+- **Prefix Icons:** 16-18px, `--color-muted` color.
 
 ### Navigation (Sidebar)
 
-- **Style:** 60px fixed width, dark gradient background (Carbon Ink to Sidebar Dark End).
-- **Items:** 44px square, Hairline-radius-lg, icon-only (24px). No text labels visible; hover shows browser title tooltip.
-- **Active State:** White icon, 8% white background overlay, 3px Ember Coral left indicator bar.
-- **Divider:** 1px line at 12% white opacity, 24px width, centered.
-- **Transition:** 150ms ease on color and background changes.
+- **Style:** `--sidebar-width` (72px) fixed width, flat dark background (`--sidebar-bg`: #111111).
+- **Items:** 44px square, `--radius-lg` (12px), icon-only (24px). No text labels visible; hover shows browser title tooltip.
+- **Active State:** White icon (`--sidebar-icon-active-color`), 8% white background overlay (`--sidebar-item-active-bg`), 3px `--color-brand-coral` left indicator bar.
+- **Divider:** 1px line at 12% white opacity (`--sidebar-divider-color`), 24px width, centered.
+- **Transition:** `--transition-base` (150ms ease) on color and background changes.
 
 ### Drawers
 
 - **Width:** `min(480px, 40vw)`. Responsive to window width.
-- **Background:** Transparent (native NDrawer is transparent, inner content is Canvas).
-- **Header:** Surface background, 1px Hairline bottom border. Compact: 12px vertical padding.
-- **Body:** Light blue tint background (Steel Blue 200 equivalent). Contains skill cards with Canvas background.
+- **Background:** Transparent (native NDrawer is transparent, inner content is `--color-canvas`).
+- **Header:** `--color-surface` background, 1px `--color-hairline` bottom border. Compact: `--space-sm` (12px) vertical padding.
+- **Body:** Light blue tint background (`--color-brand-blue-200` equivalent). Contains skill cards with `--color-canvas` background.
 
 ### Modals / Dialogs
 
-- **Border Radius:** XXL (20px) for install dialog, XL (16px) for remove dialog.
-- **Background:** Canvas. Content uses standard spacing.
+- **Border Radius:** XXL (`--radius-xxl`: 20px) for install dialog, XL (`--radius-xl`: 16px) for remove dialog.
+- **Background:** `--color-canvas`. Content uses standard spacing.
 - **Mask:** Semi-transparent, dismissible when not in loading state.
 
 ### Command Output / Terminal
 
-- **Background:** #1e1e1e (dark, independent of theme).
-- **Text:** #d4d4d4, monospace (Cascadia Code, Fira Code, Consolas).
-- **Skill References:** Steel Blue, underlined, clickable.
+- **Background:** `--color-terminal-bg` (#1e1e1e, dark, independent of theme).
+- **Text:** `--color-terminal-text` (#d4d4d4), monospace (Cascadia Code, Fira Code, Consolas).
+- **Skill References:** `--color-brand-blue`, underlined, clickable.
 - **Max Height:** 400px with overflow scroll.
 
 ## 6. Do's and Don'ts
 
 ### Do:
 
-- **Do** use the pill shape (9999px radius) for every button and chip. Shape consistency is an affordance.
-- **Do** use background color value to differentiate surfaces (canvas at base, surface one step up). Shadows are secondary, used only on hover.
-- **Do** assign the four brand colors (Ember Coral, Steel Blue, Neon Magenta, Ion Purple) to agent cards by modulo index. This makes the grid scannable without encoding meaning.
+- **Do** use the pill shape (`--radius-full`: 9999px) for every button and chip. Shape consistency is an affordance.
+- **Do** use background color value to differentiate surfaces (`--color-canvas` at base, `--color-surface` one step up). Shadows are secondary, used only on hover.
+- **Do** assign the four brand colors (`--color-brand-coral`, `--color-brand-blue`, `--color-brand-magenta`, `--color-brand-purple`) to agent cards by modulo index. This makes the grid scannable without encoding meaning.
 - **Do** keep the sidebar dark and minimal. Four icons, no text labels, one active indicator. Navigation is fast because choices are few.
-- **Do** use DM Sans weight 700 for headlines and 600 for titles. The weight jump from 400 body to 700 headline (1.75x ratio) creates clear hierarchy.
-- **Do** ensure all text meets WCAG AA contrast (4.5:1 for normal text, 3:1 for large text). Test Text Muted (#9ca3af) against Canvas; darken if below threshold.
+- **Do** use DM Sans weight 700 (`--weight-bold`) for headlines and 600 (`--weight-semibold`) for titles. The weight jump from 400 body to 700 headline (1.75x ratio) creates clear hierarchy.
+- **Do** ensure all text meets WCAG AA contrast (4.5:1 for normal text, 3:1 for large text). Test `--color-muted` (#757575) against `--color-canvas`; darken if below threshold.
 - **Do** make interactive elements keyboard accessible. Buttons should be `<button>` elements, not `<div>` with click handlers. Add `focus-visible` styles.
+- **Do** reference CSS variables from `tokens.css` for all colors, spacing, radius, shadows, and transitions. Never hard-code values.
 
 ### Don't:
 
 - **Don't** use generic SaaS dashboard patterns: hero metrics, gradient accents, card grids with identical tiles, or blue-and-white everything. This is a developer's tool, not a marketing page. (PRODUCT.md anti-reference)
-- **Don't** use `#000` or `#fff` directly. Carbon Ink and Canvas are the system's darkest and lightest values, tinted with the brand's cool-gray character.
-- **Don't** add decorative motion. Transitions are 100-200ms ease, used for state changes (hover, route change, expand/collapse). No orchestrated page-load sequences, no bounce easing, no elastic curves. (PRODUCT.md: "Speed over polish")
-- **Don't** nest cards. A card inside a card is always wrong. Use Surface background + Hairline border for inner grouping instead.
+- **Don't** use `#000` or `#fff` directly. `--color-primary` and `--color-canvas` are the system's darkest and lightest values, tinted with the brand's cool-gray character.
+- **Don't** add decorative motion. Transitions are `--transition-fast` (100ms) to `--transition-slow` (200ms) ease, used for state changes (hover, route change, expand/collapse). No orchestrated page-load sequences, no bounce easing, no elastic curves. (PRODUCT.md: "Speed over polish")
+- **Don't** nest cards. A card inside a card is always wrong. Use `--color-surface` background + `--color-hairline` border for inner grouping instead.
 - **Don't** use `border-left` or `border-right` greater than 1px as a colored accent stripe on cards or list items. The sidebar's 3px active bar is the one exception, justified by navigation context.
 - **Don't** use gradient text (`background-clip: text` with a gradient). Emphasis comes from weight or size.
 - **Don't** hard-code colors outside of tokens.css. Every color value in component CSS must reference a CSS custom property. If a token doesn't exist for the needed value, add one to tokens.css first.
+- **Don't** hard-code transition timing. Use `--transition-fast` (100ms), `--transition-base` (150ms), or `--transition-slow` (200ms) tokens. The only exception is continuous loading animations (spinners).
 - **Don't** hide scrollbars globally. Developers rely on scroll position for spatial orientation. Use thin overlay scrollbars or NaiveUI's NScrollbar instead of `scrollbar-width: none` on `*`.
 - **Don't** use modals as the first solution for progressive flows. The install dialog is justified by its multi-step nature. Confirm removals inline when possible.
+
+## 7. Agent Prompt Guide
+
+This section is for AI agents generating code for this project. Follow these rules precisely to avoid UI style errors.
+
+### Token Reference
+
+All visual values must reference `src/renderer/src/assets/tokens.css`. The CSS custom properties defined there are the single source of truth. This DESIGN.md's YAML frontmatter uses the same names (without the `--` prefix).
+
+**Quick mapping:**
+
+| Token type | CSS variable | Value | Usage |
+|---|---|---|---|
+| Primary action bg | `--color-primary` | #0a0a0a | Primary buttons, active chip bg |
+| Body text | `--color-ink` | #1a1a1a | All text, headings |
+| Secondary text | `--color-stone` | #6b7280 | Descriptions, metadata |
+| Muted text | `--color-muted` | #757575 | Captions, placeholders |
+| Page bg | `--color-canvas` | #ffffff | Page backgrounds, cards |
+| Surface bg | `--color-surface` | #f7f8fa | Input bg, grouped areas |
+| Borders | `--color-hairline` | #e5e7eb | Card borders, dividers |
+| Brand coral | `--color-brand-coral` | #ff5530 | Sidebar active indicator |
+| Brand blue | `--color-brand-blue` | #1456f0 | Links, badges, search |
+| Error | `--color-error` | #d45656 | Error states, destructive actions |
+| Sidebar bg | `--sidebar-bg` | #111111 | Sidebar background (flat) |
+| Sidebar width | `--sidebar-width` | 72px | Fixed sidebar width |
+
+**Spacing:** Use `--space-xxs` (4px) through `--space-xxxl` (48px). Never hard-code padding/margin values.
+
+**Radius:** Use `--radius-xs` (4px) through `--radius-full` (9999px). Buttons and chips always use `--radius-full`.
+
+**Shadows:** Use `--shadow-0` (none) through `--shadow-4`. At rest, use no shadow or `--shadow-1`.
+
+**Typography:** Use `--text-micro` (0.75rem) through `--text-hero` (2rem). Weights: `--weight-regular` (400), `--weight-medium` (500), `--weight-semibold` (600), `--weight-bold` (700).
+
+**Transitions:** Use `--transition-fast` (100ms), `--transition-base` (150ms), or `--transition-slow` (200ms).
+
+### NaiveUI Component Rules
+
+When using NaiveUI components, consult [references/naiveui-theme.md](references/naiveui-theme.md) for the complete theme override mapping. Key rules:
+
+- **Colors:** NaiveUI's `themeOverrides` uses hardcoded hex values (JS string literals), not CSS `var()`. If you need to add a new NaiveUI component, check `App.vue` for existing overrides first.
+- **Buttons:** All buttons use `borderRadius: '9999px'` (pill shape) and `fontWeight: '500'`.
+- **Inputs:** Default border radius is 8px (`--radius-md`), height is 40px.
+- **Cards:** Default border radius is 16px (`--radius-xl`), no shadow at rest.
+- **Tags/Chips:** Default border radius is 9999px (`--radius-full`).
+
+### Common Mistakes to Avoid
+
+1. **Using old token names.** The old DESIGN.md used names like `carbon-ink`, `ember-coral`, `steel-blue`. These do NOT exist in the code. Use `--color-primary`, `--color-brand-coral`, `--color-brand-blue` instead.
+2. **Wrong sidebar width.** The sidebar is 72px wide (`--sidebar-width`), not 60px.
+3. **Wrong sidebar background.** The sidebar is flat `#111111` (`--sidebar-bg`), not a gradient.
+4. **Wrong muted text color.** `--color-muted` is `#757575`, not `#9ca3af`.
+5. **Missing agent card tokens.** Agent cards use `--color-agent-*-bg` and `--color-agent-*-border` tokens, not raw brand colors.
+6. **Forgetting dark mode.** `tokens.css` has `[data-theme='dark']` overrides. When adding new color tokens, consider whether they need dark variants.
+7. **Hard-coding NaiveUI colors.** Never pass raw hex to NaiveUI props. If a token doesn't exist in `themeOverrides`, add it to `App.vue` first, then document it in `references/naiveui-theme.md`.
