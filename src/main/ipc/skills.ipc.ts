@@ -10,6 +10,7 @@ import { backgroundTaskService } from '../services/BackgroundTaskService'
 import { githubSkillInstaller } from '../services/GitHubSkillInstaller'
 import { archiveSkillInstaller } from '../services/ArchiveSkillInstaller'
 import { localSkillInstaller } from '../services/LocalSkillInstaller'
+import { isPathInside } from '../utils/pathSecurity'
 
 function serializeError(e: unknown): CommandErrorInfo {
   if (e instanceof CommandError) {
@@ -238,7 +239,10 @@ export function registerSkillsIpc(getMainWindow: () => Electron.BrowserWindow | 
     const tmpDir = os.tmpdir()
     for (const dir of tempDirs) {
       const resolved = path.resolve(dir)
-      if (resolved.startsWith(tmpDir) && path.basename(resolved).startsWith('skills-')) {
+      if (
+        isPathInside(tmpDir, resolved) &&
+        path.basename(resolved).startsWith('skills-')
+      ) {
         await localSkillInstaller.cleanupTempDir(resolved)
       }
     }
