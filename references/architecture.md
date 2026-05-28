@@ -16,7 +16,12 @@ src/
 │   │   ├── WindowManager.ts        # Multi-window (main 1200×800, settings 600×500)
 │   │   ├── LocalSkillInstaller.ts  # Copy skill dirs into agent skill paths
 │   │   ├── GitHubSkillInstaller.ts # Download & extract GitHub repos as skill sources
-│   │   └── ArchiveSkillInstaller.ts # Extract .zip/.tar.gz/.tgz archives as skill sources
+│   │   ├── ArchiveSkillInstaller.ts # Extract .zip/.tar.gz/.tgz archives as skill sources
+│   │   └── ISkillSourceInstaller.ts # Unified installer type contracts
+│   ├── utils/
+│   │   ├── pathSecurity.ts         # Path traversal prevention
+│   │   ├── download.ts             # Download with progress
+│   │   └── path.ts                 # Tilde path expansion utility
 │   ├── api/
 │   │   └── skills.ts               # HTTP client for skills.sh search API
 │   └── ipc/                         # IPC handler modules
@@ -40,7 +45,10 @@ src/
 │       ├── constants/            # Agent definitions from shared/agents.json
 │       └── assets/               # CSS design system (tokens.css, main.css, card.css)
 └── shared/
-    ├── types.ts             # Shared interfaces and utility functions
+    ├── types.ts             # Shared interfaces
+    ├── utils/
+    │   ├── format.ts        # toPackageRef, formatInstalls
+    │   └── error.ts         # toIpcError error normalization
     └── agents.json          # Agent registry: name, agentFlag, project/global paths
 ```
 
@@ -48,8 +56,9 @@ src/
 
 - **IPC communication**: Main↔renderer via typed Electron IPC. Preload exposes `window.api.*`; handlers registered in `src/main/ipc/`. All IPC errors are serialized via `CommandErrorInfo`. Handlers return `{ ok: true, data: T } | { ok: false, error: CommandErrorInfo }`.
 - **Stale-while-revalidate**: `useCachedResource<T>` provides `ensure()`, `invalidate()`, `refresh()` for all Pinia store data fetching.
-- **CLI interaction**: `CommandRunner` wraps `execa` with streaming output, timeout, and cancel. `SkillsService` uses it for all `npx skills` commands. `shell: true` on Windows.
+- **CLI interaction**: `CommandRunner` wraps `execa` with streaming output, timeout, and per-process cancellation via `CommandHandle`. Multiple commands can run concurrently. `SkillsService` uses it for all `npx skills` commands. `shell: true` on Windows.
 - **Agent scanning**: `AgentScanner` reads `shared/agents.json` and scans each agent's `globalPath` to discover installed skills. Renderer enriches data with agent associations via path matching.
+- **Path expansion**: `main/utils/path.ts` provides `expandTildePath()` for `~` → homedir resolution. Used by AgentScanner, SkillsService, LocalSkillInstaller, and shell IPC.
 - **Background tasks**: `BackgroundTaskService` manages long-running operations (update-skills, install-node, install-skills, skill-update, skill-update-all) with progress streaming via IPC.
 - **Multi-source install**: Three install paths—CLI (`SkillsService`), GitHub URL (`GitHubSkillInstaller` → download zipball → extract → `LocalSkillInstaller`), and local archive (`ArchiveSkillInstaller` → extract → `LocalSkillInstaller`). `LocalSkillInstaller` copies skill dirs into agent skill paths and handles cleanup.
 - **Multi-window**: `WindowManager` manages main window and settings modal. Window type passed via `?window=` query parameter.
@@ -70,4 +79,6 @@ src/
 
 ## Shared Types (shared/types.ts)
 
-Key interfaces: `EnvStatus`, `BackgroundTask`, `Skill`, `AgentScanResult`, `InstalledSkill`, `InstalledSkillAgent`, `CommandResult`, `CommandErrorInfo`, `AppSettings`, `SkillSearchResult`, `SkillSearchResponse`, `ScannedSkill`, `LocalInstallResult`, `ParsedGitHubUrl`, `GitHubParseResult`. Utility functions: `toPackageRef()`, `formatInstalls()`.
+Key interfaces: `EnvStatus`, `BackgroundTask`, `AgentScanResult`, `InstalledSkill`, `InstalledSkillAgent`, `CommandResult`, `AppSettings`, `SkillSearchResult`, `SkillSearchResponse`, `ScannedSkill`, `LocalInstallResult`, `ParsedGitHubUrl`, `GitHubParseResult`.
+
+Utility functions have been extracted to `shared/utils/format.ts` (`toPackageRef`, `formatInstalls`) and `shared/utils/error.ts` (`toIpcError`).
