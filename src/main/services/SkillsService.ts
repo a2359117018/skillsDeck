@@ -2,7 +2,7 @@ import type { CommandResult, SkillDoc } from '../../shared/types'
 import fs from 'fs'
 import path from 'path'
 import agentsData from '../../shared/agents.json'
-import { commandRunner } from './CommandRunner'
+import { commandRunner, type CommandHandle } from './CommandRunner'
 import { getSettings } from './StoreService'
 import { expandTildePath } from '../utils/path'
 
@@ -14,9 +14,17 @@ interface AgentDef {
 }
 
 class SkillsService {
+  private activeHandle: CommandHandle | null = null
+
   async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    return commandRunner.run('skills', args)
+    const handle = commandRunner.run('skills', args)
+    this.activeHandle = handle
+    try {
+      return await handle.promise
+    } finally {
+      this.activeHandle = null
+    }
   }
 
   async installStreaming(
@@ -26,23 +34,42 @@ class SkillsService {
     global?: boolean
   ): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    return commandRunner.run('skills', args, { onOutput })
+    const handle = commandRunner.run('skills', args, { onOutput })
+    this.activeHandle = handle
+    try {
+      return await handle.promise
+    } finally {
+      this.activeHandle = null
+    }
   }
 
   cancelInstall(): void {
-    commandRunner.cancel()
+    this.activeHandle?.cancel()
+    this.activeHandle = null
   }
 
   async update(name: string, global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', name, '-y')
     if (global) args.push('-g')
-    return commandRunner.run('skills', args)
+    const handle = commandRunner.run('skills', args)
+    this.activeHandle = handle
+    try {
+      return await handle.promise
+    } finally {
+      this.activeHandle = null
+    }
   }
 
   async updateAll(global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', '-y')
     if (global) args.push('-g')
-    return commandRunner.run('skills', args)
+    const handle = commandRunner.run('skills', args)
+    this.activeHandle = handle
+    try {
+      return await handle.promise
+    } finally {
+      this.activeHandle = null
+    }
   }
 
   /**

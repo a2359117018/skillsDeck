@@ -20,6 +20,14 @@ export interface RunOptions {
   onOutput?: (text: string) => void
 }
 
+/** 命令执行句柄，包含结果 Promise 和取消方法 */
+export interface CommandHandle {
+  /** Promise that resolves when the command completes */
+  readonly promise: Promise<CommandResult>
+  /** Cancel the running command */
+  cancel(): void
+}
+
 export class CommandError extends Error {
   constructor(
     public code: 'COMMAND_NOT_FOUND' | 'TIMEOUT' | 'EXECUTION_FAILED' | 'UNKNOWN',
@@ -43,9 +51,10 @@ export class CommandError extends Error {
 }
 
 class CommandRunner {
-  private activeProcess: ReturnType<typeof execa> | null = null
+  private processes = new Map<string, ReturnType<typeof execa>>()
+  private nextId = 1
 
-  async run(command: string, args: string[], opts?: RunOptions): Promise<CommandResult> {
+  run(command: string, args: string[], opts?: RunOptions): CommandHandle {
     const timeout = opts?.timeout ?? COMMAND_TIMEOUT_MS
     const cwd = opts?.cwd ?? os.homedir()
 
@@ -58,53 +67,44 @@ class CommandRunner {
     }
 
     const commandStr = `${command} ${args.join(' ')}`
-
-    try {
-      if (opts?.onOutput) {
-        return await this.runStreaming(command, args, execaOpts, commandStr, opts.onOutput)
-      }
-
-      const result = await execa(command, args, execaOpts)
-      return {
-        success: result.exitCode === 0,
-        stdout: stripAnsi(toString(result.stdout)),
-        stderr: stripAnsi(toString(result.stderr)),
-        exitCode: result.exitCode ?? null
-      }
-    } catch (error: unknown) {
-      throw this.mapError(error, commandStr)
-    }
-  }
-
-  private async runStreaming(
-    command: string,
-    args: string[],
-    execaOpts: Options,
-    commandStr: string,
-    onOutput: (text: string) => void
-  ): Promise<CommandResult> {
     const child = execa(command, args, execaOpts)
-    this.activeProcess = child
+    const id = String(this.nextId++)
+    this.processes.set(id, child)
 
-    child.stdout?.on('data', (data: Buffer) => {
-      onOutput(stripAnsi(data.toString()))
-    })
-    child.stderr?.on('data', (data: Buffer) => {
-      onOutput(stripAnsi(data.toString()))
-    })
+    const promise = (async (): Promise<CommandResult> => {
+      try {
+        if (opts?.onOutput) {
+          child.stdout?.on('data', (data: Buffer) => {
+            opts.onOutput!(stripAnsi(data.toString()))
+          })
+          child.stderr?.on('data', (data: Buffer) => {
+            opts.onOutput!(stripAnsi(data.toString()))
+          })
+        }
 
-    try {
-      const result = await child
-      return {
-        success: result.exitCode === 0,
-        stdout: stripAnsi(toString(result.stdout)),
-        stderr: stripAnsi(toString(result.stderr)),
-        exitCode: result.exitCode ?? null
+        const result = await child
+        return {
+          success: result.exitCode === 0,
+          stdout: stripAnsi(toString(result.stdout)),
+          stderr: stripAnsi(toString(result.stderr)),
+          exitCode: result.exitCode ?? null
+        }
+      } catch (error: unknown) {
+        throw this.mapError(error, commandStr)
+      } finally {
+        this.processes.delete(id)
       }
-    } catch (error: unknown) {
-      throw this.mapError(error, commandStr)
-    } finally {
-      this.activeProcess = null
+    })()
+
+    return {
+      promise,
+      cancel: () => {
+        const p = this.processes.get(id)
+        if (p) {
+          p.kill()
+          this.processes.delete(id)
+        }
+      }
     }
   }
 
@@ -117,13 +117,6 @@ class CommandRunner {
       return new CommandError('TIMEOUT', command, '', null)
     }
     return new CommandError('UNKNOWN', command, err.message || String(error), null)
-  }
-
-  cancel(): void {
-    if (this.activeProcess) {
-      this.activeProcess.kill()
-      this.activeProcess = null
-    }
   }
 }
 

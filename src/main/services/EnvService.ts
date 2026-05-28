@@ -22,7 +22,7 @@ async function safeRun(
   timeout: number
 ): Promise<{ success: boolean; stdout: string }> {
   try {
-    return await commandRunner.run(command, args, { timeout })
+    return await commandRunner.run(command, args, { timeout }).promise
   } catch {
     return { success: false, stdout: '' }
   }
@@ -124,7 +124,7 @@ export async function installSkillsCli(): Promise<{ success: boolean; stdout: st
     }
     const result = await commandRunner.run('npm', args, {
       timeout: 120000
-    })
+    }).promise
     return { success: result.success, stdout: result.stdout }
   } catch {
     return { success: false, stdout: '' }
