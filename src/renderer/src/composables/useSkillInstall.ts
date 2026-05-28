@@ -1,9 +1,7 @@
 import { ref, computed } from 'vue'
 import { useNotification } from 'naive-ui'
 import type { ScannedSkill, LocalInstallResult } from '../../../shared/types'
-import { getCommonAgents } from '../constants/agents'
-
-const commonAgentFlags = getCommonAgents().map((a) => a.agentFlag)
+import { useAgentSelection } from './useAgentSelection'
 
 /** 技能安装流程共享逻辑 composable */
 export function useSkillInstall(): {
@@ -20,17 +18,15 @@ export function useSkillInstall(): {
   cleanup: () => Promise<void>
   resetResult: () => void
 } {
+  const { selectedAgents, isGlobal, canProceed, reset: resetAgents } = useAgentSelection()
   const selectedSkills = ref<string[]>([])
-  const selectedAgents = ref<string[]>([])
-  const isGlobal = ref(false)
   const installing = ref(false)
   const installResult = ref<LocalInstallResult | null>(null)
   const tempDir = ref('')
 
   const canInstall = computed(() => {
     if (selectedSkills.value.length === 0) return false
-    if (isGlobal.value) return true
-    return selectedAgents.value.length > 0
+    return canProceed.value
   })
 
   const notification = useNotification()
@@ -38,8 +34,7 @@ export function useSkillInstall(): {
   /** 设置扫描到的技能列表，默认选中常用 agent */
   function setSkills(skills: ScannedSkill[]): void {
     selectedSkills.value = skills.map((s) => s.path)
-    selectedAgents.value = [...commonAgentFlags]
-    isGlobal.value = false
+    resetAgents()
     installing.value = false
     installResult.value = null
   }
@@ -108,8 +103,7 @@ export function useSkillInstall(): {
       }
       tempDir.value = ''
       selectedSkills.value = []
-      selectedAgents.value = []
-      isGlobal.value = false
+      resetAgents()
       installResult.value = null
     }
   }

@@ -14,10 +14,11 @@ import {
 import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import CheckmarkCircle from '@vicons/ionicons5/CheckmarkCircle'
 import CloseCircle from '@vicons/ionicons5/CloseCircle'
-import { AGENTS, getCommonAgents } from '../../constants/agents'
+import { AGENTS } from '../../constants/agents'
 import AgentSelector from './AgentSelector.vue'
 import { useSkillsStore } from '../../stores/skills'
 import { useNotify } from '../../composables/useNotify'
+import { useAgentSelection } from '../../composables/useAgentSelection'
 
 const props = defineProps<{ show: boolean; source: string }>()
 const emit = defineEmits<{
@@ -27,9 +28,9 @@ const emit = defineEmits<{
 const skillsStore = useSkillsStore()
 const notify = useNotify()
 
+const { selectedAgents, isGlobal, canProceed, reset: resetAgents } = useAgentSelection()
+
 const currentStep = ref(1)
-const isGlobal = ref(false)
-const selectedAgents = ref<string[]>([])
 const installing = ref(false)
 const installStatus = ref<'idle' | 'installing' | 'success' | 'failed' | 'cancelled'>('idle')
 const commandOutput = ref('')
@@ -55,24 +56,17 @@ function scrollTerminalToBottom(): void {
   }, 200)
 }
 
-const commonAgentFlags = getCommonAgents().map((a) => a.agentFlag)
-
 watch(
   () => props.show,
   (visible) => {
     if (visible) {
-      selectedAgents.value = [...commonAgentFlags]
+      resetAgents()
     }
   }
 )
 
-const canGoNext = computed(() => {
-  if (isGlobal.value) return true
-  return selectedAgents.value.length > 0
-})
-
 function goNext(): void {
-  if (!canGoNext.value) {
+  if (!canProceed.value) {
     notify.warning('请选择至少一个安装目标')
     return
   }
@@ -151,8 +145,7 @@ function handleRetry(): void {
 
 function resetState(): void {
   currentStep.value = 1
-  isGlobal.value = false
-  selectedAgents.value = [...commonAgentFlags]
+  resetAgents()
   installing.value = false
   installStatus.value = 'idle'
   commandOutput.value = ''
@@ -256,7 +249,7 @@ const failedLogLines = computed(() => {
           >
             上一步
           </NButton>
-          <NButton v-if="currentStep === 1" type="primary" :disabled="!canGoNext" @click="goNext">
+          <NButton v-if="currentStep === 1" type="primary" :disabled="!canProceed" @click="goNext">
             下一步
           </NButton>
           <NButton
