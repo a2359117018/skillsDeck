@@ -6,9 +6,30 @@ interface CacheState<T> {
   stale: boolean
 }
 
+/**
+ * useCachedResource 的配置选项。
+ */
+export interface UseCachedResourceOptions {
+  /** 缓存有效期（毫秒），未指定时缓存永不过期 */
+  ttl?: number
+}
+
+/**
+ * 带缓存的数据获取 composable。
+ *
+ * 封装 stale-while-revalidate 缓存语义：首次调用 ensure() 会触发数据获取，
+ * 后续调用在缓存有效时直接返回缓存数据。可通过 invalidate() 手动使缓存失效，
+ * 或通过 ttl 选项设置自动过期时间。
+ *
+ * @param fetcher - 数据获取函数
+ * @param initialValue - 初始值，在首次获取完成前使用
+ * @param options - 可选配置
+ * @returns 缓存状态、加载状态及操作方法
+ */
 export function useCachedResource<T>(
   fetcher: () => Promise<T>,
-  initialValue: T
+  initialValue: T,
+  options?: UseCachedResourceOptions
 ): {
   data: Ref<T>
   loading: Ref<boolean>
@@ -28,7 +49,13 @@ export function useCachedResource<T>(
 
   async function ensure(): Promise<T> {
     if (cache.value && !cache.value.stale) {
-      return cache.value.data
+      const isExpired =
+        options?.ttl !== undefined && Date.now() - cache.value.timestamp > options.ttl
+      if (!isExpired) {
+        return cache.value.data
+      }
+      /** TTL 过期，标记缓存为失效状态后再刷新 */
+      invalidate()
     }
     if (refreshing.value) {
       return data.value

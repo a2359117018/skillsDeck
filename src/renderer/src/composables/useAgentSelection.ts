@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import { getCommonAgents } from '../constants/agents'
 
 const commonAgentFlags = getCommonAgents().map((a) => a.agentFlag)
@@ -11,7 +11,12 @@ const commonAgentFlags = getCommonAgents().map((a) => a.agentFlag)
  * - 默认选中常用 Agent
  * - 是否可以继续安装的判断（全局或至少选一个 agent）
  */
-export function useAgentSelection() {
+export function useAgentSelection(): {
+  selectedAgents: Ref<string[]>
+  isGlobal: Ref<boolean>
+  canProceed: ComputedRef<boolean>
+  reset: () => void
+} {
   const selectedAgents = ref<string[]>([])
   const isGlobal = ref(false)
 
