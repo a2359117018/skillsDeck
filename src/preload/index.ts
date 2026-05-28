@@ -5,34 +5,52 @@ import type {
   GitHubParseResult,
   ArchiveScanResult,
   IpcResult,
-  SkillDoc
+  SkillDoc,
+  SkillSearchResponse,
+  InstalledSkill,
+  CommandResult,
+  AgentScanResult,
+  EnvStatus,
+  AppSettings,
+  BackgroundTask
 } from '../shared/types'
 
 const api = {
   /** 从拖拽的 File 对象获取本地文件路径（contextIsolation 兼容） */
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   skills: {
-    search: (keyword: string): Promise<unknown> => ipcRenderer.invoke('skills:search', keyword),
-    list: (): Promise<unknown[]> => ipcRenderer.invoke('skills:list'),
-    install: (opts: { source: string; agents: string[]; global?: boolean }): Promise<unknown> =>
-      ipcRenderer.invoke('skills:install', opts),
+    search: (keyword: string): Promise<IpcResult<SkillSearchResponse>> =>
+      ipcRenderer.invoke('skills:search', keyword) as Promise<IpcResult<SkillSearchResponse>>,
+    list: (): Promise<IpcResult<InstalledSkill[]>> =>
+      ipcRenderer.invoke('skills:list') as Promise<IpcResult<InstalledSkill[]>>,
+    install: (opts: {
+      source: string
+      agents: string[]
+      global?: boolean
+    }): Promise<IpcResult<CommandResult>> =>
+      ipcRenderer.invoke('skills:install', opts) as Promise<IpcResult<CommandResult>>,
     installStreaming: (opts: {
       source: string
       agents: string[]
       global?: boolean
-    }): Promise<unknown> => ipcRenderer.invoke('skills:install-streaming', opts),
+    }): Promise<IpcResult<CommandResult>> =>
+      ipcRenderer.invoke('skills:install-streaming', opts) as Promise<IpcResult<CommandResult>>,
     onInstallOutput: (callback: (text: string) => void): (() => void) => {
       const listener = (_event: Electron.IpcRendererEvent, text: string): void => callback(text)
       ipcRenderer.on('skills:install-output', listener)
       return () => ipcRenderer.removeListener('skills:install-output', listener)
     },
     cancelInstall: (): Promise<void> => ipcRenderer.invoke('skills:install-cancel'),
-    update: (opts: { packageRef: string; global?: boolean }): Promise<unknown> =>
-      ipcRenderer.invoke('skills:update', opts),
-    updateAll: (opts?: { global?: boolean }): Promise<unknown> =>
-      ipcRenderer.invoke('skills:update-all', opts),
-    remove: (opts: { packageRef: string; agent?: string; global?: boolean }): Promise<unknown> =>
-      ipcRenderer.invoke('skills:remove', opts),
+    update: (opts: { packageRef: string; global?: boolean }): Promise<IpcResult<CommandResult>> =>
+      ipcRenderer.invoke('skills:update', opts) as Promise<IpcResult<CommandResult>>,
+    updateAll: (opts?: { global?: boolean }): Promise<IpcResult<CommandResult>> =>
+      ipcRenderer.invoke('skills:update-all', opts) as Promise<IpcResult<CommandResult>>,
+    remove: (opts: {
+      packageRef: string
+      agent?: string
+      global?: boolean
+    }): Promise<IpcResult<CommandResult>> =>
+      ipcRenderer.invoke('skills:remove', opts) as Promise<IpcResult<CommandResult>>,
     updateBackground: (opts: {
       packageRef: string
       global?: boolean
@@ -69,16 +87,17 @@ const api = {
     }
   },
   agents: {
-    scanAll: (): Promise<unknown> => ipcRenderer.invoke('agent:scan-all'),
-    scanOne: (agentFlag: string): Promise<unknown> =>
-      ipcRenderer.invoke('agent:scan-one', agentFlag)
+    scanAll: (): Promise<IpcResult<AgentScanResult[]>> =>
+      ipcRenderer.invoke('agent:scan-all') as Promise<IpcResult<AgentScanResult[]>>,
+    scanOne: (agentFlag: string): Promise<IpcResult<AgentScanResult | null>> =>
+      ipcRenderer.invoke('agent:scan-one', agentFlag) as Promise<IpcResult<AgentScanResult | null>>
   },
   shell: {
     openPath: (path: string): Promise<{ success: boolean; error?: string }> =>
       ipcRenderer.invoke('shell:open-path', path)
   },
   env: {
-    check: (): Promise<unknown> => ipcRenderer.invoke('env:check'),
+    check: (): Promise<EnvStatus> => ipcRenderer.invoke('env:check') as Promise<EnvStatus>,
     installNode: (): Promise<{ success: boolean; error?: string }> =>
       ipcRenderer.invoke('env:install-node'),
     installSkills: (): Promise<{ success: boolean; error?: string; stdout?: string }> =>
@@ -92,7 +111,8 @@ const api = {
     }
   },
   store: {
-    getSettings: (): Promise<unknown> => ipcRenderer.invoke('store:get-settings'),
+    getSettings: (): Promise<AppSettings> =>
+      ipcRenderer.invoke('store:get-settings') as Promise<AppSettings>,
     setSettings: (partial: Record<string, unknown>): Promise<void> =>
       ipcRenderer.invoke('store:set-settings', partial)
   },
@@ -108,7 +128,8 @@ const api = {
     start: (opts: { type: string }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('tasks:start', opts),
     cancel: (taskId: string): Promise<void> => ipcRenderer.invoke('tasks:cancel', taskId),
-    getAll: (): Promise<unknown[]> => ipcRenderer.invoke('tasks:get-all'),
+    getAll: (): Promise<BackgroundTask[]> =>
+      ipcRenderer.invoke('tasks:get-all') as Promise<BackgroundTask[]>,
     retry: (opts: { taskId: string }): Promise<{ ok: boolean; error?: string }> =>
       ipcRenderer.invoke('tasks:retry', opts),
     retrySkillUpdate: (opts: { taskId: string }): Promise<{ ok: boolean; error?: string }> =>
@@ -129,10 +150,8 @@ const api = {
     check: (): Promise<void> => ipcRenderer.invoke('updater:check'),
     installUpdate: (): Promise<void> => ipcRenderer.invoke('updater:install-update'),
     onUpdateAvailable: (callback: (info: { version: string }) => void): (() => void) => {
-      const listener = (
-        _event: Electron.IpcRendererEvent,
-        info: { version: string }
-      ): void => callback(info)
+      const listener = (_event: Electron.IpcRendererEvent, info: { version: string }): void =>
+        callback(info)
       ipcRenderer.on('updater:update-available', listener)
       return () => ipcRenderer.removeListener('updater:update-available', listener)
     },

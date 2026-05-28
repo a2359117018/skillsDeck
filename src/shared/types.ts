@@ -59,14 +59,6 @@ export interface CommandResult {
   exitCode: number | null
 }
 
-export interface CommandErrorInfo {
-  code: 'COMMAND_NOT_FOUND' | 'TIMEOUT' | 'EXECUTION_FAILED' | 'UNKNOWN'
-  command: string
-  stderr: string
-  exitCode: number | null
-  message: string
-}
-
 export interface AppSettings {
   autoCheckEnv: boolean
   proxyUrl?: string
@@ -134,10 +126,17 @@ export interface ArchiveScanResult {
   tempDir: string
 }
 
-/** IPC 统一错误响应格式（轻量版，不含命令专用字段） */
+/** IPC 统一错误响应格式。
+ *
+ * 基础字段 `message` 为所有错误必需。
+ * CLI 扩展字段（code, command, stderr, exitCode）仅在命令执行错误时填充。
+ */
 export interface IpcError {
   message: string
   code?: string
+  command?: string
+  stderr?: string
+  exitCode?: number | null
 }
 
 /** IPC 统一结果格式 */

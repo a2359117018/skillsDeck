@@ -10,6 +10,7 @@ import { useSkillsStore } from '../stores/skills'
 import { useTaskStore } from '../stores/tasks'
 import { useConfirm } from '../composables/useConfirm'
 import { useNotify } from '../composables/useNotify'
+import { useBatchRemove } from '../composables/useBatchRemove'
 import AgentTagBar from '../components/skills/AgentTagBar.vue'
 import SkillRow from '../components/skills/SkillRow.vue'
 import SkillRemoveDialog from '../components/skills/SkillRemoveDialog.vue'
@@ -34,92 +35,14 @@ const detailModalState = ref<{
   skillName: string
 }>({ visible: false, skillName: '' })
 
-// Batch mode state
-const isBatchMode = ref(false)
-const selectedNames = ref<string[]>([])
-const pendingRemovalNames = ref<Set<string>>(new Set())
-
-const allSelected = computed(() => {
-  const skills = displayedSkills.value
-  return skills.length > 0 && skills.every((s) => selectedNames.value.includes(s.name))
+const batch = useBatchRemove(() => skillsStore.filteredSkills.map((s) => s.name), {
+  onSuccess: () => loadSkills(),
+  onError: () => loadSkills()
 })
-
-const someSelected = computed(() => {
-  return selectedNames.value.length > 0 && !allSelected.value
-})
-
-const selectedCount = computed(() => selectedNames.value.length)
 
 const displayedSkills = computed(() =>
-  skillsStore.filteredSkills.filter((s) => !pendingRemovalNames.value.has(s.name))
+  skillsStore.filteredSkills.filter((s) => !batch.pendingRemovalNames.value.has(s.name))
 )
-
-/** Enter batch management mode, clearing any previous selection. */
-function enterBatchMode(): void {
-  isBatchMode.value = true
-  selectedNames.value = []
-}
-
-/** Exit batch management mode and clear selection. */
-function exitBatchMode(): void {
-  isBatchMode.value = false
-  selectedNames.value = []
-}
-
-/** Toggle selection of all skills currently in the filtered view. */
-function toggleAll(): void {
-  const names = displayedSkills.value.map((s) => s.name)
-  if (allSelected.value) {
-    selectedNames.value = selectedNames.value.filter((n) => !names.includes(n))
-  } else {
-    selectedNames.value = Array.from(new Set([...selectedNames.value, ...names]))
-  }
-}
-
-/** Toggle selection of a single skill by name. */
-function toggleSkill(name: string): void {
-  const idx = selectedNames.value.indexOf(name)
-  if (idx >= 0) {
-    selectedNames.value = selectedNames.value.filter((n) => n !== name)
-  } else {
-    selectedNames.value = [...selectedNames.value, name]
-  }
-}
-
-/**
- * Remove all selected skills in batch via background task with optimistic deletion.
- */
-async function handleBatchRemove(): Promise<void> {
-  if (selectedNames.value.length === 0) return
-  const confirmed = await confirmRemoveBatch(selectedNames.value)
-  if (!confirmed) return
-
-  const names = [...selectedNames.value]
-
-  // 乐观删除：立即加入 pendingRemovalNames
-  pendingRemovalNames.value = new Set([...pendingRemovalNames.value, ...names])
-
-  taskStore
-    .start('skill-remove-batch', {
-      packageRefs: names,
-      onSuccess: () => {
-        pendingRemovalNames.value = new Set()
-        loadSkills()
-      },
-      onError: (err) => {
-        notify.error(err)
-        pendingRemovalNames.value = new Set()
-        loadSkills()
-      }
-    })
-    .catch((e) => {
-      notify.error(e instanceof Error ? e.message : '启动删除失败')
-      pendingRemovalNames.value = new Set()
-      loadSkills()
-    })
-
-  exitBatchMode()
-}
 
 async function loadSkills(): Promise<void> {
   await skillsStore.fetchInstalled()
@@ -238,8 +161,8 @@ function handleSearchInput(val: string): void {
 }
 
 function handleFilterAgent(agentFlag: string): void {
-  if (isBatchMode.value) {
-    exitBatchMode()
+  if (batch.isBatchMode.value) {
+    batch.exitBatchMode()
   }
   skillsStore.toggleAgent(agentFlag)
 }
@@ -254,7 +177,7 @@ function handleViewDetail(name: string): void {
     <div class="container">
       <!-- Toolbar -->
       <div class="toolbar">
-        <template v-if="!isBatchMode">
+        <template v-if="!batch.isBatchMode.value">
           <h1 class="toolbar-title">
             我的技能
             <span class="toolbar-badge">{{ displayedSkills.length }}</span>
@@ -300,7 +223,7 @@ function handleViewDetail(name: string): void {
               secondary
               size="small"
               :disabled="skillsStore.installedSkills.length === 0"
-              @click="enterBatchMode"
+              @click="batch.enterBatchMode"
             >
               批量管理
             </NButton>
@@ -310,27 +233,27 @@ function handleViewDetail(name: string): void {
           <h1 class="toolbar-title">批量管理</h1>
           <div class="batch-toolbar-middle">
             <NCheckbox
-              :checked="allSelected"
-              :indeterminate="someSelected"
-              @update:checked="toggleAll"
+              :checked="batch.allSelected.value"
+              :indeterminate="batch.someSelected.value"
+              @update:checked="batch.toggleAll"
             >
               全选
             </NCheckbox>
-            <span class="batch-count">已选 {{ selectedCount }} 个</span>
+            <span class="batch-count">已选 {{ batch.selectedCount.value }} 个</span>
           </div>
           <div class="toolbar-actions">
             <NButton
               type="error"
               size="small"
-              :disabled="selectedCount === 0"
-              @click="handleBatchRemove"
+              :disabled="batch.selectedCount.value === 0"
+              @click="batch.handleBatchRemove(confirmRemoveBatch)"
             >
               <template #icon>
                 <NIcon :size="16"><TrashOutline /></NIcon>
               </template>
               删除选中
             </NButton>
-            <NButton secondary size="small" @click="exitBatchMode">
+            <NButton secondary size="small" @click="batch.exitBatchMode">
               <template #icon>
                 <NIcon :size="16"><CloseOutline /></NIcon>
               </template>
@@ -353,14 +276,14 @@ function handleViewDetail(name: string): void {
             v-for="skill in displayedSkills"
             :key="skill.name"
             :skill="skill"
-            :batch-mode="isBatchMode"
-            :selected="selectedNames.includes(skill.name)"
+            :batch-mode="batch.isBatchMode.value"
+            :selected="batch.selectedNames.value.includes(skill.name)"
             @update="handleUpdate"
             @remove="handleRemove"
             @open-location="handleOpenLocation"
             @filter-agent="handleFilterAgent"
             @view-detail="handleViewDetail"
-            @toggle-select="toggleSkill"
+            @toggle-select="batch.toggleSkill"
           />
         </TransitionGroup>
       </div>

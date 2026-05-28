@@ -13,6 +13,7 @@ import { useSkillsStore } from '@renderer/stores/skills'
 import { useTaskStore } from '@renderer/stores/tasks'
 import { useConfirm } from '@renderer/composables/useConfirm'
 import { useNotify } from '@renderer/composables/useNotify'
+import { useBatchRemove } from '@renderer/composables/useBatchRemove'
 import EmptyState from '@renderer/components/common/EmptyState.vue'
 import type { AgentScanResult } from '../../../shared/types'
 
@@ -30,11 +31,6 @@ const selectedAgent = computed(
 const drawerVisible = ref(false)
 const removingSkill = ref<string | null>(null)
 
-// Batch mode state
-const isBatchMode = ref(false)
-const selectedSkillNames = ref<string[]>([])
-const pendingRemovalNames = ref<Set<string>>(new Set())
-
 /** 使用 @vueuse/core 的 useWindowSize 替代手动 resize 监听，避免未节流的事件风暴 */
 const { width: windowWidth } = useWindowSize()
 
@@ -50,19 +46,14 @@ const agentCount = computed(() => visibleAgentResults.value.length)
 
 const displayedAgentSkills = computed(() => {
   const skills = selectedAgent.value?.skills || []
-  return skills.filter((s) => !pendingRemovalNames.value.has(s))
+  return skills.filter((s) => !batch.pendingRemovalNames.value.has(s))
 })
 
-const allSelected = computed(() => {
-  const skills = displayedAgentSkills.value
-  return skills.length > 0 && skills.every((s) => selectedSkillNames.value.includes(s))
+const batch = useBatchRemove(() => selectedAgent.value?.skills || [], {
+  agentFlag: () => selectedAgent.value?.agentFlag,
+  onSuccess: () => skillsStore.fetchInstalled(),
+  onError: () => skillsStore.fetchInstalled()
 })
-
-const someSelected = computed(() => {
-  return selectedSkillNames.value.length > 0 && !allSelected.value
-})
-
-const selectedCount = computed(() => selectedSkillNames.value.length)
 
 function getAgentInitials(name: string): string {
   return name.slice(0, 2)
@@ -81,41 +72,8 @@ function openAgentCard(agent: AgentScanResult): void {
 function closeDrawer(): void {
   drawerVisible.value = false
   selectedAgentFlag.value = null
-  pendingRemovalNames.value = new Set()
-  exitBatchMode()
-}
-
-/** Enter batch mode and clear any previous selection. */
-function enterBatchMode(): void {
-  isBatchMode.value = true
-  selectedSkillNames.value = []
-}
-
-/** Exit batch mode and clear selection. */
-function exitBatchMode(): void {
-  isBatchMode.value = false
-  selectedSkillNames.value = []
-}
-
-/** Toggle selection of all skills in the current agent. */
-function toggleAll(): void {
-  const skills = displayedAgentSkills.value
-  const names = skills
-  if (allSelected.value) {
-    selectedSkillNames.value = selectedSkillNames.value.filter((n) => !names.includes(n))
-  } else {
-    selectedSkillNames.value = Array.from(new Set([...selectedSkillNames.value, ...names]))
-  }
-}
-
-/** Toggle selection of a single skill by name. */
-function toggleSkill(name: string): void {
-  const idx = selectedSkillNames.value.indexOf(name)
-  if (idx >= 0) {
-    selectedSkillNames.value = selectedSkillNames.value.filter((n) => n !== name)
-  } else {
-    selectedSkillNames.value = [...selectedSkillNames.value, name]
-  }
+  batch.pendingRemovalNames.value = new Set()
+  batch.exitBatchMode()
 }
 
 function openAgentFolder(agent: AgentScanResult, e?: Event): void {
@@ -141,44 +99,6 @@ async function handleUpdate(name: string): Promise<void> {
     .catch((e) => {
       notify.info(e instanceof Error ? e.message : '启动更新失败')
     })
-}
-
-/**
- * Remove all selected skills in the current agent in batch.
- * Uses optimistic deletion with a background task.
- */
-async function handleBatchRemove(): Promise<void> {
-  if (selectedSkillNames.value.length === 0) return
-  const confirmed = await confirmRemoveBatch(selectedSkillNames.value)
-  if (!confirmed) return
-
-  const names = [...selectedSkillNames.value]
-  const agentFlag = selectedAgent.value?.agentFlag
-
-  // 乐观删除：立即加入 pendingRemovalNames
-  pendingRemovalNames.value = new Set([...pendingRemovalNames.value, ...names])
-
-  taskStore
-    .start('skill-remove-batch', {
-      packageRefs: names,
-      agentFlag,
-      onSuccess: () => {
-        pendingRemovalNames.value = new Set()
-        skillsStore.fetchInstalled()
-      },
-      onError: (err) => {
-        notify.error(err)
-        pendingRemovalNames.value = new Set()
-        skillsStore.fetchInstalled()
-      }
-    })
-    .catch((e) => {
-      notify.error(e instanceof Error ? e.message : '启动删除失败')
-      pendingRemovalNames.value = new Set()
-      skillsStore.fetchInstalled()
-    })
-
-  exitBatchMode()
 }
 
 async function handleRemove(name: string): Promise<void> {
@@ -316,7 +236,7 @@ onMounted(() => {
     >
       <div v-if="selectedAgent" class="drawer-wrapper">
         <div class="drawer-header">
-          <template v-if="!isBatchMode">
+          <template v-if="!batch.isBatchMode.value">
             <div class="header-left">
               <div class="header-avatar">{{ getAgentInitials(selectedAgent.agentName) }}</div>
               <div class="header-info">
@@ -341,7 +261,7 @@ onMounted(() => {
                 </template>
                 打开文件夹
               </NTooltip>
-              <NButton secondary size="small" class="batch-entry-btn" @click="enterBatchMode">
+              <NButton secondary size="small" class="batch-entry-btn" @click="batch.enterBatchMode">
                 批量管理
               </NButton>
               <NTooltip>
@@ -365,28 +285,28 @@ onMounted(() => {
           <template v-else>
             <div class="batch-toolbar-left">
               <NCheckbox
-                :checked="allSelected"
-                :indeterminate="someSelected"
+                :checked="batch.allSelected.value"
+                :indeterminate="batch.someSelected.value"
                 aria-label="全选当前 Agent 下的所有技能"
-                @update:checked="toggleAll"
+                @update:checked="batch.toggleAll"
               >
                 全选
               </NCheckbox>
-              <span class="batch-count">已选 {{ selectedCount }} 个</span>
+              <span class="batch-count">已选 {{ batch.selectedCount.value }} 个</span>
             </div>
             <div class="header-actions">
               <NButton
                 type="error"
                 size="small"
-                :disabled="selectedCount === 0"
-                @click="handleBatchRemove"
+                :disabled="batch.selectedCount.value === 0"
+                @click="batch.handleBatchRemove(confirmRemoveBatch)"
               >
                 <template #icon>
                   <NIcon :size="16"><TrashOutline /></NIcon>
                 </template>
                 删除
               </NButton>
-              <NButton secondary size="small" @click="exitBatchMode">
+              <NButton secondary size="small" @click="batch.exitBatchMode">
                 <template #icon>
                   <NIcon :size="16"><CloseOutline /></NIcon>
                 </template>
@@ -401,27 +321,28 @@ onMounted(() => {
             :key="selectedAgent.agentFlag + '-' + skillName"
             class="skill-card"
             :class="{
-              'skill-card--selected': isBatchMode && selectedSkillNames.includes(skillName)
+              'skill-card--selected':
+                batch.isBatchMode.value && batch.selectedNames.value.includes(skillName)
             }"
             @click="
               (e) => {
-                if (!isBatchMode) return
+                if (!batch.isBatchMode.value) return
                 if ((e.target as HTMLElement).closest('.skill-checkbox')) return
-                toggleSkill(skillName)
+                batch.toggleSkill(skillName)
               }
             "
           >
             <div class="skill-left">
-              <div v-if="isBatchMode" class="skill-checkbox">
+              <div v-if="batch.isBatchMode.value" class="skill-checkbox">
                 <NCheckbox
-                  :checked="selectedSkillNames.includes(skillName)"
+                  :checked="batch.selectedNames.value.includes(skillName)"
                   aria-label="选择技能"
-                  @update:checked="toggleSkill(skillName)"
+                  @update:checked="batch.toggleSkill(skillName)"
                 />
               </div>
               <div class="skill-name">{{ skillName }}</div>
             </div>
-            <div v-if="!isBatchMode" class="skill-actions">
+            <div v-if="!batch.isBatchMode.value" class="skill-actions">
               <NTooltip>
                 <template #trigger>
                   <NButton

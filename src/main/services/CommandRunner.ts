@@ -31,13 +31,13 @@ export class CommandError extends Error {
     this.name = 'CommandError'
   }
 
-  toJSON(): import('../../shared/types').CommandErrorInfo {
+  toJSON(): import('../../shared/types').IpcError {
     return {
+      message: this.message,
       code: this.code,
       command: this.command,
       stderr: this.stderr,
-      exitCode: this.exitCode,
-      message: this.message
+      exitCode: this.exitCode
     }
   }
 }

@@ -22,22 +22,28 @@ function unwrapResult<T>(
   throw new Error(result.error.message)
 }
 
-export const useSkillsStore = defineStore('skills', () => {
+/**
+ * 管理技能数据获取与操作的 Store。
+ *
+ * 职责：
+ * - 已安装技能列表的获取与缓存 (`installedSkills`)
+ * - 搜索结果 (`searchResults`)
+ * - Agent 扫描结果 (`sortedAgentResults`)
+ * - 安装、删除、更新等操作
+ *
+ * 不包含 UI 过滤状态（如搜索关键词、Agent 筛选），这些由 useSkillsFilterStore 管理。
+ */
+export const useSkillsDataStore = defineStore('skillsData', () => {
   const installedCache = useCachedResource<InstalledSkill[]>(
     async () => unwrapResult(await window.api.skills.list()),
     []
   )
 
-  const selectedAgents = ref<string[]>([])
-  const searchKeyword = ref('')
   const _searchResults = ref<SkillSearchResult[]>([])
   const installing = ref(false)
   const removing = ref(false)
   const searching = ref(false)
   const error = ref<string | null>(null)
-
-  /** Flag to trigger search input focus from global keyboard shortcuts */
-  const focusSearchTrigger = ref(0)
 
   const agentScanCache = useCachedResource<AgentScanResult[]>(
     async () => unwrapResult(await window.api.agents.scanAll()),
@@ -53,22 +59,6 @@ export const useSkillsStore = defineStore('skills', () => {
     () => installedCache.refreshing.value || agentScanCache.refreshing.value
   )
 
-  const filteredSkills = computed(() => {
-    let skills = installedCache.data.value
-
-    if (selectedAgents.value.length > 0) {
-      const lowered = selectedAgents.value.map((a) => a.toLowerCase())
-      skills = skills.filter((s) => s.agents.some((a) => lowered.includes(a.name.toLowerCase())))
-    }
-
-    if (searchKeyword.value) {
-      const kw = searchKeyword.value.toLowerCase()
-      skills = skills.filter((s) => s.name.toLowerCase().includes(kw))
-    }
-
-    return skills
-  })
-
   const sortedAgentResults = computed(() =>
     [...(agentScanCache.data.value || [])].sort((a, b) => b.count - a.count)
   )
@@ -77,30 +67,6 @@ export const useSkillsStore = defineStore('skills', () => {
 
   function clearError(): void {
     error.value = null
-  }
-
-  function setSearchKeyword(keyword: string): void {
-    searchKeyword.value = keyword
-  }
-
-  function toggleAgent(agentFlag: string): void {
-    const idx = selectedAgents.value.indexOf(agentFlag)
-    if (idx >= 0) {
-      selectedAgents.value = selectedAgents.value.filter((a) => a !== agentFlag)
-    } else {
-      selectedAgents.value = [...selectedAgents.value, agentFlag]
-    }
-  }
-
-  function clearAgentFilter(): void {
-    selectedAgents.value = []
-  }
-
-  /**
-   * Trigger search input focus. Incrementing counter allows watchers to react.
-   */
-  function triggerFocusSearch(): void {
-    focusSearchTrigger.value++
   }
 
   async function search(keyword: string): Promise<void> {
@@ -195,9 +161,6 @@ export const useSkillsStore = defineStore('skills', () => {
   return {
     searchResults,
     installedSkills,
-    selectedAgents,
-    filteredSkills,
-    sortedAgentResults,
     fetching,
     searching,
     installing,
@@ -205,18 +168,76 @@ export const useSkillsStore = defineStore('skills', () => {
     loading,
     refreshing,
     error,
-    searchKeyword,
-    focusSearchTrigger,
-    clearError,
-    setSearchKeyword,
-    toggleAgent,
-    clearAgentFilter,
-    triggerFocusSearch,
     search,
     fetchInstalled,
     install,
     installStreaming,
     remove,
-    openLocation
+    openLocation,
+    sortedAgentResults,
+    clearError
+  }
+})
+
+// ---- 向后兼容：保留组合式 useSkillsStore ----
+
+import { useSkillsFilterStore } from './skillsFilter'
+
+/**
+ * 组合式 Store，同时暴露数据操作和过滤状态。
+ *
+ * 向后兼容：现有代码可直接继续使用 useSkillsStore。
+ * 新代码建议按需使用 useSkillsDataStore 或 useSkillsFilterStore。
+ */
+export const useSkillsStore = defineStore('skills', () => {
+  const data = useSkillsDataStore()
+  const filter = useSkillsFilterStore()
+
+  return {
+    // 数据状态
+    searchResults: computed(() => data.searchResults),
+    installedSkills: computed(() => data.installedSkills),
+    fetching: computed(() => data.fetching),
+    searching: computed(() => data.searching),
+    installing: computed(() => data.installing),
+    removing: computed(() => data.removing),
+    loading: computed(() => data.loading),
+    refreshing: computed(() => data.refreshing),
+    error: computed(() => data.error),
+    sortedAgentResults: computed(() => data.sortedAgentResults),
+
+    // 过滤状态
+    selectedAgents: computed({
+      get: () => filter.selectedAgents,
+      set: (val) => {
+        filter.selectedAgents = val
+      }
+    }),
+    searchKeyword: computed({
+      get: () => filter.searchKeyword,
+      set: (val) => {
+        filter.searchKeyword = val
+      }
+    }),
+    focusSearchTrigger: computed({
+      get: () => filter.focusSearchTrigger,
+      set: (val) => {
+        filter.focusSearchTrigger = val
+      }
+    }),
+    filteredSkills: computed(() => filter.filteredSkills),
+
+    // 操作方法
+    search: data.search,
+    fetchInstalled: data.fetchInstalled,
+    install: data.install,
+    installStreaming: data.installStreaming,
+    remove: data.remove,
+    openLocation: data.openLocation,
+    clearError: data.clearError,
+    setSearchKeyword: filter.setSearchKeyword,
+    toggleAgent: filter.toggleAgent,
+    clearAgentFilter: filter.clearAgentFilter,
+    triggerFocusSearch: filter.triggerFocusSearch
   }
 })
