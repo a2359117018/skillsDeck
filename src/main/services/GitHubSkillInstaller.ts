@@ -6,8 +6,10 @@ import type { ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
 import { getSettings } from './StoreService'
 import { localSkillInstaller } from './LocalSkillInstaller'
 import { downloadWithProgress } from '../utils/download'
+import type { IExtractableSkillInstaller } from './ISkillSourceInstaller'
 
-export class GitHubSkillInstaller {
+export class GitHubSkillInstaller implements IExtractableSkillInstaller {
+  readonly name = 'github'
   private abortController: AbortController | null = null
 
   parseUrl(url: string): ParsedGitHubUrl | null {
@@ -222,7 +224,7 @@ export class GitHubSkillInstaller {
     }
   }
 
-  cancelDownload(): void {
+  cancel(): void {
     this.abortController?.abort()
   }
 }

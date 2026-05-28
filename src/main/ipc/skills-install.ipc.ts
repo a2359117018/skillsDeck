@@ -158,7 +158,7 @@ export function registerSkillsInstallIpc(getMainWindow: () => Electron.BrowserWi
   )
 
   ipcMain.handle('skills:cancel-github-download', () => {
-    githubSkillInstaller.cancelDownload()
+    githubSkillInstaller.cancel()
   })
 
   ipcMain.handle('skills:cleanup-temp', async (_, tempDirs: string[]) => {

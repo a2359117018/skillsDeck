@@ -3,6 +3,7 @@ import path from 'path'
 import type { ScannedSkill, LocalInstallResult } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
 import { expandTildePath } from '../utils/path'
+import type { ILocalSkillInstaller } from './ISkillSourceInstaller'
 
 interface AgentDef {
   name: string
@@ -12,7 +13,8 @@ interface AgentDef {
 
 const agents: AgentDef[] = agentsData as AgentDef[]
 
-export class LocalSkillInstaller {
+export class LocalSkillInstaller implements ILocalSkillInstaller {
+  readonly name = 'local'
 
   async scanSkills(dir: string, maxDepth = 2): Promise<ScannedSkill[]> {
     const results: ScannedSkill[] = []

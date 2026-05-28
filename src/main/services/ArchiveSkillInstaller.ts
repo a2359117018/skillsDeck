@@ -5,10 +5,12 @@ import decompress from 'decompress'
 import type { ArchiveScanResult } from '../../shared/types'
 import { localSkillInstaller } from './LocalSkillInstaller'
 import { isPathInside } from '../utils/pathSecurity'
+import type { IExtractableSkillInstaller } from './ISkillSourceInstaller'
 
 const SUPPORTED_EXTENSIONS = ['.zip', '.tar.gz', '.tgz']
 
-export class ArchiveSkillInstaller {
+export class ArchiveSkillInstaller implements IExtractableSkillInstaller {
+  readonly name = 'archive'
   private getExtension(filePath: string): string {
     if (filePath.endsWith('.tar.gz')) return '.tar.gz'
     if (filePath.endsWith('.tgz')) return '.tgz'
@@ -25,6 +27,10 @@ export class ArchiveSkillInstaller {
       }
     }
     return { valid: true }
+  }
+
+  cancel(): void {
+    // Archive extraction is synchronous; no-op
   }
 
   async extractAndScan(filePath: string): Promise<ArchiveScanResult> {
