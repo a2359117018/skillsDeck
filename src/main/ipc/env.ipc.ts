@@ -8,7 +8,7 @@ import {
 } from '../services/EnvService'
 import { setEnvStatus } from '../services/StoreService'
 import { createSettingsWindow } from '../services/WindowManager'
-import { toIpcError } from '../../shared/types'
+import { toIpcError } from '../../shared/utils/error'
 
 export function registerEnvIpc(): void {
   ipcMain.handle('env:check', async () => {

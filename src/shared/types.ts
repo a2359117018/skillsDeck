@@ -25,15 +25,6 @@ export interface BackgroundTask {
   updatedAt: number
 }
 
-export interface Skill {
-  name: string
-  version: string
-  source: string
-  path: string
-  scope: 'global' | 'project'
-  agents: string[]
-}
-
 export interface AgentScanResult {
   agentFlag: string
   agentName: string
@@ -82,19 +73,8 @@ export interface SkillSearchResponse {
   duration_ms: number
 }
 
-export function toPackageRef(id: string): string {
-  const lastSlash = id.lastIndexOf('/')
-  return id.substring(0, lastSlash) + '@' + id.substring(lastSlash + 1)
-}
-
 export interface SkillDoc {
   content: string
-}
-
-export function formatInstalls(n: number): string {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
-  return String(n)
 }
 
 export interface ScannedSkill {
@@ -141,12 +121,3 @@ export interface IpcError {
 
 /** IPC 统一结果格式 */
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: IpcError }
-
-/** 将任意错误转换为 IpcError */
-export function toIpcError(e: unknown): IpcError {
-  if (e instanceof Error && 'code' in e) {
-    const cmdErr = e as { code: string; message: string }
-    return { message: cmdErr.message, code: cmdErr.code }
-  }
-  return { message: e instanceof Error ? e.message : String(e) }
-}

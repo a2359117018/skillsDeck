@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import { agentScanner } from '../services/AgentScanner'
-import { toIpcError } from '../../shared/types'
+import { toIpcError } from '../../shared/utils/error'
 
 export function registerAgentsIpc(): void {
   ipcMain.handle('agent:scan-all', async () => {

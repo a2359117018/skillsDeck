@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { backgroundTaskService } from '../services/BackgroundTaskService'
 import type { BackgroundTask } from '../../shared/types'
-import { toIpcError } from '../../shared/types'
+import { toIpcError } from '../../shared/utils/error'
 
 export function registerTasksIpc(getMainWindow: () => Electron.BrowserWindow | null): void {
   backgroundTaskService.on('update', (task: BackgroundTask) => {

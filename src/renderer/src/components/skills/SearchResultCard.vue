@@ -2,7 +2,7 @@
 import { NButton, NIcon, NText } from 'naive-ui'
 import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import type { SkillSearchResult } from '../../../../shared/types'
-import { toPackageRef, formatInstalls } from '../../../../shared/types'
+import { toPackageRef, formatInstalls } from '../../../../shared/utils/format'
 
 const props = defineProps<{ result: SkillSearchResult }>()
 const emit = defineEmits<{ install: [source: string] }>()
