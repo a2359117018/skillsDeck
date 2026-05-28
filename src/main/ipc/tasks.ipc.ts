@@ -3,7 +3,13 @@ import { backgroundTaskService } from '../services/BackgroundTaskService'
 import type { BackgroundTask } from '../../shared/types'
 import { toIpcError } from '../../shared/types'
 
-export function registerTasksIpc(): void {
+export function registerTasksIpc(getMainWindow: () => Electron.BrowserWindow | null): void {
+  backgroundTaskService.on('update', (task: BackgroundTask) => {
+    const win = getMainWindow()
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('tasks:update', task)
+    }
+  })
   ipcMain.handle('tasks:start', async (_, { type }: { type: BackgroundTask['type'] }) => {
     try {
       const taskId = await backgroundTaskService.startBuiltin(type)
@@ -24,7 +30,17 @@ export function registerTasksIpc(): void {
 
   ipcMain.handle('tasks:retry', async (_, { taskId }: { taskId: string }) => {
     const task = backgroundTaskService.getStatus(taskId)
-    if (task && !['update-skills', 'install-node', 'install-skills', 'skill-update', 'skill-update-all', 'skill-remove-batch'].includes(task.type)) {
+    if (
+      task &&
+      ![
+        'update-skills',
+        'install-node',
+        'install-skills',
+        'skill-update',
+        'skill-update-all',
+        'skill-remove-batch'
+      ].includes(task.type)
+    ) {
       return { ok: false, error: '该任务类型不支持重试' }
     }
     try {

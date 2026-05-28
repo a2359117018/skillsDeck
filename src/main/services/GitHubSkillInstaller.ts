@@ -5,6 +5,7 @@ import * as yauzl from 'yauzl'
 import type { ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
 import { getSettings } from './StoreService'
 import { localSkillInstaller } from './LocalSkillInstaller'
+import { downloadWithProgress } from '../utils/download'
 
 export class GitHubSkillInstaller {
   private abortController: AbortController | null = null
@@ -62,56 +63,18 @@ export class GitHubSkillInstaller {
     const zipPath = path.join(tempDir, 'download.zip')
 
     this.abortController = new AbortController()
-    const timeout = setTimeout(() => {
-      this.abortController?.abort()
-    }, 30000)
 
     try {
-      const response = await fetch(zipUrl, {
+      const result = await downloadWithProgress(zipUrl, zipPath, {
+        onProgress,
         signal: this.abortController.signal,
-        headers: { Accept: 'application/zip' }
+        timeout: 30000
       })
-
-      if (!response.ok) {
-        throw new Error(`下载失败: ${response.status} ${response.statusText}`)
-      }
-
-      const totalLength = Number(response.headers.get('content-length')) || 0
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('无法读取响应体')
-      }
-
-      const chunks: Uint8Array[] = []
-      let receivedLength = 0
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        chunks.push(value)
-        receivedLength += value.length
-        if (totalLength > 0 && onProgress) {
-          onProgress(Math.round((receivedLength / totalLength) * 100))
-        }
-      }
-
-      const allChunks = new Uint8Array(receivedLength)
-      let position = 0
-      for (const chunk of chunks) {
-        allChunks.set(chunk, position)
-        position += chunk.length
-      }
-
-      await fs.promises.writeFile(zipPath, allChunks)
-      return zipPath
+      return result
     } catch (e) {
       await localSkillInstaller.cleanupTempDir(tempDir)
-      if (e instanceof Error && e.name === 'AbortError') {
-        throw new Error('下载已取消或超时')
-      }
       throw e
     } finally {
-      clearTimeout(timeout)
       this.abortController = null
     }
   }

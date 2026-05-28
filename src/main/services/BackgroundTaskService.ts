@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto'
+import { EventEmitter } from 'events'
 import { execa } from 'execa'
 import type { BackgroundTask } from '../../shared/types'
 import type { Subprocess } from 'execa'
-import { getMainWindow } from './WindowManager'
 import { getSettings } from './StoreService'
 import { BACKGROUND_TASK_TIMEOUT_MS, TASK_HISTORY_LIMIT } from '../../shared/constants'
 
@@ -14,7 +14,7 @@ export interface TaskExecutor {
   execute(taskId: string, payload: unknown): Promise<void>
 }
 
-class BackgroundTaskService {
+class BackgroundTaskService extends EventEmitter {
   private tasks = new Map<string, BackgroundTask>()
   private processes = new Map<string, Subprocess>()
   private executors = new Map<string, TaskExecutor>()
@@ -295,10 +295,7 @@ class BackgroundTaskService {
   }
 
   private emitUpdate(task: BackgroundTask): void {
-    const win = getMainWindow()
-    if (win && !win.isDestroyed()) {
-      win.webContents.send('tasks:update', task)
-    }
+    this.emit('update', task)
   }
 }
 

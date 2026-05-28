@@ -51,6 +51,6 @@ export function registerIpcHandlers(): void {
   registerStoreIpc()
   registerShellIpc()
   registerAgentsIpc()
-  registerTasksIpc()
+  registerTasksIpc(getMainWindow)
   registerUpdaterIpc()
 }

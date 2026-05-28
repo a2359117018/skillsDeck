@@ -7,7 +7,12 @@ import { createMainWindow, getMainWindow } from './services/WindowManager'
 import { checkAll } from './services/EnvService'
 import { registerIpcHandlers } from './ipc'
 import { registerSkillTaskExecutors } from './services/SkillTaskExecutors'
-import { getSettings, setSettings, setEnvStatus, migrateProxySettings } from './services/StoreService'
+import {
+  getSettings,
+  setSettings,
+  setEnvStatus,
+  migrateProxySettings
+} from './services/StoreService'
 import { createTray, destroyTray } from './services/TrayService'
 import { initAutoUpdater } from './services/UpdateService'
 
@@ -51,20 +56,17 @@ app.whenReady().then(() => {
   registerIpcHandlers()
   registerSkillTaskExecutors()
 
-  ipcMain.handle(
-    'close:action',
-    (_, opts: { action: 'tray' | 'quit'; remember: boolean }) => {
-      if (opts.remember) {
-        setSettings({ closeAction: opts.action })
-      }
-      const win = getMainWindow()
-      if (opts.action === 'tray') {
-        win?.hide()
-      } else {
-        win?.destroy()
-      }
+  ipcMain.handle('close:action', (_, opts: { action: 'tray' | 'quit'; remember: boolean }) => {
+    if (opts.remember) {
+      setSettings({ closeAction: opts.action })
     }
-  )
+    const win = getMainWindow()
+    if (opts.action === 'tray') {
+      win?.hide()
+    } else {
+      win?.destroy()
+    }
+  })
 
   createMainWindow()
 

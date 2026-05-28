@@ -1,10 +1,11 @@
 import { app } from 'electron'
-import { createWriteStream, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync } from 'fs'
 import { join } from 'path'
 import decompress from 'decompress'
 import type { EnvStatus } from '../../shared/types'
 import { commandRunner } from './CommandRunner'
 import { getSettings } from './StoreService'
+import { downloadWithProgress } from '../utils/download'
 
 let downloadAbortController: AbortController | null = null
 
@@ -83,45 +84,14 @@ export async function downloadNode(onProgress: (percent: number) => void): Promi
   const archivePath = join(installDir, fileName)
 
   try {
-    const response = await fetch(url, { signal: downloadAbortController.signal })
-    if (!response.ok) throw new Error(`Download failed: ${response.statusText}`)
-    const contentLength = Number(response.headers.get('content-length') || 0)
-    let downloaded = 0
-
-    const stream = createWriteStream(archivePath)
-    const reader = response.body?.getReader()
-    if (!reader) throw new Error('No response body')
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      if (value) {
-        const canContinue = stream.write(value)
-        downloaded += value.length
-        if (contentLength > 0) {
-          onProgress(Math.round((downloaded / contentLength) * 100))
-        }
-        if (!canContinue) {
-          await new Promise<void>((resolve) => stream.once('drain', resolve))
-        }
-      }
-    }
-    stream.end()
+    const result = await downloadWithProgress(url, archivePath, {
+      onProgress,
+      signal: downloadAbortController.signal
+    })
     downloadAbortController = null
-
-    return archivePath
+    return result
   } catch (error) {
     downloadAbortController = null
-    if (existsSync(archivePath)) {
-      try {
-        unlinkSync(archivePath)
-      } catch {
-        // Ignore cleanup errors
-      }
-    }
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('下载已取消')
-    }
     throw error
   }
 }
