@@ -1,12 +1,18 @@
 # NaiveUI Theme Overrides Reference
 
-This document is the complete reference for the `themeOverrides` object defined in `src/renderer/src/App.vue`. It maps every NaiveUI component override to the design token system in `src/renderer/src/assets/tokens.css`.
+## Source of Truth
 
-**Important:** NaiveUI's `themeOverrides` API requires JS string literals, not CSS `var()`. The values below are hardcoded hex strings that mirror the token system. When tokens change, both `tokens.css` and `App.vue` must be updated together.
+The actual `themeOverrides` object is defined in `src/renderer/src/theme/naiveui-overrides.ts`.
+This document is a reference guide. When making changes, update the TypeScript file first,
+then update this document to match.
+
+This document maps every NaiveUI component override to the design token system in `src/renderer/src/assets/tokens.css`.
+
+**Important:** NaiveUI's `themeOverrides` API requires JS string literals, not CSS `var()`. The values below are hardcoded hex strings that mirror the token system. When tokens change, both `tokens.css` and `naiveui-overrides.ts` must be updated together.
 
 ## Maintenance Rules
 
-1. **Synchronize with tokens.css.** When a token value changes in `tokens.css`, update the corresponding `themeOverrides` entry in `App.vue` and this document.
+1. **Synchronize with tokens.css.** When a token value changes in `tokens.css`, update the corresponding `themeOverrides` entry in `naiveui-overrides.ts` and this document.
 2. **Add new components here.** When introducing a new NaiveUI component, check if its default colors conflict with the design system. If so, add an override to `App.vue` and document it here.
 3. **No `#000000` or `#ffffff`.** Use `--color-primary` (#0a0a0a) and `--color-canvas` (#ffffff) equivalents. The exceptions are `checkMarkColor` and `buttonColor` where NaiveUI requires pure white for contrast.
 4. **All semantic colors must be explicit.** Do not rely on NaiveUI defaults for info/success/warning/error. Each must have a mapped override.

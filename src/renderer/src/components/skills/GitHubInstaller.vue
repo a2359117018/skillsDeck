@@ -4,6 +4,7 @@ import { NInput, NButton, NText, NProgress, useNotification } from 'naive-ui'
 import type { GitHubParseResult, ParsedGitHubUrl } from '../../../../shared/types'
 import SkillScanResult from './SkillScanResult.vue'
 import AgentSelector from './AgentSelector.vue'
+import LocalInstallerLayout from './LocalInstallerLayout.vue'
 import { useSkillInstall } from '@renderer/composables/useSkillInstall'
 
 const emit = defineEmits<{
@@ -115,159 +116,87 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="github-installer">
-    <div class="github-columns">
-      <!-- Left column -->
-      <div class="column-left">
-        <!-- GitHub input card -->
-        <div class="input-card">
-          <div class="input-card-header">
-            <!-- 装饰性 GitHub 图标，对屏幕阅读器隐藏 -->
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="var(--color-ink)"
-              class="github-icon"
-              aria-hidden="true"
-            >
-              <path
-                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-              />
-            </svg>
-            <NText class="input-card-title">从 GitHub 安装技能</NText>
-          </div>
-          <div class="input-row">
-            <NInput
-              v-model:value="url"
-              placeholder="https://github.com/owner/repo"
-              clearable
-              :disabled="parsing || isParsed"
-              @keyup.enter="handleParse"
-            />
-            <NButton
-              v-if="!isParsed"
-              type="primary"
-              round
-              :disabled="parsing || !url.trim()"
-              @click="handleParse"
-            >
-              分析仓库
-            </NButton>
-            <NButton v-else round @click="handleReparse"> 重新分析 </NButton>
-          </div>
-          <!-- Inline download progress -->
-          <div v-if="parsing" class="inline-progress">
-            <NProgress
-              type="line"
-              :percentage="downloadProgress"
-              :show-indicator="true"
-              :height="6"
-              status="default"
-            />
-            <div class="inline-progress-footer">
-              <NText depth="3" class="inline-progress-hint">
-                {{ downloadProgress < 100 ? '正在下载...' : '正在扫描技能...' }}
-              </NText>
-              <NButton size="tiny" round @click="handleCancel">取消</NButton>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 1 -->
-        <div class="step-header">
-          <span class="step-number">1</span>
-          <h3 class="step-title">选择技能</h3>
-          <span v-if="skills.length > 0" class="step-count">
-            {{ selectedSkills.length }} / {{ skills.length }}
-          </span>
-        </div>
-
-        <!-- Skill list area -->
-        <div class="skill-list-area">
-          <SkillScanResult
-            :skills="skills"
-            :model-value="selectedSkills"
-            @update:model-value="selectedSkills = $event"
+  <LocalInstallerLayout
+    :skill-count="skills.length"
+    :selected-count="selectedSkills.length"
+    :installing="installing"
+    :can-install="canInstall"
+    @install="handleInstall"
+  >
+    <template #input>
+      <div class="input-card-header">
+        <!-- 装饰性 GitHub 图标，对屏幕阅读器隐藏 -->
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="var(--color-ink)"
+          class="github-icon"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
           />
+        </svg>
+        <NText class="input-card-title">从 GitHub 安装技能</NText>
+      </div>
+      <div class="input-row">
+        <NInput
+          v-model:value="url"
+          placeholder="https://github.com/owner/repo"
+          clearable
+          :disabled="parsing || isParsed"
+          @keyup.enter="handleParse"
+        />
+        <NButton
+          v-if="!isParsed"
+          type="primary"
+          round
+          :disabled="parsing || !url.trim()"
+          @click="handleParse"
+        >
+          分析仓库
+        </NButton>
+        <NButton v-else round @click="handleReparse"> 重新分析 </NButton>
+      </div>
+      <!-- Inline download progress -->
+      <div v-if="parsing" class="inline-progress">
+        <NProgress
+          type="line"
+          :percentage="downloadProgress"
+          :show-indicator="true"
+          :height="6"
+          status="default"
+        />
+        <div class="inline-progress-footer">
+          <NText depth="3" class="inline-progress-hint">
+            {{ downloadProgress < 100 ? '正在下载...' : '正在扫描技能...' }}
+          </NText>
+          <NButton size="tiny" round @click="handleCancel">取消</NButton>
         </div>
       </div>
+    </template>
 
-      <!-- Right column -->
-      <div class="column-right">
-        <div class="step-header">
-          <span class="step-number">2</span>
-          <h3 class="step-title">选择安装目标</h3>
-        </div>
+    <template #skill-list>
+      <SkillScanResult
+        :skills="skills"
+        :model-value="selectedSkills"
+        @update:model-value="selectedSkills = $event"
+      />
+    </template>
 
-        <div class="agent-area">
-          <AgentSelector
-            :model-value="selectedAgents"
-            :is-global="isGlobal"
-            @update:model-value="selectedAgents = $event"
-            @update:is-global="isGlobal = $event"
-          />
-        </div>
-
-        <!-- Compact action bar -->
-        <div class="action-bar">
-          <span class="action-bar-count">
-            已选 <span class="action-bar-num">{{ selectedSkills.length }}</span> 个技能
-          </span>
-          <NButton
-            type="primary"
-            size="small"
-            :disabled="!canInstall || installing"
-            :loading="installing"
-            round
-            @click="handleInstall"
-          >
-            安装
-          </NButton>
-        </div>
-      </div>
-    </div>
-  </div>
+    <template #agent-selector>
+      <AgentSelector
+        :model-value="selectedAgents"
+        :is-global="isGlobal"
+        @update:model-value="selectedAgents = $event"
+        @update:is-global="isGlobal = $event"
+      />
+    </template>
+  </LocalInstallerLayout>
 </template>
 
 <style scoped>
-.github-installer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.github-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  grid-template-rows: minmax(0, 1fr);
-  gap: var(--space-lg);
-  flex: 1;
-  min-height: 0;
-}
-
-/* --- Left column --- */
-.column-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  min-height: 0;
-  padding-bottom: var(--space-lg);
-}
-
-/* --- Input card --- */
-.input-card {
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  background: var(--color-canvas);
-  border: 1px solid var(--color-hairline);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  flex-shrink: 0;
-  min-height: 120px;
-}
-
 .input-card-header {
   display: flex;
   align-items: center;
@@ -285,105 +214,11 @@ onUnmounted(() => {
   gap: var(--space-xs);
 }
 
-.input-row .n-input {
+.input-row :deep(.n-input) {
   flex: 1;
 }
 
-/* --- Step header --- */
-.step-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+.github-icon {
   flex-shrink: 0;
-}
-
-.step-number {
-  background: var(--color-brand-blue);
-  color: var(--color-canvas);
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-micro);
-  font-weight: var(--weight-semibold);
-}
-
-.step-title {
-  font-size: var(--text-body-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--color-ink);
-}
-
-.step-count {
-  font-size: var(--text-micro);
-  color: var(--color-muted);
-}
-
-/* --- Skill list area --- */
-.skill-list-area {
-  flex: 1;
-  min-height: 0;
-  max-height: 420px;
-  overflow-y: auto;
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm);
-  background: var(--color-canvas);
-}
-
-/* --- Right column --- */
-.column-right {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  min-height: 0;
-  padding-bottom: 2em;
-}
-
-.agent-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-/* --- Action bar --- */
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--color-canvas);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-}
-
-.action-bar-count {
-  font-size: var(--text-micro);
-  color: var(--color-muted);
-}
-
-.action-bar-num {
-  color: var(--color-ink);
-  font-weight: var(--weight-semibold);
-}
-
-/* --- Inline progress --- */
-.inline-progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xxs);
-}
-
-.inline-progress-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.inline-progress-hint {
-  font-size: var(--text-micro);
 }
 </style>
