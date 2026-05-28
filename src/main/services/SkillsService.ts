@@ -1,10 +1,10 @@
 import type { CommandResult, SkillDoc } from '../../shared/types'
 import fs from 'fs'
 import path from 'path'
-import os from 'os'
 import agentsData from '../../shared/agents.json'
 import { commandRunner } from './CommandRunner'
 import { getSettings } from './StoreService'
+import { expandTildePath } from '../utils/path'
 
 interface AgentDef {
   name: string
@@ -57,7 +57,7 @@ class SkillsService {
     const errors: string[] = []
 
     for (const target of targets) {
-      const basePath = this.expandPath(global ? target.globalPath : target.projectPath)
+      const basePath = expandTildePath(global ? target.globalPath : target.projectPath)
       const skillPath = path.join(basePath, name)
 
       try {
@@ -86,8 +86,8 @@ class SkillsService {
     const agents = agentsData as AgentDef[]
 
     for (const agent of agents) {
-      const globalPath = this.expandPath(agent.globalPath)
-      const projectPath = this.expandPath(agent.projectPath)
+      const globalPath = expandTildePath(agent.globalPath)
+      const projectPath = expandTildePath(agent.projectPath)
 
       for (const basePath of [globalPath, projectPath]) {
         const skillPath = path.join(basePath, name)
@@ -106,13 +106,6 @@ class SkillsService {
     }
 
     throw new Error(`未找到技能 "${name}" 的 SKILL.md`)
-  }
-
-  private expandPath(p: string): string {
-    if (p.startsWith('~')) {
-      return path.join(os.homedir(), p.slice(2))
-    }
-    return path.resolve(p)
   }
 
   private buildArgs(subcommand: string, ...parts: string[]): string[] {

@@ -1,6 +1,5 @@
 import { ipcMain, shell } from 'electron'
 import path from 'path'
-import os from 'os'
 import fs from 'fs'
 import { registerSkillsIpc } from './skills.ipc'
 import { registerEnvIpc } from './env.ipc'
@@ -9,14 +8,7 @@ import { registerAgentsIpc } from './agents.ipc'
 import { registerTasksIpc } from './tasks.ipc'
 import { registerUpdaterIpc } from './updater.ipc'
 import { getMainWindow } from '../services/WindowManager'
-
-function resolvePath(p: string): string {
-  if (p === '~') return os.homedir()
-  if (p.startsWith('~/') || p.startsWith('~\\')) {
-    return path.join(os.homedir(), p.slice(2))
-  }
-  return path.resolve(p)
-}
+import { expandTildePath } from '../utils/path'
 
 function registerShellIpc(): void {
   ipcMain.handle(
@@ -25,7 +17,7 @@ function registerShellIpc(): void {
       if (!rawPath || typeof rawPath !== 'string') {
         return { success: false, error: '无效路径' }
       }
-      const resolved = resolvePath(rawPath)
+      const resolved = expandTildePath(rawPath)
       if (!fs.existsSync(resolved)) {
         const parent = path.dirname(resolved)
         if (fs.existsSync(parent)) {

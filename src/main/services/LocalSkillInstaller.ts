@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import os from 'os'
 import type { ScannedSkill, LocalInstallResult } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
+import { expandTildePath } from '../utils/path'
 
 interface AgentDef {
   name: string
@@ -13,12 +13,6 @@ interface AgentDef {
 const agents: AgentDef[] = agentsData as AgentDef[]
 
 export class LocalSkillInstaller {
-  private expandPath(p: string): string {
-    if (p.startsWith('~')) {
-      return path.join(os.homedir(), p.slice(2))
-    }
-    return path.resolve(p)
-  }
 
   async scanSkills(dir: string, maxDepth = 2): Promise<ScannedSkill[]> {
     const results: ScannedSkill[] = []
@@ -116,7 +110,7 @@ export class LocalSkillInstaller {
         const agent = agents.find((a) => a.agentFlag === agentFlag)
         if (!agent) continue
 
-        const agentDir = path.resolve(this.expandPath(agent.globalPath))
+        const agentDir = expandTildePath(agent.globalPath)
         const targetDir = path.join(agentDir, skillName)
         if (!path.resolve(targetDir).startsWith(agentDir + path.sep)) {
           allSucceeded = false

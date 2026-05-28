@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import os from 'os'
 import type { AgentScanResult, InstalledSkill } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
+import { expandTildePath } from '../utils/path'
 
 interface AgentDef {
   name: string
@@ -13,13 +13,6 @@ interface AgentDef {
 
 class AgentScanner {
   private agents: AgentDef[] = agentsData as AgentDef[]
-
-  private expandPath(p: string): string {
-    if (p.startsWith('~')) {
-      return path.join(os.homedir(), p.slice(2))
-    }
-    return path.resolve(p)
-  }
 
   async scanAll(): Promise<AgentScanResult[]> {
     const results: AgentScanResult[] = []
@@ -36,7 +29,7 @@ class AgentScanner {
   }
 
   private async scanOneAgent(agent: AgentDef): Promise<AgentScanResult> {
-    const absPath = this.expandPath(agent.globalPath)
+    const absPath = expandTildePath(agent.globalPath)
     const skills: string[] = []
 
     try {
@@ -63,7 +56,7 @@ class AgentScanner {
     const skillMap = new Map<string, InstalledSkill>()
 
     for (const agent of this.agents) {
-      const absPath = this.expandPath(agent.globalPath)
+      const absPath = expandTildePath(agent.globalPath)
       const skillNames: string[] = []
 
       try {
