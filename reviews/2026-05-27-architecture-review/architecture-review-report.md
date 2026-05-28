@@ -22,16 +22,16 @@
 
 ### 风险矩阵
 
-| 风险项 | 影响 | 概率 | 等级 |
-|--------|------|------|------|
-| cleanup-temp 路径逃逸（Windows 前缀绕过） | 高 | 中 | 🔴 Critical |
-| skills.ipc.ts God File 导致修改冲突 | 中 | 高 | 🟡 Warning |
-| Preload 类型安全仅为编译时保障（运行时 any） | 低 | 中 | 🟡 Warning |
-| skills:install source 参数缺少输入验证 | 中 | 低 | 🟡 Warning |
-| BackgroundTaskService 职责不完整导致维护困难 | 中 | 高 | 🟡 Warning |
-| Store 混合 UI 状态导致难以测试 | 低 | 中 | 🟡 Warning |
-| 批量删除逻辑在多处重复 | 低 | 中 | 🟡 Warning |
-| 视图组件臃肿（SettingsView 1000行，含~300行样式） | 低 | 中 | 🟡 Warning |
+| 风险项 | 影响 | 概率 | 等级 | 状态 |
+|--------|------|------|------|------|
+| cleanup-temp 路径逃逸（Windows 前缀绕过） | 高 | 中 | 🔴 Critical | ✅ 已修复 (`b25ef40`) |
+| skills.ipc.ts God File 导致修改冲突 | 中 | 高 | 🟡 Warning | ⏳ 待修复 |
+| Preload 类型安全仅为编译时保障（运行时 any） | 低 | 中 | 🟡 Warning | ⏳ 待修复 |
+| skills:install source 参数缺少输入验证 | 中 | 低 | 🟡 Warning | ✅ 已修复 (`c5ef165`) |
+| BackgroundTaskService 职责不完整导致维护困难 | 中 | 高 | 🟡 Warning | ✅ 已修复 (`d8adea9`) |
+| Store 混合 UI 状态导致难以测试 | 低 | 中 | 🟡 Warning | ⏳ 待修复 |
+| 批量删除逻辑在多处重复 | 低 | 中 | 🟡 Warning | ⏳ 待修复 |
+| 视图组件臃肿（SettingsView 1000行，含~300行样式） | 低 | 中 | 🟡 Warning | ⏳ 待修复 |
 
 ---
 
@@ -149,16 +149,16 @@ BackgroundTaskService.emitUpdate() 直接调用 getMainWindow().webContents.send
 
 ### Main Process 关键问题清单
 
-| # | 严重度 | 位置 | 问题 | 建议 |
-|---|--------|------|------|------|
-| M1 | 🟡 Warning | `skills.ipc.ts:261-353` | IPC handler 包含完整业务编排逻辑 | 迁移到 Service 层 |
-| M2 | 🟡 Warning | `skills.ipc.ts`（389行） | God File，混合8种职责 | 按子域拆分 |
-| M3 | 🟡 Warning | `BackgroundTaskService.ts` | 职责不完整，任务逻辑分散 | 引入 TaskExecutor 接口 |
-| M4 | 🟡 Warning | `BackgroundTaskService.ts:239-243` | 直接依赖 WindowManager | 通过 EventEmitter 解耦 |
-| M5 | 🟡 Warning | `SkillsService.ts:52-83` | remove() 直接操作文件系统 | 提取 FileSystemSkillManager |
-| M6 | 🟡 Warning | `CommandRunner.ts:46` | 单例限制并发 | 返回带 cancel() 的句柄 |
-| M7 | 🔵 Suggestion | 3个文件 | expandPath 逻辑重复 | 提取到 shared/path-utils.ts |
-| M8 | 🔵 Suggestion | `EnvService` vs `GitHubSkillInstaller` | 下载逻辑重复70% | 提取通用 downloadWithProgress |
+| # | 严重度 | 位置 | 问题 | 建议 | 状态 |
+|---|--------|------|------|------|------|
+| M1 | 🟡 Warning | `skills.ipc.ts:261-353` | IPC handler 包含完整业务编排逻辑 | 迁移到 Service 层 | ✅ 已修复 (`d8adea9`) |
+| M2 | 🟡 Warning | `skills.ipc.ts`（389行） | God File，混合8种职责 | 按子域拆分 | ⏳ 待修复 |
+| M3 | 🟡 Warning | `BackgroundTaskService.ts` | 职责不完整，任务逻辑分散 | 引入 TaskExecutor 接口 | ✅ 已修复 (`d8adea9`) |
+| M4 | 🟡 Warning | `BackgroundTaskService.ts:239-243` | 直接依赖 WindowManager | 通过 EventEmitter 解耦 | ⏳ 待修复 |
+| M5 | 🟡 Warning | `SkillsService.ts:52-83` | remove() 直接操作文件系统 | 提取 FileSystemSkillManager | ⏳ 待修复 |
+| M6 | 🟡 Warning | `CommandRunner.ts:46` | 单例限制并发 | 返回带 cancel() 的句柄 | ⏳ 待修复 |
+| M7 | 🔵 Suggestion | 3个文件 | expandPath 逻辑重复 | 提取到 shared/path-utils.ts | ⏳ 待修复 |
+| M8 | 🔵 Suggestion | `EnvService` vs `GitHubSkillInstaller` | 下载逻辑重复70% | 提取通用 downloadWithProgress | ⏳ 待修复 |
 
 ---
 
@@ -220,16 +220,16 @@ BackgroundTaskService.emitUpdate() 直接调用 getMainWindow().webContents.send
 
 ### Renderer Process 关键问题清单
 
-| # | 严重度 | 位置 | 问题 | 建议 |
-|---|--------|------|------|------|
-| R1 | 🟡 Warning | `stores/skills.ts` | Store 混合数据层与UI层状态 | 拆分为 dataStore + filterStore |
-| R2 | 🟡 Warning | `InstalledList.vue` + `AgentView.vue` | 批量删除逻辑高度重复（存在合理差异） | 提取 useBatchRemove composable |
-| R3 | 🟡 Warning | `SettingsView.vue`（~1000行，约300行样式） | 单个组件包含6个独立功能 | 拆分为4个子组件 |
-| R4 | 🟡 Warning | `GitHubInstaller.vue` + `ArchiveInstaller.vue` | 布局结构高度重复 | 提取 LocalInstallerLayout |
-| R5 | 🟡 Warning | `App.vue:127-301` | themeOverrides 硬编码颜色值 | 创建映射文件或同步脚本（受限于 NaiveUI `themeOverrides` 要求 JS 字符串字面量） |
-| R6 | 🟡 Warning | `stores/tasks.ts:14-49` | if/else 链违反开闭原则 | 使用任务类型注册表 |
-| R7 | 🟡 Warning | `useSkillInstall.ts` + `SkillInstallDialog.vue` | 状态管理重叠 | 统一职责边界 |
-| R8 | 🔵 Suggestion | `useCachedResource.ts` | 缺少 TTL 机制 | 添加 ttl 参数 |
+| # | 严重度 | 位置 | 问题 | 建议 | 状态 |
+|---|--------|------|------|------|------|
+| R1 | 🟡 Warning | `stores/skills.ts` | Store 混合数据层与UI层状态 | 拆分为 dataStore + filterStore | ⏳ 待修复 |
+| R2 | 🟡 Warning | `InstalledList.vue` + `AgentView.vue` | 批量删除逻辑高度重复（存在合理差异） | 提取 useBatchRemove composable | ⏳ 待修复 |
+| R3 | 🟡 Warning | `SettingsView.vue`（~1000行，约300行样式） | 单个组件包含6个独立功能 | 拆分为4个子组件 | ⏳ 待修复 |
+| R4 | 🟡 Warning | `GitHubInstaller.vue` + `ArchiveInstaller.vue` | 布局结构高度重复 | 提取 LocalInstallerLayout | ⏳ 待修复 |
+| R5 | 🟡 Warning | `App.vue:127-301` | themeOverrides 硬编码颜色值 | 创建映射文件或同步脚本（受限于 NaiveUI `themeOverrides` 要求 JS 字符串字面量） | ⏳ 待修复 |
+| R6 | 🟡 Warning | `stores/tasks.ts:14-49` | if/else 链违反开闭原则 | 使用任务类型注册表 | ✅ 已修复 (`d8adea9`) |
+| R7 | 🟡 Warning | `useSkillInstall.ts` + `SkillInstallDialog.vue` | 状态管理重叠 | 统一职责边界 | ⏳ 待修复 |
+| R8 | 🔵 Suggestion | `useCachedResource.ts` | 缺少 TTL 机制 | 添加 ttl 参数 | ⏳ 待修复 |
 
 ---
 
@@ -288,18 +288,18 @@ Preload 实现中约 **60% 的 invoke 方法**使用了 `Promise<unknown>` 或 `
 
 ### Preload & IPC 关键问题清单
 
-| # | 严重度 | 位置 | 问题 | 建议 |
-|---|--------|------|------|------|
-| P1 | 🟡 Warning | `preload/index.ts` | `ipcRenderer.invoke` 返回 `Promise<unknown>`，与声明文件类型不一致 | 在 Preload 层显式添加类型断言对齐声明 |
-| P2 | 🟡 Warning | `ipc/skills.ipc.ts:44-56` | `skills:install` 的 `source` 参数缺少输入验证 | 添加 URL 格式正则校验 |
-| P3 | 🔴 Critical | `ipc/skills.ipc.ts:245-253` | cleanup-temp 路径逃逸校验薄弱（Windows 前缀绕过风险） | 使用 `fs.realpath` 后比较 |
-| P4 | 🟡 Warning | `shared/types.ts` | CommandErrorInfo 与 IpcError 并存（语义不同） | 统一为扩展字段 |
-| P5 | 🟡 Warning | `ipc/skills.ipc.ts:355-388` | tasks:retry-skill-update 位置错误 | 合并到 tasks.ipc.ts |
-| P6 | 🟡 Warning | `ipc/env.ipc.ts:50-52` | window:open-settings 放错文件 | 移至 window.ipc.ts |
-| P7 | 🟡 Warning | `ipc/store.ipc.ts` | set-settings 无 schema 验证 | 引入运行时校验 |
-| P8 | 🔵 Suggestion | `WindowManager.ts:35` | sandbox: false | 当前架构下启用 sandbox 会导致 preload 中 Node API 不可用，属必要选择 |
-| P9 | 🔵 Suggestion | `shared/types.ts` | Skill 接口未被使用 | 删除 |
-| P10 | 🔵 Suggestion | 3个文件 | resolvePath/expandPath 重复 | 提取共享工具函数 |
+| # | 严重度 | 位置 | 问题 | 建议 | 状态 |
+|---|--------|------|------|------|------|
+| P1 | 🟡 Warning | `preload/index.ts` | `ipcRenderer.invoke` 返回 `Promise<unknown>`，与声明文件类型不一致 | 在 Preload 层显式添加类型断言对齐声明 | ⏳ 待修复 |
+| P2 | 🟡 Warning | `ipc/skills.ipc.ts:44-56` | `skills:install` 的 `source` 参数缺少输入验证 | 添加 URL 格式正则校验 | ✅ 已修复 (`c5ef165`) |
+| P3 | 🔴 Critical | `ipc/skills.ipc.ts:245-253` | cleanup-temp 路径逃逸校验薄弱（Windows 前缀绕过风险） | 使用 `fs.realpath` 后比较 | ✅ 已修复 (`b25ef40`) |
+| P4 | 🟡 Warning | `shared/types.ts` | CommandErrorInfo 与 IpcError 并存（语义不同） | 统一为扩展字段 | ⏳ 待修复 |
+| P5 | 🟡 Warning | `ipc/skills.ipc.ts:355-388` | tasks:retry-skill-update 位置错误 | 合并到 tasks.ipc.ts | ✅ 已修复 (`d8adea9`) |
+| P6 | 🟡 Warning | `ipc/env.ipc.ts:50-52` | window:open-settings 放错文件 | 移至 window.ipc.ts | ⏳ 待修复 |
+| P7 | 🟡 Warning | `ipc/store.ipc.ts` | set-settings 无 schema 验证 | 引入运行时校验 | ⏳ 待修复 |
+| P8 | 🔵 Suggestion | `WindowManager.ts:35` | sandbox: false | 当前架构下启用 sandbox 会导致 preload 中 Node API 不可用，属必要选择 | ⏳ 待修复 |
+| P9 | 🔵 Suggestion | `shared/types.ts` | Skill 接口未被使用 | 删除 | ⏳ 待修复 |
+| P10 | 🔵 Suggestion | 3个文件 | resolvePath/expandPath 重复 | 提取共享工具函数 | ⏳ 待修复 |
 
 ---
 
@@ -307,52 +307,52 @@ Preload 实现中约 **60% 的 invoke 方法**使用了 `Promise<unknown>` 或 `
 
 ### P0 — 立即修复（安全问题与高影响可维护性问题）
 
-| # | 问题 | 涉及文件 | 预估工作量 |
-|---|------|---------|-----------|
-| 1 | 修复 `skills:cleanup-temp` 路径逃逸漏洞（Windows 前缀绕过） | `ipc/skills.ipc.ts` | 1h |
-| 2 | 修复 `ArchiveSkillInstaller.extractAndScan()` 相同路径校验问题 | `services/ArchiveSkillInstaller.ts` | 1h |
-| 3 | 修复 `BackgroundTaskService` stderr 误写入 stdout | `services/BackgroundTaskService.ts` | 1h |
-| 4 | 加强 `skills:install` source 参数输入验证 | `ipc/skills.ipc.ts` | 1h |
-| 5 | 将后台任务编排逻辑从 IPC 迁移到 Service 层 | `ipc/skills.ipc.ts` + `BackgroundTaskService.ts` | 4h |
+| # | 问题 | 涉及文件 | 预估工作量 | 状态 |
+|---|------|---------|-----------|------|
+| 1 | 修复 `skills:cleanup-temp` 路径逃逸漏洞（Windows 前缀绕过） | `ipc/skills.ipc.ts` | 1h | ✅ 已修复 (`b25ef40`) |
+| 2 | 修复 `ArchiveSkillInstaller.extractAndScan()` 相同路径校验问题 | `services/ArchiveSkillInstaller.ts` | 1h | ✅ 已修复 (`b25ef40`) |
+| 3 | 修复 `BackgroundTaskService` stderr 误写入 stdout | `services/BackgroundTaskService.ts` | 1h | ✅ 已修复 (`0a499dc`) |
+| 4 | 加强 `skills:install` source 参数输入验证 | `ipc/skills.ipc.ts` | 1h | ✅ 已修复 (`c5ef165`) |
+| 5 | 将后台任务编排逻辑从 IPC 迁移到 Service 层 | `ipc/skills.ipc.ts` + `BackgroundTaskService.ts` | 4h | ✅ 已修复 (`d8adea9`) |
 
 ### P0.5 — 高优先级优化（DRY 与内聚）
 
-| # | 问题 | 涉及文件 | 预估工作量 |
-|---|------|---------|-----------|
-| 6 | 拆分 `useSkillsStore`，分离 UI 状态（可选优化） | `stores/skills.ts` | 3h |
-| 7 | 提取 `useBatchRemove` 减少批量删除重复逻辑 | `InstalledList.vue` + `AgentView.vue` | 2h |
-| 8 | Preload `Promise<unknown>` 显式添加类型断言 | `preload/index.ts` | 2h |
+| # | 问题 | 涉及文件 | 预估工作量 | 状态 |
+|---|------|---------|-----------|------|
+| 6 | 拆分 `useSkillsStore`，分离 UI 状态（可选优化） | `stores/skills.ts` | 3h | ⏳ 待修复 |
+| 7 | 提取 `useBatchRemove` 减少批量删除重复逻辑 | `InstalledList.vue` + `AgentView.vue` | 2h | ⏳ 待修复 |
+| 8 | Preload `Promise<unknown>` 显式添加类型断言 | `preload/index.ts` | 2h | ⏳ 待修复 |
 
 ### P1 — 短期改进（降低耦合、提升内聚）
 
-| # | 问题 | 涉及文件 | 预估工作量 |
-|---|------|---------|-----------|
-| 9 | 统一错误响应格式（合并 CommandErrorInfo 到 IpcError） | `shared/types.ts` + 所有 IPC | 3h |
-| 10 | 拆分 `skills.ipc.ts` 为多个子域模块 | `ipc/skills.ipc.ts` | 4h |
-| 11 | 解耦 `BackgroundTaskService` 与 `WindowManager` | `BackgroundTaskService.ts` | 2h |
-| 12 | 提取通用下载工具函数 | `EnvService.ts` + `GitHubSkillInstaller.ts` | 2h |
-| 13 | 拆分 `SettingsView` 为子组件 | `SettingsView.vue` | 3h |
-| 14 | 提取 `LocalInstallerLayout` 统一 GitHub/Archive 安装器布局 | `GitHubInstaller.vue` + `ArchiveInstaller.vue` | 2h |
-| 15 | 统一 themeOverrides 维护机制 | `App.vue` + `tokens.css` | 2h |
+| # | 问题 | 涉及文件 | 预估工作量 | 状态 |
+|---|------|---------|-----------|------|
+| 9 | 统一错误响应格式（合并 CommandErrorInfo 到 IpcError） | `shared/types.ts` + 所有 IPC | 3h | ⏳ 待修复 |
+| 10 | 拆分 `skills.ipc.ts` 为多个子域模块 | `ipc/skills.ipc.ts` | 4h | ⏳ 待修复 |
+| 11 | 解耦 `BackgroundTaskService` 与 `WindowManager` | `BackgroundTaskService.ts` | 2h | ⏳ 待修复 |
+| 12 | 提取通用下载工具函数 | `EnvService.ts` + `GitHubSkillInstaller.ts` | 2h | ⏳ 待修复 |
+| 13 | 拆分 `SettingsView` 为子组件 | `SettingsView.vue` | 3h | ⏳ 待修复 |
+| 14 | 提取 `LocalInstallerLayout` 统一 GitHub/Archive 安装器布局 | `GitHubInstaller.vue` + `ArchiveInstaller.vue` | 2h | ⏳ 待修复 |
+| 15 | 统一 themeOverrides 维护机制 | `App.vue` + `tokens.css` | 2h | ⏳ 待修复 |
 
 ### P2 — 中期重构（架构升级）
 
-| # | 问题 | 涉及文件 | 预估工作量 |
-|---|------|---------|-----------|
-| 16 | 为 Installer 引入 `ISkillSourceInstaller` 接口 | `services/*Installer.ts` | 3h |
-| 17 | 重构 `CommandRunner` 支持多进程管理 | `CommandRunner.ts` | 3h |
-| 18 | 重构 `TaskStore.start()` 使用注册表模式 | `stores/tasks.ts` | 2h |
-| 19 | 统一 `SkillInstallDialog` 与 `useSkillInstall` 状态管理 | `SkillInstallDialog.vue` + `useSkillInstall.ts` | 2h |
-| 20 | 清理 `shared/types.ts`（删除 Skill、迁移工具函数） | `shared/types.ts` | 1h |
-| 21 | 提取共享路径工具函数 `expandTildePath` | 3个文件 | 1h |
+| # | 问题 | 涉及文件 | 预估工作量 | 状态 |
+|---|------|---------|-----------|------|
+| 16 | 为 Installer 引入 `ISkillSourceInstaller` 接口 | `services/*Installer.ts` | 3h | ⏳ 待修复 |
+| 17 | 重构 `CommandRunner` 支持多进程管理 | `CommandRunner.ts` | 3h | ⏳ 待修复 |
+| 18 | 重构 `TaskStore.start()` 使用注册表模式 | `stores/tasks.ts` | 2h | ⏳ 待修复 |
+| 19 | 统一 `SkillInstallDialog` 与 `useSkillInstall` 状态管理 | `SkillInstallDialog.vue` + `useSkillInstall.ts` | 2h | ⏳ 待修复 |
+| 20 | 清理 `shared/types.ts`（删除 Skill、迁移工具函数） | `shared/types.ts` | 1h | ⏳ 待修复 |
+| 21 | 提取共享路径工具函数 `expandTildePath` | 3个文件 | 1h | ⏳ 待修复 |
 
 ### P3 — 长期优化
 
-| # | 问题 | 涉及文件 | 预估工作量 |
-|---|------|---------|-----------|
-| 22 | 引入依赖注入容器替代全局单例 | 所有 services | 8h |
-| 23 | 统一 zip 解压库（decompress 替代 yauzl） | `GitHubSkillInstaller.ts` | 2h |
-| 24 | 为 `useCachedResource` 添加 TTL 支持 | `useCachedResource.ts` | 1h |
+| # | 问题 | 涉及文件 | 预估工作量 | 状态 |
+|---|------|---------|-----------|------|
+| 22 | 引入依赖注入容器替代全局单例 | 所有 services | 8h | ⏳ 待修复 |
+| 23 | 统一 zip 解压库（decompress 替代 yauzl） | `GitHubSkillInstaller.ts` | 2h | ⏳ 待修复 |
+| 24 | 为 `useCachedResource` 添加 TTL 支持 | `useCachedResource.ts` | 1h | ⏳ 待修复 |
 
 **总预估工作量：** P0 约 8h，P0.5 约 7h，P1 约 18h，P2 约 12h，P3 约 11h，合计约 **56 小时**
 
@@ -368,11 +368,15 @@ Preload 实现中约 **60% 的 invoke 方法**使用了 `Promise<unknown>` 或 `
 
 `child.stderr?.on('data', ...)` 中将 stderr 数据追加到 `task.stdout`，导致错误输出与正常输出混淆，无法区分。这是一个实际的运行时 bug。
 
+**状态：** ✅ 已修复 (`0a499dc`)
+
 ### L2 — `retryBuiltIn()` 与 `startBuiltin()` 代码高度重复
 
 **位置：** `src/main/services/BackgroundTaskService.ts:88-133` vs `162-215`
 
 两个方法几乎完全相同，只有初始状态设置不同。应提取公共逻辑。
+
+**状态：** ⏳ 待修复
 
 ### L3 — `ArchiveSkillInstaller.extractAndScan()` 存在路径前缀绕过风险
 
@@ -380,11 +384,15 @@ Preload 实现中约 **60% 的 invoke 方法**使用了 `Promise<unknown>` 或 `
 
 使用 `path.resolve(tempDir, f.path).startsWith(resolvedTemp + path.sep)` 校验，与 P3（cleanup-temp）有相同的 Windows 路径前缀绕过风险（`C:\...\Tempfake` 以 `C:\...\Temp` 开头）。
 
+**状态：** ✅ 已修复 (`b25ef40`)
+
 ### L4 — `GitHubSkillInstaller` 的 `subPath` 清理逻辑缺陷
 
 **位置：** `src/main/services/GitHubSkillInstaller.ts:241-242`
 
 `subPath.replace(/\.\./g, '')` 会将 `....` 替换为空字符串，`a..b` 替换为 `ab`，可能产生非预期路径。应使用更安全的清理策略。
+
+**状态：** ⏳ 待修复
 
 ### L5 — `env.ipc.ts` 存在跨层依赖
 
@@ -392,11 +400,15 @@ Preload 实现中约 **60% 的 invoke 方法**使用了 `Promise<unknown>` 或 `
 
 `env:install-node` handler 直接调用 `BrowserWindow.fromWebContents(event.sender)` 发送进度，与 M4（BackgroundTaskService → WindowManager）是同类跨层问题。
 
+**状态：** ⏳ 待修复
+
 ### L6 — `agents.json` 缺少运行时类型验证
 
 **位置：** `src/main/services/SkillsService.ts:53`、`src/main/services/LocalSkillInstaller.ts:13` 等
 
 多处使用 `agentsData as AgentDef[]` 强制类型转换，无运行时验证。`agents.json` 来自外部文件系统，格式异常可能导致运行时错误。
+
+**状态：** ⏳ 待修复
 
 ---
 
