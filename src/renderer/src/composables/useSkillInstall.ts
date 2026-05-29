@@ -67,8 +67,13 @@ export function useSkillInstall(): {
       installResult.value = result.data
       if (result.data.failed.length > 0) {
         const failList = result.data.failed.map((f) => `${f.name}: ${f.error}`).join('\n')
+        const failNames = result.data.failed.map((f) => f.name).join('、')
+        const title =
+          result.data.failed.length === 1
+            ? `「${failNames}」安装失败`
+            : `${result.data.failed.length} 个技能安装失败`
         notification.warning({
-          title: '安装部分失败',
+          title,
           content: `成功 ${result.data.success.length} 个，失败 ${result.data.failed.length} 个\n${failList}`,
           duration: 0
         })

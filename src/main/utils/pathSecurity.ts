@@ -13,7 +13,12 @@ import path from 'path'
 export function isPathInside(parent: string, child: string): boolean {
   try {
     const realParent = fs.realpathSync(parent)
-    const realChild = fs.realpathSync(child)
+    let realChild: string
+    try {
+      realChild = fs.realpathSync(child)
+    } catch {
+      realChild = path.resolve(child)
+    }
     const rel = path.relative(realParent, realChild)
     return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel)
   } catch {

@@ -114,6 +114,7 @@ export class LocalSkillInstaller implements ILocalSkillInstaller {
         if (!agent) continue
 
         const agentDir = expandTildePath(agent.globalPath)
+        await fs.promises.mkdir(agentDir, { recursive: true })
         const targetDir = path.join(agentDir, skillName)
         if (!isPathInside(agentDir, targetDir)) {
           allSucceeded = false

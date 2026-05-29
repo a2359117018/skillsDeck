@@ -96,7 +96,7 @@ class BackgroundTaskService extends EventEmitter {
     let command: string
     let args: string[]
     try {
-      ({ command, args } = this.resolveCommand(task.type))
+      ;({ command, args } = this.resolveCommand(task.type))
     } catch {
       throw new Error('该任务类型不支持重试')
     }

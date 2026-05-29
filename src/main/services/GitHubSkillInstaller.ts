@@ -3,6 +3,7 @@ import path from 'path'
 import os from 'os'
 import decompress from 'decompress'
 import type { ParsedGitHubUrl, GitHubParseResult } from '../../shared/types'
+import { BACKGROUND_TASK_TIMEOUT_MS } from '../../shared/constants'
 import { getSettings } from './StoreService'
 import { localSkillInstaller } from './LocalSkillInstaller'
 import { downloadWithProgress } from '../utils/download'
@@ -71,7 +72,7 @@ export class GitHubSkillInstaller implements IExtractableSkillInstaller {
       const result = await downloadWithProgress(zipUrl, zipPath, {
         onProgress,
         signal: this.abortController.signal,
-        timeout: 30000
+        timeout: BACKGROUND_TASK_TIMEOUT_MS
       })
       return result
     } catch (e) {

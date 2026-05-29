@@ -190,21 +190,4 @@ const emit = defineEmits<{
   color: var(--color-ink);
   font-weight: var(--weight-semibold);
 }
-
-/* --- 内联进度 --- */
-.inline-progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xxs);
-}
-
-.inline-progress-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.inline-progress-hint {
-  font-size: var(--text-micro);
-}
 </style>

@@ -22,16 +22,28 @@ export async function downloadWithProgress(
 ): Promise<string> {
   const controller = new AbortController()
   const signal = options?.signal
+  let timedOut = false
 
-  // 如果外部 signal 触发，联动取消内部 controller
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+  // 如果外部 signal 触发，联动取消内部 controller 并清除超时计时
   if (signal) {
-    const onAbort = (): void => controller.abort()
+    const onAbort = (): void => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+      timedOut = false
+      controller.abort()
+    }
     signal.addEventListener('abort', onAbort, { once: true })
   }
 
-  let timeoutId: ReturnType<typeof setTimeout> | null = null
   if (options?.timeout && options.timeout > 0) {
-    timeoutId = setTimeout(() => controller.abort(), options.timeout)
+    timeoutId = setTimeout(() => {
+      timedOut = true
+      controller.abort()
+    }, options.timeout)
   }
 
   try {
@@ -77,7 +89,10 @@ export async function downloadWithProgress(
       }
     }
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('下载已取消或超时')
+      if (timedOut) {
+        throw new Error(`下载超时（${options?.timeout}ms），请检查网络连接或代理设置`)
+      }
+      throw new Error('下载已取消')
     }
     throw error
   } finally {
