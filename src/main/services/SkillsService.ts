@@ -5,6 +5,7 @@ import agentsData from '../../shared/agents.json'
 import { commandRunner, type CommandHandle } from './CommandRunner'
 import { getSettings } from './StoreService'
 import { expandTildePath } from '../utils/path'
+import { isPathInside } from '../utils/pathSecurity'
 
 interface AgentDef {
   name: string
@@ -86,6 +87,11 @@ class SkillsService {
     for (const target of targets) {
       const basePath = expandTildePath(global ? target.globalPath : target.projectPath)
       const skillPath = path.join(basePath, name)
+
+      if (!isPathInside(basePath, skillPath)) {
+        errors.push(`${target.agentFlag}: Invalid skill path`)
+        continue
+      }
 
       try {
         const stat = await fs.promises.lstat(skillPath)

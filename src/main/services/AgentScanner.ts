@@ -3,7 +3,6 @@ import path from 'path'
 import type { AgentScanResult, InstalledSkill } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
 import { expandTildePath } from '../utils/path'
-import { isPathInside } from '../utils/pathSecurity'
 
 interface AgentDef {
   name: string
@@ -71,9 +70,21 @@ class AgentScanner {
         continue
       }
 
+      let realAbsPath: string
+      try {
+        realAbsPath = fs.realpathSync(absPath)
+      } catch {
+        continue
+      }
       for (const skillName of skillNames) {
         const skillPath = path.join(absPath, skillName)
-        if (!isPathInside(absPath, skillPath)) continue
+        let rel: string
+        try {
+          rel = path.relative(realAbsPath, fs.realpathSync(skillPath))
+        } catch {
+          continue
+        }
+        if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) continue
         if (!skillMap.has(skillName)) {
           skillMap.set(skillName, { name: skillName, agents: [] })
         }

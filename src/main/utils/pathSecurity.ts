@@ -15,7 +15,7 @@ export function isPathInside(parent: string, child: string): boolean {
     const realParent = fs.realpathSync(parent)
     const realChild = fs.realpathSync(child)
     const rel = path.relative(realParent, realChild)
-    return !rel.startsWith('..') && !path.isAbsolute(rel)
+    return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel)
   } catch {
     return false
   }

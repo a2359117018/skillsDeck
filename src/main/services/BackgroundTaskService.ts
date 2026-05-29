@@ -93,7 +93,13 @@ class BackgroundTaskService extends EventEmitter {
     }
 
     // Builtin subprocess retry (update-skills, install-node, install-skills)
-    const { command, args } = this.resolveCommand(task.type)
+    let command: string
+    let args: string[]
+    try {
+      ({ command, args } = this.resolveCommand(task.type))
+    } catch {
+      throw new Error('该任务类型不支持重试')
+    }
     const child = execa(command, args, { timeout: BACKGROUND_TASK_TIMEOUT_MS })
     this.processes.set(taskId, child)
 
