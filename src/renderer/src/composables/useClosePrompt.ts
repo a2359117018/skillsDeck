@@ -18,12 +18,16 @@ export function useClosePrompt(): void {
       content: () =>
         h('div', { style: 'display: flex; flex-direction: column; gap: 12px' }, [
           h('span', null, '你希望应用如何？'),
-          h(NCheckbox, {
-            checked: rememberChoice.value,
-            'onUpdate:checked': (val: boolean) => {
-              rememberChoice.value = val
-            }
-          }, { default: () => '记住选择' })
+          h(
+            NCheckbox,
+            {
+              checked: rememberChoice.value,
+              'onUpdate:checked': (val: boolean) => {
+                rememberChoice.value = val
+              }
+            },
+            { default: () => '记住选择' }
+          )
         ]),
       positiveText: '最小化到托盘',
       negativeText: '退出应用',

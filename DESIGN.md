@@ -399,20 +399,20 @@ All visual values must reference `src/renderer/src/assets/tokens.css`. The CSS c
 
 **Quick mapping:**
 
-| Token type | CSS variable | Value | Usage |
-|---|---|---|---|
-| Primary action bg | `--color-primary` | #0a0a0a | Primary buttons, active chip bg |
-| Body text | `--color-ink` | #1a1a1a | All text, headings |
-| Secondary text | `--color-stone` | #6b7280 | Descriptions, metadata |
-| Muted text | `--color-muted` | #757575 | Captions, placeholders |
-| Page bg | `--color-canvas` | #ffffff | Page backgrounds, cards |
-| Surface bg | `--color-surface` | #f7f8fa | Input bg, grouped areas |
-| Borders | `--color-hairline` | #e5e7eb | Card borders, dividers |
-| Brand coral | `--color-brand-coral` | #ff5530 | Sidebar active indicator |
-| Brand blue | `--color-brand-blue` | #1456f0 | Links, badges, search |
-| Error | `--color-error` | #d45656 | Error states, destructive actions |
-| Sidebar bg | `--sidebar-bg` | #111111 | Sidebar background (flat) |
-| Sidebar width | `--sidebar-width` | 72px | Fixed sidebar width |
+| Token type        | CSS variable          | Value   | Usage                             |
+| ----------------- | --------------------- | ------- | --------------------------------- |
+| Primary action bg | `--color-primary`     | #0a0a0a | Primary buttons, active chip bg   |
+| Body text         | `--color-ink`         | #1a1a1a | All text, headings                |
+| Secondary text    | `--color-stone`       | #6b7280 | Descriptions, metadata            |
+| Muted text        | `--color-muted`       | #757575 | Captions, placeholders            |
+| Page bg           | `--color-canvas`      | #ffffff | Page backgrounds, cards           |
+| Surface bg        | `--color-surface`     | #f7f8fa | Input bg, grouped areas           |
+| Borders           | `--color-hairline`    | #e5e7eb | Card borders, dividers            |
+| Brand coral       | `--color-brand-coral` | #ff5530 | Sidebar active indicator          |
+| Brand blue        | `--color-brand-blue`  | #1456f0 | Links, badges, search             |
+| Error             | `--color-error`       | #d45656 | Error states, destructive actions |
+| Sidebar bg        | `--sidebar-bg`        | #111111 | Sidebar background (flat)         |
+| Sidebar width     | `--sidebar-width`     | 72px    | Fixed sidebar width               |
 
 **Spacing:** Use `--space-xxs` (4px) through `--space-xxxl` (48px). Never hard-code padding/margin values.
 

@@ -18,7 +18,10 @@ export interface ISkillSourceInstaller {
  */
 export interface IExtractableSkillInstaller extends ISkillSourceInstaller {
   /** 从来源提取并扫描技能（具体参数因实现而异） */
-  extractAndScan(source: string, ...rest: unknown[]): Promise<{ skills: ScannedSkill[]; tempDir: string }>
+  extractAndScan(
+    source: string,
+    ...rest: unknown[]
+  ): Promise<{ skills: ScannedSkill[]; tempDir: string }>
   /** 取消进行中的下载或提取操作 */
   cancel(): void
 }

@@ -13,7 +13,12 @@ const DEFAULT_DURATION: Record<NotifyType, number> = {
  * 统一通知封装。基于 NaiveUI NNotificationProvider（已在 App.vue 中挂载）。
  * 仅用于操作结果反馈，确认对话框仍使用 useDialog()。
  */
-export function useNotify() {
+export function useNotify(): {
+  success: (title: string) => void
+  error: (title: string) => void
+  warning: (title: string) => void
+  info: (title: string) => void
+} {
   const notification = useNotification()
 
   function notify(type: NotifyType, title: string, duration?: number): void {

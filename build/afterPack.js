@@ -2,15 +2,16 @@
  * electron-builder afterPack 钩子。
  * 删除除 en-US、zh-CN 外的 Electron locale 文件，减小安装包体积。
  */
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
 const KEEP_LOCALES = new Set(['en-US.pak', 'zh-CN.pak'])
 
 /**
  * @param {import('electron-builder').AfterPackContext} context
+ * @returns {Promise<void>}
  */
-exports.default = async (context) => {
+export default async function afterPack(context) {
   const localesDir = path.join(context.appOutDir, 'locales')
   if (!fs.existsSync(localesDir)) return
 

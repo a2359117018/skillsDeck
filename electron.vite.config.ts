@@ -13,7 +13,7 @@ export default defineConfig({
     },
     plugins: [vue()],
     server: {
-      port: 7456
+      port: 5173
     }
   }
 })

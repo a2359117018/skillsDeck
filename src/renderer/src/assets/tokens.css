@@ -83,7 +83,12 @@
   /* Sidebar */
   --sidebar-bg: #111111;
   --sidebar-width: 72px;
-  --sidebar-icon-color: rgba(255, 255, 255, 0.7); /* 提高透明度以通过 WCAG AA 对比度（#111 背景上 ~4.6:1） */
+  --sidebar-icon-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* 提高透明度以通过 WCAG AA 对比度（#111 背景上 ~4.6:1） */
   --sidebar-icon-hover-color: rgba(255, 255, 255, 0.85);
   --sidebar-icon-active-color: #ffffff;
   --sidebar-item-hover-bg: rgba(255, 255, 255, 0.05);

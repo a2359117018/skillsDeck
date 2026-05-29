@@ -11,7 +11,7 @@ const emit = defineEmits<{
 
 const keyword = computed({
   get: () => props.modelValue ?? '',
-  set: (val: string) => emit('update:modelValue', val),
+  set: (val: string) => emit('update:modelValue', val)
 })
 
 function handleSearch(): void {
@@ -41,7 +41,14 @@ function handleKeydown(e: KeyboardEvent): void {
           <NIcon :size="18" :color="'var(--color-muted)'"><SearchOutline /></NIcon>
         </template>
       </NInput>
-      <NButton type="primary" size="large" round :disabled="disabled" class="search-btn" @click="handleSearch">
+      <NButton
+        type="primary"
+        size="large"
+        round
+        :disabled="disabled"
+        class="search-btn"
+        @click="handleSearch"
+      >
         <template #icon>
           <NIcon :size="18"><SearchOutline /></NIcon>
         </template>

@@ -1,16 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onUnmounted, watch } from 'vue'
-import {
-  NModal,
-  NCard,
-  NSteps,
-  NStep,
-  NButton,
-  NSpace,
-  NText,
-  NTag,
-  NIcon
-} from 'naive-ui'
+import { NModal, NCard, NSteps, NStep, NButton, NSpace, NText, NTag, NIcon } from 'naive-ui'
 import DownloadOutline from '@vicons/ionicons5/DownloadOutline'
 import CheckmarkCircle from '@vicons/ionicons5/CheckmarkCircle'
 import CloseCircle from '@vicons/ionicons5/CloseCircle'
