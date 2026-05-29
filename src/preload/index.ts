@@ -63,6 +63,7 @@ const api = {
     removeBatchBackground: (opts: {
       packageRefs: string[]
       agentFlag?: string
+      global?: boolean
     }): Promise<{ taskId: string; error?: string }> =>
       ipcRenderer.invoke('skills:remove-batch-background', opts),
     parseGitHub: (url: string): Promise<IpcResult<GitHubParseResult>> =>

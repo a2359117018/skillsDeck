@@ -53,7 +53,7 @@ class BackgroundTaskService extends EventEmitter {
     return id
   }
 
-  retryBuiltIn(taskId: string): void {
+  retryTask(taskId: string): void {
     const task = this.tasks.get(taskId)
     if (!task || task.status !== 'error') {
       throw new Error('Task not found or not in error state')

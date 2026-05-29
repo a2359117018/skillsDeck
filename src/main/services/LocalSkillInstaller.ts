@@ -3,6 +3,7 @@ import path from 'path'
 import type { ScannedSkill, LocalInstallResult } from '../../shared/types'
 import agentsData from '../../shared/agents.json'
 import { expandTildePath } from '../utils/path'
+import { isPathInside } from '../utils/pathSecurity'
 import type { ILocalSkillInstaller } from './ISkillSourceInstaller'
 
 interface AgentDef {
@@ -114,7 +115,7 @@ export class LocalSkillInstaller implements ILocalSkillInstaller {
 
         const agentDir = expandTildePath(agent.globalPath)
         const targetDir = path.join(agentDir, skillName)
-        if (!path.resolve(targetDir).startsWith(agentDir + path.sep)) {
+        if (!isPathInside(agentDir, targetDir)) {
           allSucceeded = false
           firstError = 'Invalid target path'
           break

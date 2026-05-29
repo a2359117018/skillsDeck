@@ -32,12 +32,16 @@ export function registerSkillTaskExecutors(): void {
 
   backgroundTaskService.registerExecutor('skill-remove-batch', {
     async execute(taskId, payload) {
-      const { packageRefs, agentFlag } = payload as { packageRefs: string[]; agentFlag?: string }
+      const { packageRefs, agentFlag, global } = payload as {
+        packageRefs: string[]
+        agentFlag?: string
+        global?: boolean
+      }
       const failedNames: string[] = []
 
       for (const packageRef of packageRefs) {
         try {
-          const result = await skillsService.remove(packageRef, agentFlag, true)
+          const result = await skillsService.remove(packageRef, agentFlag, global ?? true)
           if (!result.success) {
             failedNames.push(packageRef)
           }

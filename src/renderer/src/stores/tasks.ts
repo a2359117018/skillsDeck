@@ -41,7 +41,8 @@ taskRegistry.set('skill-remove-batch', {
   start: async (opts) => {
     return window.api.skills.removeBatchBackground({
       packageRefs: (opts.packageRefs as string[]) || [],
-      agentFlag: opts.agentFlag as string | undefined
+      agentFlag: opts.agentFlag as string | undefined,
+      global: opts.global as boolean | undefined
     })
   },
   retry: async () => {
@@ -66,6 +67,8 @@ export const useTaskStore = defineStore('tasks', () => {
     let result: { taskId: string; error?: string }
     if (handler) {
       const { onSuccess: _os, onError: _oe, ...handlerOpts } = opts || {}
+      void _os
+      void _oe
       result = await handler.start(handlerOpts as Record<string, unknown>)
     } else {
       result = await window.api.tasks.start({ type: type as BackgroundTask['type'] })

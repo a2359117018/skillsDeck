@@ -17,6 +17,8 @@ import { useNotify } from './useNotify'
 export interface UseBatchRemoveOptions {
   /** 返回当前 Agent 的 flag，用于 AgentView 的批量删除 */
   agentFlag?: () => string | null | undefined
+  /** 是否全局删除，默认 true */
+  global?: boolean
   /** 删除成功后的回调（用于刷新列表等） */
   onSuccess?: () => void
   /** 删除失败后的回调 */
@@ -106,6 +108,7 @@ export function useBatchRemove(
 
     const names = [...selectedNames.value]
     const agentFlag = options?.agentFlag?.() ?? undefined
+    const global = options?.global ?? true
 
     // 乐观删除：立即加入 pendingRemovalNames
     pendingRemovalNames.value = new Set([...pendingRemovalNames.value, ...names])
@@ -114,6 +117,7 @@ export function useBatchRemove(
       .start('skill-remove-batch', {
         packageRefs: names,
         agentFlag,
+        global,
         onSuccess: () => {
           pendingRemovalNames.value = new Set()
           options?.onSuccess?.()

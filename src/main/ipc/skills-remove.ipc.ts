@@ -35,7 +35,7 @@ export function registerSkillsRemoveIpc(): void {
 
   ipcMain.handle(
     'skills:remove-batch-background',
-    async (_, opts: { packageRefs: string[]; agentFlag?: string }) => {
+    async (_, opts: { packageRefs: string[]; agentFlag?: string; global?: boolean }) => {
       try {
         if (!Array.isArray(opts.packageRefs) || opts.packageRefs.length === 0) {
           return { taskId: '', error: '未选择要删除的技能' }

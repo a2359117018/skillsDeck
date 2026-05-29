@@ -29,22 +29,8 @@ export function registerTasksIpc(getMainWindow: () => Electron.BrowserWindow | n
   })
 
   ipcMain.handle('tasks:retry', async (_, { taskId }: { taskId: string }) => {
-    const task = backgroundTaskService.getStatus(taskId)
-    if (
-      task &&
-      ![
-        'update-skills',
-        'install-node',
-        'install-skills',
-        'skill-update',
-        'skill-update-all',
-        'skill-remove-batch'
-      ].includes(task.type)
-    ) {
-      return { ok: false, error: '该任务类型不支持重试' }
-    }
     try {
-      backgroundTaskService.retryBuiltIn(taskId)
+      backgroundTaskService.retryTask(taskId)
       return { ok: true }
     } catch (error) {
       return { ok: false, error: toIpcError(error).message }
@@ -62,7 +48,7 @@ export function registerTasksIpc(getMainWindow: () => Electron.BrowserWindow | n
     }
 
     try {
-      backgroundTaskService.retryBuiltIn(taskId)
+      backgroundTaskService.retryTask(taskId)
       return { ok: true }
     } catch (error) {
       return { ok: false, error: toIpcError(error).message }
