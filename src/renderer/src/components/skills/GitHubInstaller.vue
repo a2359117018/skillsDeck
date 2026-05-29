@@ -25,7 +25,7 @@ const {
   cleanup
 } = useSkillInstall()
 
-const url = ref('')
+const url = ref('https://github.com/eze-is/web-access')
 const parsing = ref(false)
 const downloadProgress = ref(0)
 const scanResult = ref<GitHubParseResult | null>(null)
@@ -220,5 +220,21 @@ onUnmounted(() => {
 
 .github-icon {
   flex-shrink: 0;
+}
+
+.inline-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+
+.inline-progress-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inline-progress-hint {
+  font-size: var(--text-micro);
 }
 </style>
