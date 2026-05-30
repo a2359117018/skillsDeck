@@ -25,10 +25,10 @@ const CUSTOM_PROXY_VALUE = '__custom__'
 
 const proxyOptions: ProxyOption[] = [
   { label: '不使用代理', value: '', icon: UnlinkOutline },
+  { label: 'v4.gh-proxy.org', value: 'https://v4.gh-proxy.org', icon: LinkOutline },
   { label: 'gh-proxy.org', value: 'https://gh-proxy.org', icon: LinkOutline },
-  { label: 'hk.gh-proxy.org', value: 'https://hk.gh-proxy.org', icon: LinkOutline },
+  { label: 'v6.gh-proxy.org', value: 'https://v6.gh-proxy.org', icon: LinkOutline },
   { label: 'cdn.gh-proxy.org', value: 'https://cdn.gh-proxy.org', icon: LinkOutline },
-  { label: 'edgeone.gh-proxy.org', value: 'https://edgeone.gh-proxy.org', icon: LinkOutline },
   { label: '自定义...', value: CUSTOM_PROXY_VALUE, icon: PencilOutline }
 ]
 

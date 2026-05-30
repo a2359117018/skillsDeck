@@ -6,7 +6,7 @@ interface StoreSchema {
   envStatus: EnvStatus | null
 }
 
-export const DEFAULT_PROXY_URL = 'https://gh-proxy.org'
+export const DEFAULT_PROXY_URL = 'https://v4.gh-proxy.org'
 
 const DEFAULT_SETTINGS: AppSettings = {
   autoCheckEnv: true,

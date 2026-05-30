@@ -19,7 +19,8 @@ class SkillsService {
 
   async install(source: string, agents: string[], global?: boolean): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    const handle = commandRunner.run('skills', args)
+    const env = this.buildGitEnv()
+    const handle = commandRunner.run('skills', args, { env })
     this.activeHandle = handle
     try {
       return await handle.promise
@@ -35,7 +36,8 @@ class SkillsService {
     global?: boolean
   ): Promise<CommandResult> {
     const args = this.buildInstallArgs(source, agents, global)
-    const handle = commandRunner.run('skills', args, { onOutput })
+    const env = this.buildGitEnv()
+    const handle = commandRunner.run('skills', args, { onOutput, env })
     this.activeHandle = handle
     try {
       return await handle.promise
@@ -52,7 +54,8 @@ class SkillsService {
   async update(name: string, global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', name, '-y')
     if (global) args.push('-g')
-    const handle = commandRunner.run('skills', args)
+    const env = this.buildGitEnv()
+    const handle = commandRunner.run('skills', args, { env })
     this.activeHandle = handle
     try {
       return await handle.promise
@@ -64,7 +67,8 @@ class SkillsService {
   async updateAll(global?: boolean): Promise<CommandResult> {
     const args = this.buildArgs('update', '-y')
     if (global) args.push('-g')
-    const handle = commandRunner.run('skills', args)
+    const env = this.buildGitEnv()
+    const handle = commandRunner.run('skills', args, { env })
     this.activeHandle = handle
     try {
       return await handle.promise
@@ -160,6 +164,23 @@ class SkillsService {
       return `${proxyUrl}/https://github.com/${source}.git`
     }
     return `https://github.com/${source}.git`
+  }
+
+  /**
+   * 当设置了 GitHub 代理时，构造 git URL 重写环境变量。
+   * 利用 git 的 `url.<base>.insteadOf` 功能，让 git 自动将原始 GitHub URL
+   * 替换为代理 URL，解决外部 `skills` CLI 内部忽略代理前缀的问题。
+   */
+  private buildGitEnv(): Record<string, string> | undefined {
+    const proxyUrl = getSettings().proxyUrl
+    if (!proxyUrl) return undefined
+
+    const cleanProxyUrl = proxyUrl.replace(/\/+$/, '')
+    return {
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: `url.${cleanProxyUrl}/https://github.com/.insteadOf`,
+      GIT_CONFIG_VALUE_0: 'https://github.com/'
+    }
   }
 
   private buildInstallArgs(source: string, agents: string[], global?: boolean): string[] {

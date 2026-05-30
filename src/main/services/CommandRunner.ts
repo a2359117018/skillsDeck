@@ -18,6 +18,7 @@ export interface RunOptions {
   timeout?: number
   cwd?: string
   onOutput?: (text: string) => void
+  env?: Record<string, string>
 }
 
 /** 命令执行句柄，包含结果 Promise 和取消方法 */
@@ -63,7 +64,8 @@ class CommandRunner {
       reject: false,
       cwd,
       shell: process.platform === 'win32',
-      encoding: 'utf8'
+      encoding: 'utf8',
+      env: opts?.env
     }
 
     const commandStr = `${command} ${args.join(' ')}`
