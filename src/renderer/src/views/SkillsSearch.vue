@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onUnmounted } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { NSpin, NText, NTabs, NTabPane, NButton } from 'naive-ui'
 import SearchOutline from '@vicons/ionicons5/SearchOutline'
 import { useSkillsStore } from '@renderer/stores/skills'
 import { useNetworkStatus } from '@renderer/composables/useNetworkStatus'
+import { useDebounce } from '@renderer/composables/useDebounce'
 import SkillSearchBar from '@renderer/components/skills/SkillSearchBar.vue'
 import SearchResultCard from '@renderer/components/skills/SearchResultCard.vue'
 import SkillInstallDialog from '@renderer/components/skills/SkillInstallDialog.vue'
@@ -32,25 +33,16 @@ watch(
 
 const SUGGESTIONS = ['code-review', 'testing', 'debug', 'docs']
 
-let searchTimer: ReturnType<typeof setTimeout> | null = null
-
-function debouncedSearch(keyword: string): void {
-  if (searchTimer) clearTimeout(searchTimer)
-  if (!keyword.trim()) return
-  searchTimer = setTimeout(() => {
-    hasSearched.value = true
-    skillsStore.search(keyword)
-  }, 300)
-}
+const { run: debouncedSearch } = useDebounce((keyword: string) => {
+  hasSearched.value = true
+  skillsStore.search(keyword)
+}, 300)
 
 function handleSearch(keyword: string): void {
   searchKeyword.value = keyword
+  if (!keyword.trim()) return
   debouncedSearch(keyword)
 }
-
-onUnmounted(() => {
-  if (searchTimer) clearTimeout(searchTimer)
-})
 
 function handleInstall(source: string): void {
   selectedSource.value = source
