@@ -100,9 +100,10 @@ export class LocalSkillInstaller implements ILocalSkillInstaller {
 
     for (const skillDir of skillDirs) {
       const rawName = path.basename(skillDir)
-      const skillName = rawName.replace(/[\\/]/g, '_').replace(/^\.+/, '')
-      const displayName = await this.extractSkillName(path.join(skillDir, 'SKILL.md'), skillName)
-      if (!skillName) {
+      const fallbackName = rawName.replace(/[\\/]/g, '_').replace(/^\.+/, '')
+      const displayName = await this.extractSkillName(path.join(skillDir, 'SKILL.md'), fallbackName)
+      const targetName = displayName.replace(/[\\/]/g, '_').replace(/^\.+/, '')
+      if (!targetName) {
         result.failed.push({ name: rawName || 'unknown', error: 'Invalid skill name' })
         continue
       }
@@ -115,7 +116,7 @@ export class LocalSkillInstaller implements ILocalSkillInstaller {
 
         const agentDir = expandTildePath(agent.globalPath)
         await fs.promises.mkdir(agentDir, { recursive: true })
-        const targetDir = path.join(agentDir, skillName)
+        const targetDir = path.join(agentDir, targetName)
         if (!isPathInside(agentDir, targetDir)) {
           allSucceeded = false
           firstError = 'Invalid target path'

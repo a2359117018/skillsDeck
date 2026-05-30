@@ -86,6 +86,13 @@ class SkillsService {
 
     for (const target of targets) {
       const basePath = expandTildePath(global ? target.globalPath : target.projectPath)
+
+      try {
+        await fs.promises.access(basePath)
+      } catch {
+        continue
+      }
+
       const skillPath = path.join(basePath, name)
 
       if (!isPathInside(basePath, skillPath)) {
@@ -98,6 +105,8 @@ class SkillsService {
         if (stat.isDirectory() || stat.isSymbolicLink()) {
           await fs.promises.rm(skillPath, { recursive: true, force: true })
           removed++
+        } else {
+          errors.push(`${target.agentFlag}: Not a directory or symlink`)
         }
       } catch (err) {
         const code = (err as NodeJS.ErrnoException).code
