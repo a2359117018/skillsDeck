@@ -30,6 +30,7 @@ jobs:
           node-version: 24
 
       - name: Remove local npmrc mirrors
+        shell: bash
         run: rm -f .npmrc
 
       - name: Install dependencies
