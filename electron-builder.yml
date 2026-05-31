@@ -24,9 +24,7 @@ afterPack: build/afterPack.js
 asarUnpack:
   - resources/**
 win:
-  target:
-    - nsis
-    - zip
+  target: nsis
   executableName: skillsDeck
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
@@ -37,6 +35,7 @@ nsis:
   license: LICENSE
   allowToChangeInstallationDirectory: true
 mac:
+  target: dmg
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
@@ -47,10 +46,7 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
-  target:
-    - AppImage
-    - snap
-    - deb
+  target: AppImage
   maintainer: electronjs.org
   category: Utility
 appImage:

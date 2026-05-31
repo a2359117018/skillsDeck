@@ -40,7 +40,6 @@ jobs:
         with:
           files: |
             dist/skilldeck-*-setup.exe
-            dist/skilldeck-*.zip
             dist/skilldeck-*.dmg
             dist/skilldeck-*.AppImage
           fail_on_unmatched_files: false
