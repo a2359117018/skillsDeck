@@ -1,5 +1,5 @@
 appId: com.skilldeck.app
-productName: SkillDeck
+productName: skillsDeck
 directories:
   buildResources: build
 files:
@@ -24,7 +24,7 @@ afterPack: build/afterPack.js
 asarUnpack:
   - resources/**
 win:
-  executableName: SkillDeck
+  executableName: skillsDeck
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -54,7 +54,6 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

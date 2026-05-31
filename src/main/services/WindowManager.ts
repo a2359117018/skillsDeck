@@ -3,6 +3,7 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
 import { getSettings } from './StoreService'
+import { APP_NAME } from '../../shared/constants'
 
 let mainWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
@@ -59,7 +60,7 @@ export function createMainWindow(): BrowserWindow {
       height: 800,
       minWidth: 1200,
       minHeight: 800,
-      title: 'SkillDeck'
+      title: APP_NAME
     })
   )
   loadWindow(mainWindow)

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { NButton, NIcon, NText } from 'naive-ui'
 import RefreshOutline from '@vicons/ionicons5/RefreshOutline'
 import { useNotify } from '../../composables/useNotify'
+import { APP_NAME } from '../../../../shared/constants'
 
 const props = defineProps<{
   appVersion: string
@@ -85,7 +86,7 @@ function handleInstallUpdate(): void {
 
 <template>
   <div class="about-row">
-    <NText class="about-version">SkillDeck v{{ props.appVersion }}</NText>
+    <NText class="about-version">{{ APP_NAME }} v{{ props.appVersion }}</NText>
     <NButton v-if="updateDownloaded" type="primary" round @click="handleInstallUpdate">
       安装更新
     </NButton>

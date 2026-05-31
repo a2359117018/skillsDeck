@@ -1,5 +1,8 @@
 /** 跨层级共享的配置常量 */
 
+/** 应用显示名称 */
+export const APP_NAME = 'skillsDeck'
+
 /** 命令执行 */
 export const COMMAND_TIMEOUT_MS = 60_000
 export const BACKGROUND_TASK_TIMEOUT_MS = 120_000

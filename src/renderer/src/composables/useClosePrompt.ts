@@ -1,5 +1,6 @@
 import { ref, h, onUnmounted } from 'vue'
 import { createDiscreteApi, NCheckbox } from 'naive-ui'
+import { APP_NAME } from '../../../shared/constants'
 
 const { dialog } = createDiscreteApi(['dialog'])
 
@@ -14,7 +15,7 @@ export function useClosePrompt(): void {
   const cleanup = window.api.close.onPrompt(() => {
     rememberChoice.value = false
     dialog.create({
-      title: '关闭 SkillDeck',
+      title: `关闭 ${APP_NAME}`,
       content: () =>
         h('div', { style: 'display: flex; flex-direction: column; gap: 12px' }, [
           h('span', null, '你希望应用如何？'),

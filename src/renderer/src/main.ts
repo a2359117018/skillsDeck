@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import { router } from './router'
+import { APP_NAME } from '../../shared/constants'
 import './assets/main.css'
 
 // 监听系统暗黑模式偏好并同步到 html[data-theme]
@@ -27,6 +28,8 @@ EventTarget.prototype.addEventListener = function (
   }
   origAddEventListener.call(this, type, listener, options)
 }
+
+document.title = APP_NAME
 
 const app = createApp(App)
 app.config.errorHandler = (err, _instance, info) => {

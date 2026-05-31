@@ -1,4 +1,4 @@
-# SkillDeck 架构审查报告
+# skillsDeck 架构审查报告
 
 **审查日期：** 2026-05-27
 **审查范围：** Main Process、Renderer Process、Preload & IPC 通信层

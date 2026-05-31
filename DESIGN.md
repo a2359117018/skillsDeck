@@ -1,5 +1,5 @@
 ---
-name: SkillDeck
+name: skillsDeck
 description: Desktop GUI for managing AI agent skills across 50+ coding agents
 colors:
   color-primary: '#0a0a0a'
@@ -147,7 +147,7 @@ components:
     width: '72px'
 ---
 
-# Design System: SkillDeck
+# Design System: skillsDeck
 
 ## 1. Overview
 

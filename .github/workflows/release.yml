@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            build_cmd: build:mac
+          - os: windows-latest
+            build_cmd: build:win
+          - os: ubuntu-latest
+            build_cmd: build:linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run ${{ matrix.build_cmd }}
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/skilldeck-*-setup.exe
+            dist/skilldeck-*.dmg
+            dist/skilldeck-*.AppImage
+            dist/skilldeck-*.deb
+            dist/skilldeck-*.snap
+            dist/latest*.yml
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

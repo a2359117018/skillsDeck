@@ -1,8 +1,8 @@
-# SkillDeck — 软件架构文档
+# skillsDeck — 软件架构文档
 
 ## 1. 项目概述
 
-**SkillDeck** 是一个基于 Electron 的桌面应用，为 [`npx skills`](https://github.com/vercel-labs/skills) CLI 提供图形化管理界面。它支持对 55+ 种 AI 编码助手（如 Claude Code、Cursor、GitHub Copilot 等）的技能包（skills）进行搜索、安装、更新和卸载。
+**skillsDeck** 是一个基于 Electron 的桌面应用，为 [`npx skills`](https://github.com/vercel-labs/skills) CLI 提供图形化管理界面。它支持对 55+ 种 AI 编码助手（如 Claude Code、Cursor、GitHub Copilot 等）的技能包（skills）进行搜索、安装、更新和卸载。
 
 ### 1.1 技术栈
 
@@ -30,7 +30,7 @@
 ## 2. 目录结构
 
 ```
-SkillDeck
+skillsDeck
 ├── src/
 │   ├── main/                          # Electron 主进程（Node.js）
 │   │   ├── index.ts                   # 应用生命周期、窗口创建、IPC 注册
@@ -110,7 +110,7 @@ SkillDeck
 
 ## 3. 整体架构
 
-SkillDeck 采用 Electron 标准的三进程架构，配合 **electron-vite** 实现主进程与渲染进程的独立构建。
+skillsDeck 采用 Electron 标准的三进程架构，配合 **electron-vite** 实现主进程与渲染进程的独立构建。
 
 ```mermaid
 graph TB
