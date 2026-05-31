@@ -31,6 +31,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Remove local npmrc mirrors
+        run: rm -f .npmrc
+
       - name: Install dependencies
         run: npm install
 
