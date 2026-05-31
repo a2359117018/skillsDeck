@@ -24,6 +24,9 @@ afterPack: build/afterPack.js
 asarUnpack:
   - resources/**
 win:
+  target:
+    - nsis
+    - zip
   executableName: skillsDeck
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
