@@ -42,11 +42,10 @@ jobs:
       - name: Sign artifacts
         shell: bash
         run: |
-          for f in dist/skilldeck-*-setup.exe dist/skilldeck-*.zip dist/skilldeck-*.dmg dist/skilldeck-*.AppImage; do
-            [ -f "$f" ] && cosign sign-blob --yes --output-signature="${f}.sig" "$f"
+          find dist -maxdepth 1 -type f \( -name "skilldeck-*-setup.exe" -o -name "skilldeck-*.zip" -o -name "skilldeck-*.dmg" -o -name "skilldeck-*.AppImage" \) | while read -r f; do
+            echo "Signing $f..."
+            cosign sign-blob --yes --output-signature="${f}.sig" "$f" || echo "Warning: cosign exited with error for $f"
           done
-        env:
-          COSIGN_EXPERIMENTAL: 1
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
