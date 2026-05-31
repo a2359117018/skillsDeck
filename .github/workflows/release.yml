@@ -9,7 +9,6 @@ jobs:
   build:
     permissions:
       contents: write
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -36,17 +35,6 @@ jobs:
       - name: Build
         run: npm run ${{ matrix.build_cmd }}
 
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
-
-      - name: Sign artifacts
-        shell: bash
-        run: |
-          find dist -maxdepth 1 -type f \( -name "skilldeck-*-setup.exe" -o -name "skilldeck-*.zip" -o -name "skilldeck-*.dmg" -o -name "skilldeck-*.AppImage" \) | while read -r f; do
-            echo "Signing $f..."
-            cosign sign-blob --yes --output-signature="${f}.sig" "$f" || echo "Warning: cosign exited with error for $f"
-          done
-
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -55,7 +43,6 @@ jobs:
             dist/skilldeck-*.zip
             dist/skilldeck-*.dmg
             dist/skilldeck-*.AppImage
-            dist/*.sig
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
